@@ -33,6 +33,8 @@ typedef enum
     STRING = TOKEN_STRING_LITERAL,
     IDENTIFIER = TOKEN_IDENTIFIER,
 
+    STRUCTURE,
+    INCLUDE_EXTERNAL,
     DECLARATION,
     ASSIGN,
     CONDITIONAL,
@@ -43,7 +45,7 @@ typedef enum
     RETURN, THROW,
 
     BLOCK, INDEX,
-} node_type_t;
+} ast_node_type_t;
 
 /**
  * Defines a node in the abstract syntax tree.
@@ -52,7 +54,7 @@ typedef enum
  */
 typedef struct ast_node_t
 {
-    node_type_t type;
+    ast_node_type_t type;
     size_t branch_count;
     ast_node_t *branches;
     void *value;
@@ -78,7 +80,88 @@ typedef struct {
     const char *variable_name;
     const char *variable_type;
     ast_node_t *value;
+    bool immutable;
 } ast_declaration_node_t;
+
+/*
+ * Abstract syntax tree node.
+ */
+class ASTNode {
+public:
+    ASTNode *branches;
+    size_t branch_count;
+    ast_node_type_t type;
+    void *value;
+
+    ASTNode(ast_node_type_t type, size_t branch_count, ASTNode *branches, void *value) {
+        this->type = type;
+        this->branch_count = branch_count;
+        this->branches = branches;
+        this->value = value;
+    }
+};
+
+/**
+ * Abstract syntax tree parser.
+ */
+class AST {
+private:
+    token_t **tokens;
+    size_t token_count;
+    size_t current_index;
+
+    token_t* next();
+    token_t* previous();
+    token_t* peak(int offset);
+
+    bool hasNext();
+    bool hasPrevious();
+
+    bool isNext(token_type_t type);
+    bool isNextInRange(token_type_t type, int range);
+
+    bool isValidType(token_type_t type);
+
+    ast_node_t parseExpression();
+    ast_node_t parsePrimary();
+    ast_node_t parseUnary();
+    ast_node_t parseBinary(ast_node_t left, int precedence);
+    ast_node_t parseAssignment();
+    ast_node_t parseDeclaration();
+    ast_node_t parseFunction();
+    ast_node_t parseBlock();
+    ast_node_t parseStatement();
+    ast_node_t parseConditional();
+    ast_node_t parseRepetition();
+    ast_node_t parseComparison();
+
+    void traverseBlocksRecursively();
+
+public:
+    AST(token_t **tokens, size_t token_count);
+    ASTNode parse();
+
+    ASTNode* createConditional(ASTNode condition, ASTNode if_true, ASTNode if_false);
+
+    /**
+     * Create a repetition node.
+     * @param condition The condition to check.
+     * @param body The body of the repetition.
+     * @return
+     */
+    ASTNode* createRepetition(ASTNode condition, ASTNode body);
+
+    /**
+     * Create a comparative node.
+     * @param left The left side of the comparison.
+     * @param right The right side to compare
+     * @param comparison The comparator type.
+     * @return
+     */
+    ASTNode* createComparison(ASTNode *left, ASTNode *right, token_type_t comparison);
+
+    ASTNode* createFunction(ast_function_node_t *node);
+};
 
 void ast_parse(token_t *tokens, size_t token_count, ast_node_t **dst, size_t *dst_size);
 

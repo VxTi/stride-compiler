@@ -4,12 +4,10 @@ fn main(args: ...string): void {
         printf("Hello, World!");
 
         math::cos( 0.5 );
+        var k: int16 = 10;
 
-        var k = +1e-3
+        const var immutable: int64;
 
-        k = 5.2 - -1.e3
-
-        -30.03e+2
 }
 
 namespace math {
@@ -29,21 +27,16 @@ namespace io {
 
     class inner_test {
 
-        let k = 0;
-        let j = 0.03;
-
-        let m = 1e-2;
-
         pub fn test() {
             io::log("test");
         }
 
 
-        pub ext void exit(status: int32);
-        pub ext void printf(args: ...string);
+        pub ext fn exit(status: int32);
+        pub ext fn printf(args: ...string);
 
         while ( true ) {
-            for ( int i = 0; i < 10; i++ ) {
+            for ( var i: int8 = 0; i < 10; i++ ) {
 
                 io::print("test");
 

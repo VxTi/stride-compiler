@@ -35,6 +35,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token("true", TOKEN_KEYWORD_TRUE),
         gen_token("false", TOKEN_KEYWORD_FALSE),
         gen_token("class", TOKEN_KEYWORD_CLASS),
+        gen_token("const", TOKEN_KEYWORD_CONST),
         gen_token("fn", TOKEN_KEYWORD_FN),
         gen_token("this", TOKEN_KEYWORD_THIS),
         gen_token("struct", TOKEN_KEYWORD_STRUCT),

@@ -13,18 +13,18 @@ int main(const int argc, const char **argv)
         std::cerr << "./cstride <input file> <output file>" << std::endl;
         exit(1);
     }
-    std::cout << "Compiling file " << argv[1] << " to path " << argv[2] << std::endl;
+    std::cout << "Compiling file " << argv[ 1 ] << " to path " << argv[ 2 ] << std::endl;
 
-    std::ifstream file_in(argv[1]);
-    std::string content( (std::istreambuf_iterator<char>(file_in) ),
-                         (std::istreambuf_iterator<char>()    ) );
+    std::ifstream file_in(argv[ 1 ]);
+    std::string content(( std::istreambuf_iterator<char>(file_in)),
+                        ( std::istreambuf_iterator<char>()));
 
     size_t size;
     token_t *tokens;
     ast_node_t *nodes;
 
     lex_tokenize(content.c_str(), content.size(), &tokens, &size);
-    std::cout << "Lexical analysis generated " << size << " tokens" << std::endl;
+    std::cout << "Lexical analysis generated " << size << " tokens. \n" << std::endl;
     ast_parse(tokens, size, &nodes, &size);
 
 

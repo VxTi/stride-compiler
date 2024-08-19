@@ -5,41 +5,26 @@
 #include <regex.h>
 #include "lexer.h"
 
-int get_column(const char *source, size_t index)
+void get_cursor_position(const char *source, size_t index, int *line, int *column)
 {
-    if ( index == 0 )
-    {
-        return 0;
-    }
-
-    int column = 0, i;
-
-    for ( i = 0; index - i >= 0; i++ )
-    {
-        if ( source[index - i] == '\n' )
-        {
-            break;
-        }
-        column++;
-    }
-    return column;
-}
-
-int get_line(const char *source, size_t index)
-{
-    int line = 1, i;
-    for ( i = 0; i < index; i++ )
+    int i;
+    for ( i = 0, *line = 1, *column = 0; i < index; i++ )
     {
         if ( source[i] == '\n' )
         {
-            line++;
+            (*line)++;
+            *column = 0;
+        }
+        else
+        {
+            (*column)++;
         }
     }
 }
 
 void lex_tokenize(const char *source, size_t source_size, token_t **dst, size_t *dst_size)
 {
-    int matched, i, j;
+    int matched, i, j, line, col;
 
     size_t size = 0;
 
@@ -58,8 +43,9 @@ void lex_tokenize(const char *source, size_t source_size, token_t **dst, size_t 
                 token_t token;
                 token.type = token_definitions[j].token;
                 token.value = (char *) malloc(match.rm_eo - match.rm_so + 1);
-                token.column = get_column(source, i);
-                token.line = get_line(source, i);
+                get_cursor_position(source, i, &line, &col);
+                token.line = line;
+                token.column = col;
 
                 memcpy((void *) token.value, source + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value)[match.rm_eo - match.rm_so] = '\0';
