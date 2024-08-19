@@ -2,29 +2,7 @@
 // Created by Luca Warmenhoven on 19/08/2024.
 //
 
-#include "ast_parser.h"
-
-ast_node_t gen_node(ast_node_type_t type, size_t branch_count, ast_node_t *branches, void *value)
-{
-    ast_node_t node;
-    node.type = type;
-    node.branch_count = branch_count;
-    node.branches = branches;
-    node.value = value;
-    return node;
-}
-
-/**
- * Checks if there is a next token in the token stream.
- * @param tokens The token stream.
- * @param token_count The number of tokens in the stream.
- * @param index The current index.
- * @return True if there is a next token, false otherwise.
- */
-bool has_next_token(size_t token_count, size_t index)
-{
-    return index + 1 < token_count;
-}
+#include "AST.h"
 
 /**
  * Checks if the next token in the token stream is of a certain type.
@@ -318,7 +296,14 @@ AST::AST(token_t **tokens, size_t token_count)
 }
 
 
-ASTNode* AST::createComparison(ASTNode *left, ASTNode *right, token_type_t comparison)
+/**
+ * Creates a new comparative node.
+ * @param left The left node of the comparison
+ * @param right The right node of the comparison
+ * @param comparison The comparative function.
+ * @return
+ */
+ASTNode *AST::createComparison(ASTNode *left, ASTNode *right, token_type_t comparison)
 {
     switch ( comparison ) {
         case TOKEN_LESS:
@@ -342,7 +327,8 @@ ASTNode* AST::createComparison(ASTNode *left, ASTNode *right, token_type_t compa
  * Checks if there is a next token in the token stream.
  * @return True if there is a next token, false otherwise.
  */
-bool AST::hasNext() {
+bool AST::hasNext() const
+{
     return this->current_index < this->token_count;
 }
 
@@ -350,7 +336,8 @@ bool AST::hasNext() {
  * Whether there is a token before the current one
  * @return
  */
-bool AST::hasPrevious() {
+bool AST::hasPrevious() const
+{
     return this->current_index - 1 >= 0;
 }
 
@@ -359,11 +346,13 @@ bool AST::hasPrevious() {
  * the current index.
  * @return
  */
-token_t* AST::next() {
-    if ( !this->hasNext() )
+token_t *AST::next()
+{
+    if ( !this->hasNext()) {
         return nullptr;
+    }
 
-    return this->tokens[this->current_index + 1];
+    return this->tokens[ this->current_index + 1 ];
 }
 
 /**
@@ -371,11 +360,13 @@ token_t* AST::next() {
  * current index.
  * @return
  */
-token_t *AST::previous() {
-    if (!this->hasPrevious())
+token_t *AST::previous()
+{
+    if ( !this->hasPrevious()) {
         return nullptr;
+    }
 
-    return this->previous();
+    return this->tokens[ this->current_index - 1 ];
 }
 
 /**
@@ -384,12 +375,29 @@ token_t *AST::previous() {
  * @param offset
  * @return
  */
-token_t *AST::peak(int offset) {
-    int index = offset + this->current_index;
-    if ( index < 0 || index >= this->token_count )
+token_t *AST::peak(int offset)
+{
+    long index = offset + this->current_index;
+    if ( index >= this->token_count ) {
         return nullptr;
+    }
 
-    return this->tokens[index];
+    return this->tokens[ index ];
+}
+
+/**
+ * Whether the previous token is of the provided type.
+ * If there are no tokens left, the function will return false.
+ * @param type The type to check for
+ * @return
+ */
+bool AST::isPrevious(token_type_t type)
+{
+    if ( !hasPrevious()) {
+        return false;
+    }
+
+    return this->previous()->type == type;
 }
 
 /**
@@ -398,9 +406,11 @@ token_t *AST::peak(int offset) {
  * @param type The type to check for
  * @return
  */
-bool AST::isNext(token_type_t type) {
-    if ( !hasNext() )
+bool AST::isNext(token_type_t type)
+{
+    if ( !hasNext()) {
         return false;
+    }
 
     return this->next()->type == type;
 }
@@ -414,12 +424,14 @@ bool AST::isNext(token_type_t type) {
  * @param range The offset to provide
  * @return
  */
-bool AST::isNextInRange(token_type_t type, int range ) {
-    if ( range == 0 )
-        return this->tokens[this->token_count]->type == type;
+bool AST::isInRange(token_type_t type, int range)
+{
+    if ( range == 0 ) {
+        return this->tokens[ this->token_count ]->type == type;
+    }
 
-    size_t start = this->current_index;
-    size_t end = this->current_index + range;
+    long start = this->current_index;
+    long end = this->current_index + range;
 
     // Swap range if range is negative
     if ( start > end ) {
@@ -428,9 +440,11 @@ bool AST::isNextInRange(token_type_t type, int range ) {
         end = tmp;
     }
 
+    // Check whether token type is in range
     for ( size_t i = start; i < end; i++ ) {
-        if ( this->tokens[i]->type == type )
+        if ( this->tokens[ i ]->type == type ) {
             return true;
+        }
     }
     return false;
 }
@@ -461,11 +475,34 @@ bool AST::isValidType(token_type_t type)
 }
 
 /**
+ * Exits the program if the next token is not of a certain type.
+ * @param type The type to check for.
+ * @param offset The offset to check.p
+ * @param errorMessage The error message to display.
+ */
+void AST::requiresAt(token_type_t type, int offset, char *errorMessage, ...)
+{
+    if ( ... )
+        va_list args;
+        va_start(args, errorMessage);
+        fprintf(stderr, "Error at line %d column %d -- %s\n", this->tokens[ this->current_index ]->line,
+                this->tokens[ this->current_index ]->column, errorMessage, args);
+        va_end(args);
+        exit(1);
+    }
+}
+
+/**
  * Parses the token stream into an abstract syntax tree.
  * @return An AST Node.
  */
-ASTNode AST::parse() {
+ASTNode AST::parse()
+{
     auto *rootNode = new ASTNode(BLOCK, 1, nullptr, nullptr);
+
+    for ( this->current_index = 0; this->current_index < this->token_count; this->current_index++ ) {
+
+    }
 
     return *rootNode;
 }

@@ -10,6 +10,6 @@ add_executable(stride_language src/main.cpp
         src/analysis/lexer.cpp
         src/analysis/lexer.h
         src/analysis/token.cpp
-        src/parsing/ast_parser.cpp
-        src/parsing/ast_parser.h
+        src/parsing/AST.cpp
+        src/parsing/AST.h
         src/analysis/expression.h)

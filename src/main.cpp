@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "analysis/lexer.h"
-#include "parsing/ast_parser.h"
+#include "parsing/AST.h"
 
 
 int main(const int argc, const char **argv)

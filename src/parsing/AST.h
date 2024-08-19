@@ -2,8 +2,8 @@
 // Created by Luca Warmenhoven on 19/08/2024.
 //
 
-#ifndef STRIDE_LANGUAGE_AST_PARSER_H
-#define STRIDE_LANGUAGE_AST_PARSER_H
+#ifndef STRIDE_LANGUAGE_AST_H
+#define STRIDE_LANGUAGE_AST_H
 
 #include <cstdlib>
 #include "../analysis/token.h"
@@ -114,13 +114,16 @@ private:
     token_t* previous();
     token_t* peak(int offset);
 
-    bool hasNext();
-    bool hasPrevious();
+    bool hasNext() const;
+    bool hasPrevious() const;
 
+    bool isPrevious(token_type_t type);
     bool isNext(token_type_t type);
-    bool isNextInRange(token_type_t type, int range);
+    bool isInRange(token_type_t type, int range);
 
     bool isValidType(token_type_t type);
+
+    void requiresAt(token_type_t type, int offset, char *errorMessage, ...);
 
     ast_node_t parseExpression();
     ast_node_t parsePrimary();
@@ -166,4 +169,4 @@ public:
 void ast_parse(token_t *tokens, size_t token_count, ast_node_t **dst, size_t *dst_size);
 
 
-#endif //STRIDE_LANGUAGE_AST_PARSER_H
+#endif //STRIDE_LANGUAGE_AST_H
