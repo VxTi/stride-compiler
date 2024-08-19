@@ -1,0 +1,57 @@
+
+fn main(args: ...string): void {
+
+        printf("Hello, World!");
+
+        math::cos( 0.5 );
+
+        var k = +1e-3
+
+        k = 5.2 - -1.e3
+
+        -30.03e+2
+}
+
+namespace math {
+
+    pub ext fn cos(radians: float32): float32;
+    pub ext fn sin(radians: float32): float32;
+    pub ext fn tan(radians: float32): float32;
+    pub ext fn acos(radians: float32): float32;
+    pub ext fn asin(radians: float32): float32;
+    pub ext fn atan(radians: float32): float32;
+    pub ext fn atan2(y: float32, x: float32): float32;
+    pub ext fn cosh(radians: float32): float32;
+
+}
+
+namespace io {
+
+    class inner_test {
+
+        let k = 0;
+        let j = 0.03;
+
+        let m = 1e-2;
+
+        pub fn test() {
+            io::log("test");
+        }
+
+
+        pub ext void exit(status: int32);
+        pub ext void printf(args: ...string);
+
+        while ( true ) {
+            for ( int i = 0; i < 10; i++ ) {
+
+                io::print("test");
+
+            }
+        }
+
+    }
+    pub fn test(param: int8): int8 {
+        return param;
+    }
+}
