@@ -19,17 +19,14 @@ int main(const int argc, const char **argv)
     std::string content(( std::istreambuf_iterator<char>(file_in)),
                         ( std::istreambuf_iterator<char>()));
 
+
     size_t size;
     token_t *tokens;
-    ast_node_t *nodes;
 
     lex_tokenize(content.c_str(), content.size(), &tokens, &size);
     std::cout << "Lexical analysis generated " << size << " tokens. \n" << std::endl;
-    ast_parse(tokens, size, &nodes, &size);
-
-
-    free(tokens);
-    free(nodes);
+    auto ast = new AST(*tokens, size);
+    ast->parse();
 
     return 0;
 }

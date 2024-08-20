@@ -4,7 +4,7 @@ fn main(args: ...string): void {
         printf("Hello, World!");
 
         math::cos( 0.5 );
-        var k: int16 = 10;
+        var k: i16 = 10;
 
         const var immutable: int64;
 
@@ -12,14 +12,14 @@ fn main(args: ...string): void {
 
 namespace math {
 
-    pub ext fn cos(radians: float32): float32;
-    pub ext fn sin(radians: float32): float32;
-    pub ext fn tan(radians: float32): float32;
-    pub ext fn acos(radians: float32): float32;
-    pub ext fn asin(radians: float32): float32;
-    pub ext fn atan(radians: float32): float32;
-    pub ext fn atan2(y: float32, x: float32): float32;
-    pub ext fn cosh(radians: float32): float32;
+    pub ext fn cos(radians: f32): f32;
+    pub ext fn sin(radians: f32): f32;
+    pub ext fn tan(radians: f32): f32;
+    pub ext fn acos(radians: f32): f32;
+    pub ext fn asin(radians: f32): f32;
+    pub ext fn atan(radians: f32): f32;
+    pub ext fn atan2(y: f32, x: f32): f32;
+    pub ext fn cosh(radians: f32): f32;
 
 }
 
@@ -36,7 +36,7 @@ namespace io {
         pub ext fn printf(args: ...string);
 
         while ( true ) {
-            for ( var i: int8 = 0; i < 10; i++ ) {
+            for ( var i: i8 = 0; i < 10; i++ ) {
 
                 io::print("test");
 
@@ -44,7 +44,7 @@ namespace io {
         }
 
     }
-    pub fn test(param: int8): int8 {
+    pub fn test(param: i8): i8 {
         return param;
     }
 }
