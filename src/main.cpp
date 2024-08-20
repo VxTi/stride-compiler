@@ -3,7 +3,6 @@
 #include "analysis/lexer.h"
 #include "parsing/AST.h"
 
-
 int main(const int argc, const char **argv)
 {
 
@@ -19,14 +18,14 @@ int main(const int argc, const char **argv)
     std::string content(( std::istreambuf_iterator<char>(file_in)),
                         ( std::istreambuf_iterator<char>()));
 
+    stride::ast::ast_token_set_t token_set;
+    stride::lexer::tokenize(content.c_str(), content.size(), token_set);
+    std::cout << "Lexical analysis generated " << token_set.token_count << " tokens. \n" << std::endl;
 
-    size_t size;
-    token_t *tokens;
-
-    lex_tokenize(content.c_str(), content.size(), &tokens, &size);
-    std::cout << "Lexical analysis generated " << size << " tokens. \n" << std::endl;
-    auto ast = new AST(*tokens, size);
-    ast->parse();
+    for ( size_t i = 0; i < token_set.token_count; i++ ) {
+        std::cout << "Token " << i << " type: " << token_set.tokens[ i ].type << " value: " << token_set.tokens[ i ].value << std::endl;
+    }
+    stride::ast::parse(token_set);
 
     return 0;
 }

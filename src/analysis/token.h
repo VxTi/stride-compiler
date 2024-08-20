@@ -11,7 +11,7 @@
 typedef enum
 {
     TOKEN_COMMENT = 0,
-    TOKEN_COMMENT_MULTILINE,
+    TOKEN_COMMENT_MULTILINE = 0,
 
     TOKEN_LPAREN,
     TOKEN_RPAREN,
@@ -76,6 +76,7 @@ typedef enum
     TOKEN_PRIMITIVE_VOID,
 
     /* Keywords */
+    TOKEN_KEYWORD_AS,
     TOKEN_KEYWORD_FN,
     TOKEN_KEYWORD_VAR,
     TOKEN_KEYWORD_CONST,
@@ -128,7 +129,7 @@ typedef struct
 typedef struct
 {
     token_type_t type;
-    const char *value;
+    char *value;
     int valueLength;
     int line;
     int column;

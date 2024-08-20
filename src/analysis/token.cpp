@@ -25,8 +25,9 @@ token_def_t gen_token(const char *expression, token_type_t token)
  * Token definitions for the lexer.
  */
 std::vector<token_def_t> token_definitions = {
-        gen_token("//.*", TOKEN_COMMENT),
+        gen_token("//[^\n]*", TOKEN_COMMENT),
         gen_token("/\\*.*\\*/", TOKEN_COMMENT_MULTILINE),
+        gen_token("as", TOKEN_KEYWORD_AS),
         gen_token("var", TOKEN_KEYWORD_VAR),
         gen_token("return", TOKEN_KEYWORD_RETURN),
         gen_token("if", TOKEN_KEYWORD_IF),

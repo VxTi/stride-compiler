@@ -5,6 +5,7 @@
 #include <regex.h>
 #include "lexer.h"
 
+/* Returns the cursor position relative to the cursor index */
 void get_cursor_position(const char *source, size_t index, int *line, int *column)
 {
     int i;
@@ -22,16 +23,38 @@ void get_cursor_position(const char *source, size_t index, int *line, int *colum
     }
 }
 
-void lex_tokenize(const char *source, size_t source_size, token_t **dst, size_t *dst_size)
+/**
+ * Tokenize the source code.
+ * This function will tokenize the source code and store the tokens in the destination token set.
+ * Tokenization is based on the grammar defined in token.h. This uses regular expressions
+ * to match for phrases in source code, and generate tokens accordingly.
+ * @param source The source code.
+ * @param source_size The size of the source code.
+ * @param dst The destination token set.
+ */
+void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_set_t &dst)
 {
     int matched, i, j, line, col;
 
-    size_t size = 0;
-
-    auto *buffer = (token_t *) malloc(sizeof(token_t) * source_size);
+    dst.token_count = 0;
+    dst.tokens = (token_t *) malloc(sizeof(token_t) * source_size);
 
     for ( i = 0; i < source_size; )
     {
+        // Skip whitespaces
+        if ( source[i] == ' ' || source[i] == '\n' || source[i] == '\t' )
+        {
+            i++;
+            continue;
+        }
+        // Prevent illegal characters
+        if ( source[i] < 32 || source[i] > 126 )
+        {
+            get_cursor_position(source, i, &line, &col);
+            fprintf(stderr, "Invalid character at line %d, column %d\n", line, col);
+            exit(1);
+        }
+
         for ( j = 0, matched = 0; j < token_definitions.size(); j++ )
         {
             regmatch_t match;
@@ -49,7 +72,7 @@ void lex_tokenize(const char *source, size_t source_size, token_t **dst, size_t 
 
                 memcpy((void *) token.value, source + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value)[match.rm_eo - match.rm_so] = '\0';
-                buffer[size++] = token;
+                dst.tokens[dst.token_count++] = token;
                 i += match.rm_eo - match.rm_so;
                 matched = 1;
                 break;
@@ -57,11 +80,8 @@ void lex_tokenize(const char *source, size_t source_size, token_t **dst, size_t 
         }
         if ( !matched )
         {
+            fprintf(stderr, "Illegal character found");
             i++;
         }
     }
-
-    // Move the buffer to the destination
-    *dst_size = size;
-    *dst = buffer;
 }

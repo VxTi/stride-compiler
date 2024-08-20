@@ -1,50 +1,17 @@
+import "system";
+import "/test/path/to/file" as test;
 
-fn main(args: ...string): void {
-
-        printf("Hello, World!");
-
-        math::cos( 0.5 );
-        var k: i16 = 10;
-
-        const var immutable: int64;
-
+fn do_print(content: string, args: ...unknown) {
+    printf(content, args);
 }
 
-namespace math {
+fn main(): void {
 
-    pub ext fn cos(radians: f32): f32;
-    pub ext fn sin(radians: f32): f32;
-    pub ext fn tan(radians: f32): f32;
-    pub ext fn acos(radians: f32): f32;
-    pub ext fn asin(radians: f32): f32;
-    pub ext fn atan(radians: f32): f32;
-    pub ext fn atan2(y: f32, x: f32): f32;
-    pub ext fn cosh(radians: f32): f32;
+    var a: i32 = 10;
+    var b: f32 = 3.1, c: f32 = 4.1;
 
-}
+    var k: f32 = a = a * b + c;
 
-namespace io {
+    do_print("Calculated value for k: %d", k);
 
-    class inner_test {
-
-        pub fn test() {
-            io::log("test");
-        }
-
-
-        pub ext fn exit(status: int32);
-        pub ext fn printf(args: ...string);
-
-        while ( true ) {
-            for ( var i: i8 = 0; i < 10; i++ ) {
-
-                io::print("test");
-
-            }
-        }
-
-    }
-    pub fn test(param: i8): i8 {
-        return param;
-    }
 }
