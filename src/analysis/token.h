@@ -74,10 +74,11 @@ typedef enum
     TOKEN_PRIMITIVE_STRING,
     TOKEN_PRIMITIVE_CHAR,
     TOKEN_PRIMITIVE_VOID,
+    TOKEN_PRIMITIVE_UNKNOWN,
 
     /* Keywords */
     TOKEN_KEYWORD_AS,
-    TOKEN_KEYWORD_FN,
+    TOKEN_KEYWORD_DECLARE,
     TOKEN_KEYWORD_VAR,
     TOKEN_KEYWORD_CONST,
     TOKEN_KEYWORD_DO,
@@ -97,11 +98,10 @@ typedef enum
     TOKEN_KEYWORD_THIS,
     TOKEN_KEYWORD_STRUCT,
     TOKEN_KEYWORD_IMPORT,
-    TOKEN_KEYWORD_NAMESPACE,
-    TOKEN_KEYWORD_EXT,
+    TOKEN_KEYWORD_SHARED,
+    TOKEN_KEYWORD_EXTERNAL,
     TOKEN_KEYWORD_NULL,
     TOKEN_KEYWORD_OVERRIDE,
-    TOKEN_KEYWORD_PUB,
 
     TOKEN_STRING_LITERAL,
     TOKEN_NUMBER_LITERAL,
@@ -117,13 +117,14 @@ typedef struct
 {
     token_type_t token;
     regex_t regex;
+    bool keyword;
     int column;
     int line;
 } token_def_t;
 
 /**
  * Struct that represents a matched token.
- * This includes the type of the token, the value of the token,
+ * This includes the properties of the token, the value of the token,
  * the length of the value, the line number and the column number.
  */
 typedef struct

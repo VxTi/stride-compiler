@@ -1,17 +1,52 @@
-import "system";
-import "/test/path/to/file" as test;
+const var local_scope: string = “I’m hidden”;
 
-fn do_print(content: string, args: ...unknown) {
-    printf(content, args);
+/*
+ * Functions have return type i32
+ * by default, if no return type
+ * is provided, and return 0 if
+ * no return is stated.
+ *
+ * The data is shared through
+ * either a ‘shared’ keyword,
+ * followed by the module name,
+ * or the ‘shared’ keyword after
+ * abstraction declaration. The
+ * latter is advised against due
+ * to the possibility of naming
+ * collisions.
+ */
+
+shared module::name {
+
+   declare fname(p: param): i32 {
+      return 0;
+   }
+
+   // Function that is declared externally, like in a compiled C file
+   declare external fname();
+
+   // Enumerables
+   enum ename {
+      ENAME =
+   }
 }
 
-fn main(): void {
+// Single function sharing
+declare shared external fname();
 
-    var a: i32 = 10;
-    var b: f32 = 3.1, c: f32 = 4.1;
+// publicly shared class
+shared class cname {
 
-    var k: f32 = a = a * b + c;
+}
 
-    do_print("Calculated value for k: %d", k);
+declare main() {
 
+   // Automatically gets transformed to 3 by syntax analysis
+   var len = [0, 1, 2].length;
+
+   for ( var i = 0; i < 10; i++) {
+
+   }
+
+   return 0;
 }

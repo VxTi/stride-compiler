@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "analysis/lexer.h"
-#include "parsing/AST.h"
+#include "ast/ast.h"
 
 int main(const int argc, const char **argv)
 {
@@ -23,7 +23,7 @@ int main(const int argc, const char **argv)
     std::cout << "Lexical analysis generated " << token_set.token_count << " tokens. \n" << std::endl;
 
     for ( size_t i = 0; i < token_set.token_count; i++ ) {
-        std::cout << "Token " << i << " type: " << token_set.tokens[ i ].type << " value: " << token_set.tokens[ i ].value << std::endl;
+        std::cout << "Token " << i << " properties: " << token_set.tokens[ i ].type << " value: " << token_set.tokens[ i ].value << std::endl;
     }
     stride::ast::parse(token_set);
 

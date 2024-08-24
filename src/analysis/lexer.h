@@ -6,7 +6,7 @@
 #define STRIDE_LANGUAGE_LEXER_H
 
 #include "token.h"
-#include "../parsing/AST.h"
+#include "../ast/ast.h"
 
 using namespace stride::ast;
 
