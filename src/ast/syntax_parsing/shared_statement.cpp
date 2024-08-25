@@ -27,7 +27,7 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
     Node *node = new Node(NODE_TYPE_SHARED, 0);
 
     token_t *next_token;
-    if ((next_token = next(token_set, index)) != nullptr && next_token->type == TOKEN_KEYWORD_CLASS)
+    if ((next_token = peak(token_set, index, 0)) != nullptr && next_token->type == TOKEN_KEYWORD_CLASS)
     {
         node->node_type = NODE_TYPE_CLASS;
         printf("Class definition\n");
@@ -39,7 +39,7 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
     int skipped = parse_identifier(token_set, index, *node);
 
     // Capture the closure after the namespace
-    int closureLength = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
+    int closureLength = parse_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
 
     if ( closureLength == 0 )
     {

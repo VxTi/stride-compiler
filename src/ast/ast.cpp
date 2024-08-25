@@ -77,6 +77,62 @@ void Node::addBranch(Node *node)
 }
 
 /**
+ * Prints the content of this node to the console.
+ */
+void Node::print(Node &reference, int depth)
+{
+    if ( depth > 0 )
+        printf("");
+    printf("%*s", depth * 3, "");
+    switch (reference.node_type) {
+        case NODE_TYPE_IMPORT:
+            printf("IMPORT");
+            break;
+        case NODE_TYPE_IDENTIFIER_REFERENCE:
+            printf("IDENTIFIER REFERENCE");
+            break;
+        case NODE_TYPE_IDENTIFIER:
+            printf("IDENTIFIER (%s)", (char *) reference.value);
+            break;
+        case NODE_TYPE_VARIABLE_TYPE:
+            printf("VARIABLE TYPE (%s)", (char *) reference.value);
+            break;
+        case NODE_TYPE_BLOCK:
+            printf("BLOCK");
+            break;
+        case NODE_TYPE_VALUE:
+            printf("VALUE (%s)", (char *) reference.value);
+            break;
+        case NODE_TYPE_FUNCTION_DEFINITION:
+            printf("FUNCTION DECLARATION");
+            break;
+        case NODE_TYPE_SHARED:
+            printf("SHARED BLOCK");
+            break;
+        case NODE_TYPE_ARRAY:
+            printf("ARRAY");
+            break;
+        case NODE_TYPE_CLASS:
+            printf("CLASS");
+            break;
+        case NODE_TYPE_VARIABLE_DECLARATION:
+            printf("VARIABLE DECLARATION");
+            break;
+        case NODE_TYPE_ENUMERATION:
+            printf("ENUMERABLE DEF");
+            break;
+        default:
+            printf("%d", reference.node_type);
+    }
+    printf("\n");
+
+    for ( int i = 0; i < reference.branch_count; i++ )
+    {
+        print(reference.branches[i], depth + 1);
+    }
+}
+
+/**
  * Whether the provided token properties is an acceptable
  * variable properties. This is only true for primitives and identifiers.
  * @param type The properties to check.
@@ -141,6 +197,16 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
                 cursor += parse_variable_declaration(token_set, cursor, *root);
             }
                 break;
+            /**
+             * Parsing of an enum statement.
+             * An enum statement is denoted in the following format:
+             * enum <name> { KEYWORD: ..., ... }
+             */
+            case TOKEN_KEYWORD_ENUM:
+            {
+                cursor += parse_enumerable(token_set, ++cursor, *root);
+            }
+                break;
 
                 /**
                  * Declares a namespace to group code together.
@@ -166,64 +232,14 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
     }
 }
 
-void print_type(Node &node)
-{
-    switch ( node.node_type )
-    {
-        case NODE_TYPE_BLOCK:
-            printf("BLOCK\n");
-            break;
-        case TOKEN_KEYWORD_CLASS:
-            printf("CLASS\n");
-            break;
-        case NODE_TYPE_FUNCTION_DEFINITION:
-            printf("FUNCTION_DEF\n");
-            break;
-        case NODE_TYPE_VARIABLE_DECLARATION:
-            printf("DECLARATION\n");
-            break;
-        case NODE_TYPE_IDENTIFIER:
-            printf("IDENTIFIER\n");
-            break;
-        case NODE_TYPE_RETURN:
-            printf("RETURN\n");
-            break;
-        case NODE_TYPE_STRUCTURE:
-            printf("STRUCTURE\n");
-            break;
-        default:
-            printf("UNKNOWN\n");
-            break;
-    }
-}
-
-void recursive_print(Node &node, int depth)
-{
-    if ( depth > 0 )
-    { printf("|"); }
-    for ( int i = 0; i < depth; i++ )
-    {
-        printf("_");
-    }
-    print_type(node);
-
-    for ( size_t i = 0; i < node.branch_count; i++ )
-    {
-        recursive_print(node.branches[ i ], depth + 1);
-    }
-
-}
-
 /**
  * Parses the token stream into an abstract syntax tree.
  * @return An AST Node.
  */
 Node *stride::ast::parse(ast_token_set_t &token_set)
 {
-    auto *root = new Node(NODE_TYPE_BLOCK, AST_FLAG_BLOCK_SCOPE_LOCAL);
+    auto *root = new Node(NODE_TYPE_BLOCK, FLAG_SCOPE_LOCAL);
     stride::ast::parsePartial(root, token_set);
-
-    recursive_print(*root, 0);
-
+    Node::print(*root);
     return root;
 }

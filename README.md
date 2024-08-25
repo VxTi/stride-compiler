@@ -14,27 +14,58 @@ to be generated yet.
 A syntax example of the language can be found below:
 
 ```
-import "system";
+const var externally_invisible: string = "I'm hidden";
 
-fn do_print(content: string, args: ...unknown) {
-    system::printf(content, args);
+define test(p1: i8, p2: i32, p3: string[]) {}
+
+/*
+ * Functions have return type i32 and return 0 by default,
+ * if no type or return value is provided.
+ *
+ * Classes, modules or variables are shared through the 'shared' keyword.
+ * This allows objects to be exposed to other modules.
+ * Below is a representation of how one can write code in this language.
+ */
+
+shared module::name {
+
+    // Reference external (C) library function
+    declare shared external shared_function();
+
+    declare f3(const param: i8) {}
+
+    declare fname(varname: i8) {
+        return 0;
+    }
+
+    declare ts(variadic: ...string) {}
+
+    // Enumerables
+    enum ename {
+        MEMBER_0 = 0,
+        MEMBER_1 = 1;
+    }
 }
 
-fn main(): void {
+// Single function sharing
+declare shared external fname();
 
-    var a: i32 = 10;
-    var b: f32 = 3.1, c: f32 = 4.1;
-
-    var k: f32 = a = a * b + c;
-
-    do_print("Calculated value for k: %d", k);
-
+// publicly shared class
+shared class cname {
+    declare main() {
+    
+       // Automatically gets transformed to 3 by syntax analysis
+       var len: i8 = [0, 1, 2].length;
+    
+       for ( var i: i32 = 0; i < 10; i++) {
+    
+       }
+    
+       return 0;
+    }
 }
+
 ```
-
-In this example, we import the system module, define a function that prints
-a formatted string to the console, and then we define the main function that
-declares some variables and calculates a value for `k`.
 
 The code shown above is a simple example of how the language syntax is going to
 be. The language is still in development, so there are no guarantees that the

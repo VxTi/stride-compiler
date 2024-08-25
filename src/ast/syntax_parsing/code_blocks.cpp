@@ -24,8 +24,8 @@ using namespace stride::ast;
  * @param parent_node The parent Node to append the closure to.
  * @return
  */
-int stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index,
-                 Node &parent_node)
+int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index,
+                             Node &parent_node)
 {
     int index, skipped_tokens, branch_depth;
     auto *closureNode = new Node(NODE_TYPE_BLOCK, 0);
@@ -67,4 +67,42 @@ int stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_to
     }
 
     return skipped_tokens;
+}
+
+ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index)
+{
+    int index, skipped_tokens, branch_depth;
+
+    for (
+            index = starting_index, skipped_tokens = 0, branch_depth = 0;
+            index < token_set.token_count;
+            index++, skipped_tokens++
+            )
+    {
+        if ( token_set.tokens[ index ].type == start_token )
+        {
+            branch_depth++;
+        } // If the ending of the closure was found with balancing tokens, we can safely end the loop.
+        else if ( token_set.tokens[ index ].type == end_token && --branch_depth == 0 )
+        {
+            break;
+        }
+        // Make sure there's a balance...
+        if ( branch_depth < 0 )
+        {
+            error("Imbalanced closure at line %d column %d",
+                  token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+        }
+    }
+
+    // If there aren't any tokens skipped, there's no closure to append.
+    if ( skipped_tokens > 0 )
+    {
+        auto *subset = (ast_token_set_t *) malloc(sizeof (ast_token_set_t));
+        subset->tokens = token_set.tokens + starting_index + 1;
+        subset->token_count = skipped_tokens - 1;
+        return subset;
+    }
+
+    return nullptr;
 }

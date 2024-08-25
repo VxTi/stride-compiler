@@ -39,7 +39,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         // The identifier containing the name of the variable
         variable_declaration_node->addBranch(
                 new Node(NODE_TYPE_IDENTIFIER, 0,
-                         token_set.tokens[ index ].value)
+                         token_set.tokens[ index + 1 ].value)
         );
 
         // Node containing the variable type
@@ -49,7 +49,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         );
 
         variable_declaration_node->flags = is_previous(token_set, TOKEN_KEYWORD_CONST, index) ?
-                                           AST_VARIABLE_IMMUTABLE : 0;
+                                           FLAG_VARIABLE_IMMUTABLE : 0;
         token_t *nextToken = peak(token_set, index, 4);
 
         // Ensure there's a next token. We want either a comma or a value assignment
@@ -70,7 +70,6 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
                     break;
                 }
             }
-            printf("Variable declaration with value assignment\n");
             // Parse the expression after the equals sign
             skipped += parse_expression(token_set, index + 4, token_set.token_count, *variable_declaration_node);
             nextToken = peak(token_set, index, skipped);
@@ -80,9 +79,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         {
             hasNext = nextToken->type == TOKEN_COMMA;
         }
-        printf("Variable declaration: %s - type: %s, const: %s, value: %s\n", token_set.tokens[ index + 1 ].value,
-               type_token->value, variable_declaration_node->flags == AST_VARIABLE_IMMUTABLE ? "true" : "false",
-               (char *)variable_declaration_node->branches[ variable_declaration_node->branch_count - 1 ].value);
+        root.addBranch(variable_declaration_node);
 
     } while ( hasNext );
 

@@ -43,24 +43,22 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
         {
             case TOKEN_KEYWORD_SHARED:
             {
-                if ( flags & AST_FLAG_FUNCTION_SHARED)
+                if ( flags & FLAG_OBJECT_SHARED)
                 {
                     error("Double shared keyword at line %d column %d",
                           next->line, next->column);
                 }
-                flags |= AST_FLAG_FUNCTION_SHARED;
-                printf("Function definition with shared keyword\n");
+                flags |= FLAG_OBJECT_SHARED;
             }
                 break;
             case TOKEN_KEYWORD_EXTERNAL:
             {
-                if ( flags & AST_FLAG_FUNCTION_EXTERNAL)
+                if ( flags & FLAG_FUNCTION_EXTERNAL)
                 {
                     error("Double external keyword at line %d column %d",
                           next->line, next->column);
                 }
-                flags |= AST_FLAG_FUNCTION_EXTERNAL;
-                printf("Function definition with external keyword\n");
+                flags |= FLAG_FUNCTION_EXTERNAL;
             }
                 break;
             case TOKEN_IDENTIFIER:
@@ -78,11 +76,6 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     DECLARATION:
     // Create function Node with the function name as value
     auto *functionNode = new Node(NODE_TYPE_FUNCTION_DEFINITION, flags, func_identifier.value);
-
-    printf("Function definition: %s - shared: %s, external: %s\n",
-           func_identifier.value,
-           flags & AST_FLAG_FUNCTION_SHARED ? "true" : "false",
-           flags & AST_FLAG_FUNCTION_EXTERNAL ? "true" : "false");
 
     /*
      * Parse function parameters
@@ -105,7 +98,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
         // we'll move the cursor and declare it immutable.
         if ( token_set.tokens[ index ].type == TOKEN_KEYWORD_CONST )
         {
-            flags |= AST_VARIABLE_IMMUTABLE;
+            flags |= FLAG_VARIABLE_IMMUTABLE;
             index++;
         }
         requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected parameter name, but received %s",
@@ -122,7 +115,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
         {
             paramNode->addBranch(
                     new Node(NODE_TYPE_VARIABLE_TYPE,
-                             paramNode->flags | AST_VARIABLE_ARRAY,
+                             paramNode->flags | FLAG_VARIABLE_ARRAY,
                              token_set.tokens[ index + 3 ].value
                     )
             );
@@ -133,12 +126,14 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             paramNode->addBranch(
                     new Node(NODE_TYPE_VARIABLE_TYPE, 0,
                              token_set.tokens[ index + 2 ].value));
+
             index += 3;
 
-            if ( peak(token_set, index, 3)->type == TOKEN_LBRACKET &&
-                 peak(token_set, index, 4)->type == TOKEN_RBRACKET )
+            if ( peak(token_set, index, 3)->type == TOKEN_LSQUARE_BRACKET &&
+                 peak(token_set, index, 4)->type == TOKEN_RSQUARE_BRACKET )
             {
-                paramNode->flags |= AST_VARIABLE_ARRAY;
+                printf("(array)\n");
+                paramNode->flags |= FLAG_VARIABLE_ARRAY;
                 index += 2;
             }
         }
@@ -148,13 +143,9 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                   token_set.tokens[ index + 2 ].line, token_set.tokens[ index + 2 ].column,
                   token_set.tokens[ index + 2 ].value);
         }
-        printf("Function parameter: %s - type: %s, const: %s\n",
-               token_set.tokens[ index ].value,
-               token_set.tokens[ index + 2 ].value,
-               paramNode->flags == AST_VARIABLE_IMMUTABLE ? "true" : "false");
     }
 
-    if ( flags & AST_FLAG_FUNCTION_EXTERNAL)
+    if ( flags & FLAG_FUNCTION_EXTERNAL)
     {
         requires_token(TOKEN_SEMICOLON, token_set, index,
                        "Expected semicolon after external function declaration, but received %s",

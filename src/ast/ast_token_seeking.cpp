@@ -71,6 +71,18 @@ token_t *stride::ast::peak(ast_token_set_t &token_set, cursor_t index, int offse
     return &token_set.tokens[ i ];
 }
 
+int stride::ast::peakcmp(stride::ast::ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type)
+{
+    token_t *peaked = peak(token_set, index, offset);
+
+    if ( peaked == nullptr )
+    {
+        return 0;
+    }
+
+    return peaked->type == type;
+}
+
 /**
  * Whether the previous token is of the provided properties.
  * If there are no tokens left, the function will return false.
@@ -101,41 +113,4 @@ bool stride::ast::is_next(ast_token_set_t &token_set, token_type_t type, cursor_
     }
 
     return next(token_set, index)->type == type;
-}
-
-/**
- * Checks whether the provided properties is within the provided range,
- * from the current index. If one wants to check if there's a token of a specific properties
- * within the next -3n || +3n of the cursor, this function is yours.
- * If range = 0, the function will check whether the current token is of the provided properties.
- * @param type The properties to check
- * @param range The offset to provide
- * @return
- */
-bool stride::ast::within_range(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range)
-{
-    if ( range == 0 )
-    {
-        return token_set.tokens[ index ].type == type;
-    }
-
-    long start = index;
-    long end = index + range;
-
-
-    // Swap range if range is negative
-    if ( start > end )
-    {
-        std::swap(start, end);
-    }
-
-    // Check whether token properties is in range
-    for ( cursor_t i = start; i < end; i++ )
-    {
-        if ( token_set.tokens[ i ].type == type )
-        {
-            return true;
-        }
-    }
-    return false;
 }

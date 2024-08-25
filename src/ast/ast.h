@@ -24,7 +24,7 @@
 
 #define NODE_TYPE_RETURN               (0x07)
 #define NODE_TYPE_IMPORT               (0x08)
-#define NODE_TYPE_DECLARE              (0x09)
+#define NODE_TYPE_IDENTIFIER_REFERENCE (0x09)
 #define NODE_TYPE_THROW                (0x0A)
 #define NODE_TYPE_ARRAY                (0x0B)
 #define NODE_TYPE_SWITCH               (0x0C)
@@ -42,27 +42,20 @@
 #define NODE_TYPE_BLOCK                (0x18)
 
 #define NODE_TYPE_VARIABLE_TYPE        (0x19)
-#define NODE_TYPE_VARIABLE_VALUE       (0x1A)
+#define NODE_TYPE_VALUE       (0x1A)
 #define NODE_TYPE_EXPRESSION           (0x1B)
 #define NODE_TYPE_SHARED               (0x1C)
-#define NODE_TYPE_IDENTIFIER_REFERENCE (0x1D)
 
-/* 
- * Definitions of function types.
- * These types determine what kind of function will be created.
- * These values can be stored in a single byte, since they're all boolean
- * properties.
- */
-#define AST_FLAG_FUNCTION_SHARED   (0x1)
-#define AST_FLAG_FUNCTION_EXTERNAL (0x2)
-#define AST_FLAG_FUNCTION_SHARED_BP   (1)
-#define AST_FLAG_FUNCTION_EXTERNAL_BP (2)
 
-#define AST_VARIABLE_IMMUTABLE (0x1)
-#define AST_VARIABLE_ARRAY     (0x2)
+#define FLAG_VARIABLE_IMMUTABLE (0x1) // Whether a variable is immutable
+#define FLAG_VARIABLE_ARRAY     (0x2) // Whether a variable is an array
 
-#define AST_FLAG_BLOCK_SCOPE_GLOBAL (0x1)
-#define AST_FLAG_BLOCK_SCOPE_LOCAL  (0x2)
+#define FLAG_OBJECT_SHARED     (0x1) // Whether the function or variable declaration is shared with other modules.
+#define FLAG_FUNCTION_EXTERNAL (0x2)
+
+#define FLAG_SCOPE_GLOBAL (0x1)
+#define FLAG_SCOPE_LOCAL  (0x2)
+#define FLAG_SCOPE_CLASS  (0x3)
 
 /**
  * Definitions of operations.
@@ -127,6 +120,18 @@ namespace stride::ast
 
     token_t *peak(ast_token_set_t &token_set, cursor_t index, int offset);
 
+    /**
+     * Returns an integer representing whether the the token in the set at the given position
+     * is equal to the provided type.
+     * @param token_set The token set to check from
+     * @param index The index to start from
+     * @param offset The offset, relative from the index
+     * @param type The type to check for at the provided location
+     * @return An integer representing whether the token at the given location is equal to the provided type.
+     * Returns 1 for a match, 0 otherwise.
+     */
+    int peakcmp(ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type);
+
     bool has_next(ast_token_set_t &token_set, cursor_t index);
 
     bool has_previous(cursor_t index);
@@ -135,8 +140,6 @@ namespace stride::ast
 
     bool is_next(ast_token_set_t &token_set, token_type_t type, cursor_t index);
 
-    bool within_range(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range);
-    
     /**
      * AST Error handling function definitions
      */
@@ -168,6 +171,11 @@ namespace stride::ast
          * @return
          */
         bool hasEmptyLeaves() const;
+
+        /**
+         * Prints the content of this node to the console.
+         */
+        static void print(Node &reference, int depth = 0);
 
         /**
          * Ensures that the Node has the minimum amount of branches.
@@ -255,7 +263,7 @@ namespace stride::ast
          * keywords, such as `return` or `break`.
          * @param props The properties of the Node.
          */
-        Node(unsigned int node_type, unsigned int flags) : Node(node_type, flags, 0, nullptr, nullptr) {}
+        Node(unsigned int node_type, unsigned int flags = 0) : Node(node_type, flags, 0, nullptr, nullptr) {}
 
         /**
          * Default constructor for Node.
@@ -300,8 +308,21 @@ namespace stride::ast
      * @param parent_node The parent Node to append the captured block to.
      * @return The amount of tokens that were skipped.
      */
-    int capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index,
-                      Node &parent_node);
+    int parse_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index,
+                    Node &parent_node);
+
+    /**
+     * Captures a block and returns the referring token set.
+     * This function is similar to 'parse_block', except this one does not parse the content of the acquired
+     * block. This can be used in other parsing functions to validate whether the content of an abstraction
+     * follows the right format.
+     * @param token_set The token set to analyse
+     * @param start_token The starting token of the block
+     * @param end_token The ending token of the block
+     * @param starting_index The index to start scanning from
+     * @return An object containing the parsed tokens.
+     */
+    ast_token_set_t *capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index);
 
     /**
      * Parses a 'shared' code block, which is similar to declaring a module.
@@ -399,6 +420,18 @@ namespace stride::ast
      * @return How many tokens were skipped.
      */
     int parse_identifier(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     * Parsing of an enumerable. Enumerable statements currently accept integers only.
+     * The parsing function starts after the enum keyword, like all other parsing functions.
+     * It is therefore required to only call this method after an 'enum' keyword has been
+     * found, otherwise the program will exit immediately.
+     * @param token_set The token set to parse the enum from
+     * @param index The index to start parsing from
+     * @param root The root element to add the enumerable object to.
+     * @return How many tokens were skipped.
+     */
+    int parse_enumerable(ast_token_set_t &token_set, cursor_t index, Node &root);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

@@ -21,10 +21,6 @@ int main(const int argc, const char **argv)
     stride::ast::ast_token_set_t token_set;
     stride::lexer::tokenize(content.c_str(), content.size(), token_set);
     std::cout << "Lexical analysis generated " << token_set.token_count << " tokens. \n" << std::endl;
-
-    for ( size_t i = 0; i < token_set.token_count; i++ ) {
-        std::cout << "Token " << i << " properties: " << token_set.tokens[ i ].type << " value: " << token_set.tokens[ i ].value << std::endl;
-    }
     stride::ast::parse(token_set);
 
     return 0;

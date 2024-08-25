@@ -2,6 +2,8 @@ const var local_scope: string = "I'm hidden";
 
 var balls: i32 = 0;
 
+define test(p1: i8, p2: i32, p3: string[]) {}
+
 /*
  * Functions have return type i32
  * by default, if no return type
@@ -51,9 +53,9 @@ shared class cname {
 declare main() {
 
    // Automatically gets transformed to 3 by syntax analysis
-   var len = [0, 1, 2].length;
+   var len: i8 = [0, 1, 2].length;
 
-   for ( var i = 0; i < 10; i++) {
+   for ( var i: i32 = 0; i < 10; i++) {
 
    }
 
