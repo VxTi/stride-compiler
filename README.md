@@ -30,15 +30,15 @@ define test(p1: i8, p2: i32, p3: string[]) {}
 shared module::name {
 
     // Reference external (C) library function
-    declare shared external shared_function();
+    define shared external shared_function();
 
-    declare f3(const param: i8) {}
+    define f3(const param: i8) {}
 
-    declare fname(varname: i8) {
+    define fname(varname: i8) {
         return 0;
     }
 
-    declare ts(variadic: ...string) {}
+    define ts(variadic: ...string) {}
 
     // Enumerables
     enum ename {
@@ -48,11 +48,11 @@ shared module::name {
 }
 
 // Single function sharing
-declare shared external fname();
+define shared external fname();
 
 // publicly shared class
 shared class cname {
-    declare main() {
+    define main() {
     
        // Automatically gets transformed to 3 by syntax analysis
        var len: i8 = [0, 1, 2].length;

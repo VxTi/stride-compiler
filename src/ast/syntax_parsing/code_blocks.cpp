@@ -72,6 +72,7 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
 ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index)
 {
     int index, skipped_tokens, branch_depth;
+    int block_start_index = starting_index;
 
     for (
             index = starting_index, skipped_tokens = 0, branch_depth = 0;
@@ -81,7 +82,10 @@ ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_ty
     {
         if ( token_set.tokens[ index ].type == start_token )
         {
-            branch_depth++;
+            if (branch_depth++ == 0)
+            {
+                block_start_index = index + 1;
+            }
         } // If the ending of the closure was found with balancing tokens, we can safely end the loop.
         else if ( token_set.tokens[ index ].type == end_token && --branch_depth == 0 )
         {
@@ -99,7 +103,7 @@ ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_ty
     if ( skipped_tokens > 0 )
     {
         auto *subset = (ast_token_set_t *) malloc(sizeof (ast_token_set_t));
-        subset->tokens = token_set.tokens + starting_index + 1;
+        subset->tokens = token_set.tokens + block_start_index;
         subset->token_count = skipped_tokens - 1;
         return subset;
     }

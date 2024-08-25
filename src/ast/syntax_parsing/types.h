@@ -23,6 +23,7 @@ inline int type_is_integer(token_type_t type)
         case TOKEN_PRIMITIVE_INT32:
         case TOKEN_PRIMITIVE_INT16:
         case TOKEN_PRIMITIVE_INT8:
+        case TOKEN_NUMBER_INTEGER:
             return true;
         default:
             return false;

@@ -5,9 +5,15 @@
 #include "../ast.h"
 #include "types.h"
 
+#define ENUM_IDENTIFIER_REGEXP ("([A-Z][A-Z0-9_]*)")
+
 using namespace stride::ast;
 
-#define ENUM_IDENTIFIER_REGEXP ("[A-Z]+[a-zA-Z0-9_")
+regex_t enum_identifier_regexp;
+
+void compile_reg();
+
+int compiled = 0;
 
 /**
  * Validates whether the identifier is in the correct format, in MACRO_CASE.
@@ -16,50 +22,57 @@ using namespace stride::ast;
  */
 int validate_enum_identifier(char *identifier)
 {
-    regex_t regex;
     regmatch_t match;
 
-    if ( !regcomp(&regex, ENUM_IDENTIFIER_REGEXP, REG_EXTENDED))
+    if ( !compiled )
     {
-        error("Invalid regular expression received for parsing enum identifiers.");
+        compile_reg();
     }
 
     // Check if the expression matches
-    if ( !regexec(&regex, identifier, 1, &match, 0) || match.rm_so < 0)
+    if ( regexec(&enum_identifier_regexp, identifier, 1, &match, 0) == REG_NOMATCH )
     {
         return 0;
     }
 
-    printf("enum identifier match: %lld, %lld", match.rm_so, match.rm_eo);
-
-    const char *match_str = (char *) malloc(match.rm_eo - match.rm_so + 1);
+    char *match_str = (char *) malloc(match.rm_eo - match.rm_so + 1);
     int status = 0;
-    if ( !match_str )
+    if ( match_str == nullptr )
     {
         error("Failed to allocate memory for enum identifier comparisons.");
         exit(1);
     }
 
     // Copy match to match_str
-    memcpy((void *) identifier, identifier + match.rm_so, match.rm_eo - match.rm_so);
+    memcpy((void *) match_str, identifier + match.rm_so, match.rm_eo - match.rm_so);
 
     // Check if match_str is equal to the identifier,
     // if so, the format is correct.
-    if ( !strcmp(match_str, identifier))
+    if ( !strcmp(identifier, match_str))
     {
         status = 1;
     }
 
-    free((void *) match_str);
+    free(match_str);
 
     return status;
 }
 
+/**
+ * Parses an enum block.
+ * The enum blocks must be in the following format:
+ *
+ * enum <name> {
+ *  VALUE = 1,
+ *  VALUE = 2,
+ *  ...
+ * }
+ */
 int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
     requires_token(TOKEN_IDENTIFIER, token_set, index, "An identifier is required after an enum statement.");
     requires_token(TOKEN_LBRACE, token_set, index + 1, "An opening bracket is required after enum identifier.");
-    ast_token_set_t *block = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index);
+    ast_token_set_t *block = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
     if ( block == nullptr )
     {
         error("Failed to acquire block after enum definition, likely due to a missing closing bracket.");
@@ -71,19 +84,23 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
     Node *enum_block = new Node(NODE_TYPE_ENUMERATION);
 
+    enum_block->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
+
     // If the enum is shared, add the SHARED flag.
-    if ( peakcmp(token_set, index, -2, TOKEN_KEYWORD_SHARED))
+    if ( peakcmp(*block, index, -2, TOKEN_KEYWORD_SHARED))
     {
+        printf("Enum is shared\n");
         enum_block->flags |= FLAG_OBJECT_SHARED;
     }
 
-    int enum_id = 0;
+    int enum_id = 0, i = 0, enum_value, offset;
 
     do
     {
-        current = block->tokens[ index ];
-        requires_token(TOKEN_IDENTIFIER, token_set, index++,
-                       "Enumerable names requires an identifier, but received '%'", (char *) current.value);
+        current = block->tokens[ i ];
+        offset = 2;
+        requires_token(TOKEN_IDENTIFIER, *block, i,
+                       "Enumerable names requires an identifier, but received '%s'", (char *) current.value);
 
         // Check whether all characters are uppercase
         if ( !validate_enum_identifier((char *) current.value))
@@ -97,38 +114,44 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
         auto enum_member = new Node(NODE_TYPE_ENUMERATION_MEMBER);
 
-
         // Add identifier
         enum_member->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, current.value));
 
-        int enum_value = enum_id;
+        enum_value = enum_id;
 
         // Check if a custom value is assigned
-        if ( peakcmp(token_set, index, 1, TOKEN_EQUALS))
+        if ( peakcmp(*block, i, 1, TOKEN_EQUALS))
         {
+
             // Check whether the value after enum entry assignment is an integer
             // This is required.
-            if ( peak(token_set, index, 1) == nullptr
-                 || !type_is_integer(token_set.tokens[ index + 1 ].type))
+            if ( peak(*block, i, 2) == nullptr
+                 || !type_is_integer(block->tokens[ i + 2 ].type))
             {
-                error("Value of enumerable must be an integer, received: %s, at line %d column %d.",
-                      (char *) token_set.tokens[ index + 1 ].value,
-                      token_set.tokens[ index + 1 ].line,
-                      token_set.tokens[ index + 1 ].column
+                error("Value of enumerable must be an integer, received: %s, at line %d column %d (type %d)",
+                      (char *) block->tokens[ i + 2 ].value,
+                      block->tokens[ i + 2 ].line,
+                      block->tokens[ i + 2 ].column,
+                      block->tokens[ i + 2 ].type
                 );
             }
-            enum_value = atoi(token_set.tokens[ index + 1].value);
+            enum_value = atoi(block->tokens[ i + 2 ].value);
+            offset = 4;
         }
-        enum_block->addBranch(new Node(NODE_TYPE_VALUE, 0, (void *) ( enum_value )));
 
+        enum_member->addBranch(new Node(NODE_TYPE_VALUE, 0, new int(enum_value)));
+
+        // There's a next enum member if there's a comma after the previous one.
         enum_id++;
-        has_next_entry = is_next(token_set, TOKEN_COMMA, index);
+        has_next_entry = peakcmp(*block, i + offset, -1, TOKEN_COMMA);
 
-        // If there's no next entry (comma), and there's no next token, stop.
-        if ( !has_next_entry && !peakcmp(token_set, index, 1, TOKEN_SEMICOLON))
+        // If there's no next entry (comma), and there's no semicolon, exit.
+        if ( !has_next_entry && !peakcmp(*block, i + offset, -1, TOKEN_SEMICOLON))
         {
             error("The last enum entry requires a semicolon after definition.");
         }
+
+        i += offset;
 
         // Add enumerable member to enum object.
         enum_block->addBranch(enum_member);
@@ -139,4 +162,19 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
     return block->token_count + 2;
 }
 
+void compile_reg()
+{
 
+    int regex_error = regcomp(&enum_identifier_regexp, ENUM_IDENTIFIER_REGEXP, REG_EXTENDED);
+
+    if ( regex_error )
+    {
+        char buffer[128];
+        regerror(regex_error, &enum_identifier_regexp, buffer, 128);
+        fprintf(stderr,
+                "\nAn error occurred whilst attempting to compile regular expression for token identifier validation:\n%s\n\n",
+                buffer);
+        exit(1);
+    }
+    compiled = 1;
+}

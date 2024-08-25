@@ -20,37 +20,54 @@ define test(p1: i8, p2: i32, p3: string[]) {}
  * collisions.
  */
 
-shared module::name {
+shared modulename {
 
     // Reference external (C) library function
-    declare shared external f2();
+    define shared external f2();
 
-    declare f3(const param: i8) {}
+    define f3(const param: i8) {}
 
-    declare fname(varname: i8) {
+    define fname(varname: i8) {
+
+        var f: unknown = f3(1);
         return 0;
     }
 
-    declare ts(p: ...string) {}
+    define ts(p: ...string) {}
 
-    // Function that is declared externally, like in a compiled C file
-    declare external fname();
+    // Function that is defined externally, like in a compiled C file
+    define external fname();
+    enum t { G; }
+    enum gg {
+        NAME,
+        SECOND,
+         THIRD;
+    }
 
     // Enumerables
     enum ename {
-        ENAME =
+        ENAME = 1,
+        ENAME2 = 2,
+        ENAME3 = 3;
     }
 }
+shared enum K { G; }
 
 // Single function sharing
-declare shared external fname();
+define shared external fname();
 
 // publicly shared class
 shared class cname {
+    define constructor() {
+        for (var i: i8 = 0; i < 10; i++) {
 
+            io::print("Hello, World!");
+
+        }
+    }
 }
 
-declare main() {
+define main() {
 
    // Automatically gets transformed to 3 by syntax analysis
    var len: i8 = [0, 1, 2].length;

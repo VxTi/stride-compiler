@@ -11,13 +11,13 @@ using namespace stride::ast;
  * Parses a function declaration.
  * This function will parse a function declaration in the following format:
  * ```
- * declare (external?) (shared?) name(param1: type1, param2: type2) -> return_type {
+ * define (external?) (shared?) name(param1: type1, param2: type2) -> return_type {
  *     // code
  * }
  * ```
  * The function has to be called AFTER the declaration keyword, e.g. the input stream tokens
  * must look like:
- * declare < 'keyword keyword identifier(...)'
+ * define < 'keyword keyword identifier(...)'
  * @param token_set The token set to parse the function declaration from.
  * @param index The index of the token set to start parsing from.
  * @param root The root Node to append the function declaration to.
@@ -75,7 +75,8 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
     DECLARATION:
     // Create function Node with the function name as value
-    auto *functionNode = new Node(NODE_TYPE_FUNCTION_DEFINITION, flags, func_identifier.value);
+    auto *functionNode = new Node(NODE_TYPE_FUNCTION_DEFINITION, flags);
+    functionNode->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, func_identifier.value));
 
     /*
      * Parse function parameters
@@ -101,9 +102,9 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             flags |= FLAG_VARIABLE_IMMUTABLE;
             index++;
         }
-        requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected parameter name, but received %s",
+        requires_token(TOKEN_IDENTIFIER, token_set, index, "Function definition: Expected parameter name, but received %s",
                        token_set.tokens[ index ].value);
-        requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after parameter name, but received %s",
+        requires_token(TOKEN_COLON, token_set, index + 1, "Function definition: Expected colon after parameter name, but received %s",
                        token_set.tokens[ index ].value);
 
         // Function parameter Node, resides in a Node 'FUNCTION PARAMETERS'
@@ -143,6 +144,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                   token_set.tokens[ index + 2 ].line, token_set.tokens[ index + 2 ].column,
                   token_set.tokens[ index + 2 ].value);
         }
+        functionNode->addBranch(paramNode);
     }
 
     if ( flags & FLAG_FUNCTION_EXTERNAL)

@@ -81,12 +81,14 @@ void Node::addBranch(Node *node)
  */
 void Node::print(Node &reference, int depth)
 {
-    if ( depth > 0 )
-        printf("");
-    printf("%*s", depth * 3, "");
+    printf("%*s", depth * 2, "");
+    if (depth > 0) printf("↳ ");
     switch (reference.node_type) {
         case NODE_TYPE_IMPORT:
             printf("IMPORT");
+            break;
+        case NODE_TYPE_FUNCTION_PARAMETERS:
+            printf("FUNCTION PARAMETERS");
             break;
         case NODE_TYPE_IDENTIFIER_REFERENCE:
             printf("IDENTIFIER REFERENCE");
@@ -94,8 +96,15 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_IDENTIFIER:
             printf("IDENTIFIER (%s)", (char *) reference.value);
             break;
+        case NODE_TYPE_ENUMERATION_MEMBER:
+            printf("ENUMERATION MEMBER");
+            break;
         case NODE_TYPE_VARIABLE_TYPE:
             printf("VARIABLE TYPE (%s)", (char *) reference.value);
+            if (reference.flags & FLAG_VARIABLE_ARRAY)
+            {
+                printf(" (array)");
+            }
             break;
         case NODE_TYPE_BLOCK:
             printf("BLOCK");
@@ -105,6 +114,10 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_FUNCTION_DEFINITION:
             printf("FUNCTION DECLARATION");
+            if (reference.flags & FLAG_FUNCTION_EXTERNAL)
+            {
+                printf(" (external)");
+            }
             break;
         case NODE_TYPE_SHARED:
             printf("SHARED BLOCK");
@@ -123,6 +136,10 @@ void Node::print(Node &reference, int depth)
             break;
         default:
             printf("%d", reference.node_type);
+    }
+    if (reference.flags & FLAG_OBJECT_SHARED)
+    {
+        printf(" (shared)");
     }
     printf("\n");
 
@@ -152,6 +169,7 @@ bool stride::ast::is_valid_var_type(token_type_t type)
         case TOKEN_PRIMITIVE_BOOL:
         case TOKEN_PRIMITIVE_STRING:
         case TOKEN_PRIMITIVE_CHAR:
+        case TOKEN_PRIMITIVE_UNKNOWN:
             return true;
         default:
             return false;
@@ -176,7 +194,7 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
         {
 
             // Function definitions must follow the format 'fn <name>( ... )' where ... = param: (...)properties([]), ...
-            case TOKEN_KEYWORD_DECLARE:
+            case TOKEN_KEYWORD_DEFINE:
             {
                 cursor += parse_function_declaration(token_set, ++cursor, *root);
             }

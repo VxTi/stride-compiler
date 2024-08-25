@@ -31,7 +31,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
      * No need to check for any other cases.
      */
     if ( token_count == 1 &&
-         token_set.tokens[ cursor ].type == TOKEN_NUMBER_LITERAL ||
+         token_set.tokens[ cursor ].type == TOKEN_NUMBER_INTEGER ||
          token_set.tokens[ cursor ].type == TOKEN_STRING_LITERAL ||
          token_set.tokens[ cursor ].type == TOKEN_IDENTIFIER )
     {
