@@ -23,23 +23,29 @@ using namespace stride::ast;
  */
 int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
-    requiresToken(TOKEN_IDENTIFIER, token_set, index, "Expected namespace name");
 
-    auto *namespaceNode = new Node(AST_NODE_OP_SHARED, 0);
+    Node *node = new Node(NODE_TYPE_SHARED, 0);
 
-    // Append an identifier as first child of namespace
-    namespaceNode->addBranch(
-            new Node(AST_NODE_OP_IDENTIFIER, 0, token_set.tokens[ index + 1 ].value)
-    );
+    token_t *next_token;
+    if ((next_token = next(token_set, index)) != nullptr && next_token->type == TOKEN_KEYWORD_CLASS)
+    {
+        node->node_type = NODE_TYPE_CLASS;
+        printf("Class definition\n");
+        index++;
+    }
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier, but received '%s.'", token_set.tokens[index].value);
+
+
+    int skipped = parse_identifier(token_set, index, *node);
 
     // Capture the closure after the namespace
-    int closureLength = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index, *namespaceNode);
+    int closureLength = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
 
     if ( closureLength == 0 )
     {
         error("Expected block after namespace declaration");
     }
 
-    root.addBranch(namespaceNode);
-    return closureLength + 1;
+    root.addBranch(node);
+    return closureLength + skipped;
 }

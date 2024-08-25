@@ -12,39 +12,40 @@
 
 /* 
  * Definitions of Node types.
- * These types determine what kind of operation will be performed.
+ * These types determine what kind of node_type will be performed.
  */
-#define AST_NODE_OP_OPERATION            (0x01)
-#define AST_NODE_OP_CONDITIONAL          (0x02)
-#define AST_NODE_OP_REPETITION           (0x03)
+#define NODE_TYPE_OPERATION            (0x01)
+#define NODE_TYPE_CONDITIONAL          (0x02)
+#define NODE_TYPE_REPETITION           (0x03)
 
-#define AST_NODE_OP_VARIABLE_DECLARATION (0x04)
-#define AST_NODE_OP_VARIABLE_ASSIGNMENT  (0x05)
-#define AST_NODE_OP_VARIABLE_REFERENCE   (0x06)
+#define NODE_TYPE_VARIABLE_DECLARATION (0x04)
+#define NODE_TYPE_VARIABLE_ASSIGNMENT  (0x05)
+#define NODE_TYPE_VARIABLE_REFERENCE   (0x06)
 
-#define AST_NODE_OP_RETURN               (0x07)
-#define AST_NODE_OP_IMPORT               (0x08)
-#define AST_NODE_OP_DECLARE              (0x09)
-#define AST_NODE_OP_THROW                (0x0A)
-#define AST_NODE_OP_ARRAY                (0x0B)
-#define AST_NODE_OP_SWITCH               (0x0C)
-#define AST_NODE_OP_CASE                 (0x0D)
-#define AST_NODE_OP_DEFAULT              (0x0E)
-#define AST_NODE_OP_BREAK                (0x0F)
-#define AST_NODE_OP_FUNCTION_DEFINITION  (0x10)
-#define AST_NODE_OP_FUNCTION_CALL        (0x11)
-#define AST_NODE_OP_FUNCTION_PARAMETERS  (0x12)
-#define AST_NODE_OP_IDENTIFIER           (0x13)
-#define AST_NODE_OP_STRUCTURE            (0x14)
-#define AST_NODE_OP_ENUMERATION          (0x15)
-#define AST_NODE_OP_ENUMERATION_MEMBER   (0x16)
-#define AST_NODE_OP_CLASS                (0x17)
-#define AST_NODE_OP_BLOCK                (0x18)
+#define NODE_TYPE_RETURN               (0x07)
+#define NODE_TYPE_IMPORT               (0x08)
+#define NODE_TYPE_DECLARE              (0x09)
+#define NODE_TYPE_THROW                (0x0A)
+#define NODE_TYPE_ARRAY                (0x0B)
+#define NODE_TYPE_SWITCH               (0x0C)
+#define NODE_TYPE_CASE                 (0x0D)
+#define NODE_TYPE_DEFAULT              (0x0E)
+#define NODE_TYPE_BREAK                (0x0F)
+#define NODE_TYPE_FUNCTION_DEFINITION  (0x10)
+#define NODE_TYPE_FUNCTION_CALL        (0x11)
+#define NODE_TYPE_FUNCTION_PARAMETERS  (0x12)
+#define NODE_TYPE_IDENTIFIER           (0x13)
+#define NODE_TYPE_STRUCTURE            (0x14)
+#define NODE_TYPE_ENUMERATION          (0x15)
+#define NODE_TYPE_ENUMERATION_MEMBER   (0x16)
+#define NODE_TYPE_CLASS                (0x17)
+#define NODE_TYPE_BLOCK                (0x18)
 
-#define AST_NODE_OP_VARIABLE_TYPE        (0x19)
-#define AST_NODE_OP_VARIABLE_VALUE       (0x1A)
-#define AST_NODE_OP_EXPRESSION           (0x1B)
-#define AST_NODE_OP_SHARED               (0x1C)
+#define NODE_TYPE_VARIABLE_TYPE        (0x19)
+#define NODE_TYPE_VARIABLE_VALUE       (0x1A)
+#define NODE_TYPE_EXPRESSION           (0x1B)
+#define NODE_TYPE_SHARED               (0x1C)
+#define NODE_TYPE_IDENTIFIER_REFERENCE (0x1D)
 
 /* 
  * Definitions of function types.
@@ -79,7 +80,7 @@
 
 /**
  * Definitions of conditionals.
- * Similar to operation types, these are also used as value in
+ * Similar to node_type types, these are also used as value in
  * structure `ast_node_props_t`.
  */
 #define AST_CONDITIONAL_LESS_THAN          (0x1)
@@ -126,27 +127,25 @@ namespace stride::ast
 
     token_t *peak(ast_token_set_t &token_set, cursor_t index, int offset);
 
-    bool hasNext(ast_token_set_t &token_set, cursor_t index);
+    bool has_next(ast_token_set_t &token_set, cursor_t index);
 
-    bool hasPrevious(cursor_t index);
+    bool has_previous(cursor_t index);
 
-    bool isPrevious(ast_token_set_t &token_set, token_type_t type, cursor_t index);
+    bool is_previous(ast_token_set_t &token_set, token_type_t type, cursor_t index);
 
-    bool isNext(ast_token_set_t &token_set, token_type_t type, cursor_t index);
+    bool is_next(ast_token_set_t &token_set, token_type_t type, cursor_t index);
 
-    bool isInRange(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range);
-
-    int indexOfToken(ast_token_set_t &token_set, token_type_t type, int token_count, int from_index_inclusive);
-
+    bool within_range(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range);
+    
     /**
      * AST Error handling function definitions
      */
 
     void error(const char *errorMessage, ...);
 
-    void requiresToken(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message, ...);
+    void requires_token(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message, ...);
 
-    bool isValidType(token_type_t type);
+    bool is_valid_var_type(token_type_t type);
 
 /*
  * Abstract syntax tree Node.
@@ -196,6 +195,10 @@ namespace stride::ast
          * This is an array of AST nodes, which are the children of this Node.
          */
         Node *branches;
+        
+        /**
+         * The amount of branches this Node has.
+         */
         size_t branch_count;
 
         /**
@@ -206,10 +209,10 @@ namespace stride::ast
         unsigned int flags;
 
         /**
-         * The operation of the Node.
-         * This is used to store the operation of the Node, such as addition, subtraction, etc.
+         * The node_type of the Node.
+         * This is used to store the node_type of the Node, such as addition, subtraction, etc.
          */
-        unsigned int operation;
+        unsigned int node_type;
 
         void addBranch(Node *node);
 
@@ -243,7 +246,7 @@ namespace stride::ast
          * @param props The properties of the Node.
          * @param value The value of the Node.
          */
-        Node(unsigned int operation, unsigned int flags, void *value) : Node(operation, flags, 0, nullptr, value) {}
+        Node(unsigned int node_type, unsigned int flags, void *value) : Node(node_type, flags, 0, nullptr, value) {}
 
         /**
          * Constructor for an Node without a value.
@@ -252,7 +255,7 @@ namespace stride::ast
          * keywords, such as `return` or `break`.
          * @param props The properties of the Node.
          */
-        Node(unsigned int operation, unsigned int flags) : Node(operation, flags, 0, nullptr, nullptr) {}
+        Node(unsigned int node_type, unsigned int flags) : Node(node_type, flags, 0, nullptr, nullptr) {}
 
         /**
          * Default constructor for Node.
@@ -262,10 +265,10 @@ namespace stride::ast
          * @param branches The branches of this Node.
          * @param value The value of this Node.
          */
-        Node(unsigned int operation, unsigned int flags, size_t branch_count, Node *branches, void *value)
+        Node(unsigned int node_type, unsigned int flags, size_t branch_count, Node *branches, void *value)
         {
             this->flags = flags;
-            this->operation = operation;
+            this->node_type = node_type;
             this->branch_count = branch_count;
             this->value = value;
             this->branch_count_upper_limit = 4;
@@ -385,6 +388,17 @@ namespace stride::ast
      * @return How many tokens were skipped.
      */
     int parse_expression(ast_token_set_t &token_set, size_t cursor, size_t token_count, Node &parent_node);
+
+    /**
+     * Parses an identifier into either a single or multiple nodes.
+     * This parsing depends on whether the identifier refers to a module,
+     * or a locally declared variable/function.
+     * @param token_set The token set to parse the identifier from.
+     * @param index The index of the token set to start parsing from.in
+     * @param root The root Node to append the identifier to.
+     * @return How many tokens were skipped.
+     */
+    int parse_identifier(ast_token_set_t &token_set, cursor_t index, Node &root);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

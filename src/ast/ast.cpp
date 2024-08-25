@@ -82,7 +82,7 @@ void Node::addBranch(Node *node)
  * @param type The properties to check.
  * @return
  */
-bool stride::ast::isValidType(token_type_t type)
+bool stride::ast::is_valid_var_type(token_type_t type)
 {
     switch ( type )
     {
@@ -114,8 +114,6 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
 {
     cursor_t cursor;
 
-    printf("Parsing partial %zu\n", token_set.token_count);
-
     for ( cursor = 0; cursor < token_set.token_count; )
     {
         switch ( token_set.tokens[ cursor ].type )
@@ -140,7 +138,7 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
                  */
             case TOKEN_KEYWORD_VAR:
             {
-                cursor += parse_variable_declaration(token_set, ++cursor, *root);
+                cursor += parse_variable_declaration(token_set, cursor, *root);
             }
                 break;
 
@@ -149,6 +147,7 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
                  */
             case TOKEN_KEYWORD_SHARED:
             {
+
                 cursor += parse_shared_statement(token_set, ++cursor, *root);
             }
                 break;
@@ -169,27 +168,27 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
 
 void print_type(Node &node)
 {
-    switch ( node.operation )
+    switch ( node.node_type )
     {
-        case AST_NODE_OP_BLOCK:
+        case NODE_TYPE_BLOCK:
             printf("BLOCK\n");
             break;
         case TOKEN_KEYWORD_CLASS:
             printf("CLASS\n");
             break;
-        case AST_NODE_OP_FUNCTION_DEFINITION:
+        case NODE_TYPE_FUNCTION_DEFINITION:
             printf("FUNCTION_DEF\n");
             break;
-        case AST_NODE_OP_VARIABLE_DECLARATION:
+        case NODE_TYPE_VARIABLE_DECLARATION:
             printf("DECLARATION\n");
             break;
-        case AST_NODE_OP_IDENTIFIER:
+        case NODE_TYPE_IDENTIFIER:
             printf("IDENTIFIER\n");
             break;
-        case AST_NODE_OP_RETURN:
+        case NODE_TYPE_RETURN:
             printf("RETURN\n");
             break;
-        case AST_NODE_OP_STRUCTURE:
+        case NODE_TYPE_STRUCTURE:
             printf("STRUCTURE\n");
             break;
         default:
@@ -221,11 +220,7 @@ void recursive_print(Node &node, int depth)
  */
 Node *stride::ast::parse(ast_token_set_t &token_set)
 {
-    for ( size_t i = 0; i < token_set.token_count; i++ )
-    {
-        printf("%s\n", token_set.tokens[ i ].value);
-    }
-    auto *root = new Node(AST_NODE_OP_BLOCK, AST_FLAG_BLOCK_SCOPE_LOCAL);
+    auto *root = new Node(NODE_TYPE_BLOCK, AST_FLAG_BLOCK_SCOPE_LOCAL);
     stride::ast::parsePartial(root, token_set);
 
     recursive_print(*root, 0);

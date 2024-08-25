@@ -27,7 +27,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     int flags = 0;
     int start_index = index;
 
-    if ( !hasNext(token_set, index))
+    if ( !has_next(token_set, index))
     {
         error("Expected function name or identifiers, but received none.");
     }
@@ -66,7 +66,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             case TOKEN_IDENTIFIER:
             {
                 func_identifier = *next;
-                requiresToken(TOKEN_LPAREN, token_set, ++index, "Expected opening parenthesis");
+                requires_token(TOKEN_LPAREN, token_set, ++index, "Expected opening parenthesis");
                 goto DECLARATION; // Only way to get out of this mess
             }
             default:
@@ -77,20 +77,28 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
     DECLARATION:
     // Create function Node with the function name as value
-    auto *functionNode = new Node(AST_NODE_OP_FUNCTION_DEFINITION, flags, func_identifier.value);
+    auto *functionNode = new Node(NODE_TYPE_FUNCTION_DEFINITION, flags, func_identifier.value);
 
+    printf("Function definition: %s - shared: %s, external: %s\n",
+           func_identifier.value,
+           flags & AST_FLAG_FUNCTION_SHARED ? "true" : "false",
+           flags & AST_FLAG_FUNCTION_EXTERNAL ? "true" : "false");
 
-    // Move forward until we find a closing parenthesis
-    for ( ++index; index < token_set.token_count; index++ )
+    /*
+     * Parse function parameters
+     * This loop checks for each parameter and whether its types are correctly defined.
+     */
+    for ( ++index; index < token_set.token_count; )
     {
         // End if token is RPAREN
         if ( token_set.tokens[ index ].type == TOKEN_RPAREN )
         {
+            index++;
             break;
         }
 
         // Create function parameter Node
-        auto *paramNode = new Node(AST_NODE_OP_FUNCTION_PARAMETERS, 0);
+        auto *paramNode = new Node(NODE_TYPE_FUNCTION_PARAMETERS, 0);
         int flags = 0;
 
         // If there's a 'const' keyword before the parameter declaration,
@@ -100,32 +108,38 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             flags |= AST_VARIABLE_IMMUTABLE;
             index++;
         }
-        validate_variable_declaration(token_set, index);
+        requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected parameter name, but received %s",
+                       token_set.tokens[ index ].value);
+        requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after parameter name, but received %s",
+                       token_set.tokens[ index ].value);
 
         // Function parameter Node, resides in a Node 'FUNCTION PARAMETERS'
-        paramNode->addBranch(new Node(AST_NODE_OP_IDENTIFIER, flags, token_set.tokens[ index ].value));
+        paramNode->addBranch(new Node(NODE_TYPE_IDENTIFIER, flags, token_set.tokens[ index ].value));
 
         // Check if there's a variadic array declared (...)
         if ( peak(token_set, index, 2)->type == TOKEN_THREE_DOTS &&
-             isValidType(peak(token_set, index, 3)->type))
+                is_valid_var_type(peak(token_set, index, 3)->type))
         {
             paramNode->addBranch(
-                    new Node(AST_NODE_OP_VARIABLE_TYPE,
+                    new Node(NODE_TYPE_VARIABLE_TYPE,
                              paramNode->flags | AST_VARIABLE_ARRAY,
                              token_set.tokens[ index + 3 ].value
                     )
             );
+            index += 4;
         } // Check if type is right
-        else if ( isValidType(peak(token_set, index, 2)->type))
+        else if ( is_valid_var_type(peak(token_set, index, 2)->type))
         {
             paramNode->addBranch(
-                    new Node(AST_NODE_OP_VARIABLE_TYPE, 0,
+                    new Node(NODE_TYPE_VARIABLE_TYPE, 0,
                              token_set.tokens[ index + 2 ].value));
+            index += 3;
 
             if ( peak(token_set, index, 3)->type == TOKEN_LBRACKET &&
                  peak(token_set, index, 4)->type == TOKEN_RBRACKET )
             {
                 paramNode->flags |= AST_VARIABLE_ARRAY;
+                index += 2;
             }
         }
         else
@@ -134,10 +148,24 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                   token_set.tokens[ index + 2 ].line, token_set.tokens[ index + 2 ].column,
                   token_set.tokens[ index + 2 ].value);
         }
+        printf("Function parameter: %s - type: %s, const: %s\n",
+               token_set.tokens[ index ].value,
+               token_set.tokens[ index + 2 ].value,
+               paramNode->flags == AST_VARIABLE_IMMUTABLE ? "true" : "false");
     }
 
-    requiresToken(TOKEN_LBRACKET, token_set, index, "Expected opening bracket after function parameters");
-
+    if ( flags & AST_FLAG_FUNCTION_EXTERNAL)
+    {
+        requires_token(TOKEN_SEMICOLON, token_set, index,
+                       "Expected semicolon after external function declaration, but received %s",
+                       token_set.tokens[ index ].value);
+    }
+    else
+    {
+        requires_token(TOKEN_LBRACE, token_set, index,
+                       "Expected opening bracket after function parameters, but received %s",
+                       token_set.tokens[ index ].value);
+    }
     root.addBranch(functionNode);
 
     return (int) ( index - start_index + 1 );

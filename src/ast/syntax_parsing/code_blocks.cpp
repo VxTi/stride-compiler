@@ -28,7 +28,7 @@ int stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_to
                  Node &parent_node)
 {
     int index, skipped_tokens, branch_depth;
-    auto *closureNode = new Node(AST_NODE_OP_BLOCK, 0);
+    auto *closureNode = new Node(NODE_TYPE_BLOCK, 0);
 
     for (
             index = starting_index, skipped_tokens = 0, branch_depth = 0;

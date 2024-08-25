@@ -59,6 +59,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token_kw("const", TOKEN_KEYWORD_CONST),
         gen_token_kw("declare", TOKEN_KEYWORD_DECLARE),
         gen_token_kw("this", TOKEN_KEYWORD_THIS),
+        gen_token_kw("enum", TOKEN_KEYWORD_ENUM),
         gen_token_kw("struct", TOKEN_KEYWORD_STRUCT),
         gen_token_kw("import", TOKEN_KEYWORD_IMPORT),
         gen_token_kw("external", TOKEN_KEYWORD_EXTERNAL),
@@ -132,5 +133,6 @@ std::vector<token_def_t> token_definitions = {
         gen_token(">", TOKEN_GREATER),
         gen_token("<", TOKEN_LESS),
         gen_token("!=", TOKEN_NOT_EQUALS),
-        gen_token("=", TOKEN_EQUALS)
+        gen_token("=", TOKEN_EQUALS),
+        gen_token("\\.", TOKEN_DOT)
 };

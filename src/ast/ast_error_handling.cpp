@@ -21,13 +21,35 @@ void stride::ast::error(const char *errorMessage, ...)
     exit(1);
 }
 
+std::string capture_line(stride::ast::ast_token_set_t &token_set, int index) {
+    std::string line;
+    // Find first token in line, up until provided token index
+    int line_number = token_set.tokens[index].line;
+
+    for (int i = index; i >= 0; i--) {
+        if (token_set.tokens[i].line != line_number) {
+            break;
+        }
+        line = std::string(token_set.tokens[i].value) + " " + line;
+    }
+    for (int i = index + 1; i < token_set.token_count; i++) {
+        if (token_set.tokens[i].line != line_number) {
+            break;
+        }
+        line = line + " " + token_set.tokens[i].value;
+    }
+    return line;
+}
+
 /**
  * Exits the program if the next token is not of the provided properties.
  * @param type The properties to check for.
  * @param offset The offset to check.p
  * @param errorMessage The error message to display.
  */
-void stride::ast::requiresToken(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message, ...)
+void
+stride::ast::requires_token(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message,
+                           ...)
 {
     if ( index >= token_set.token_count || token_set.tokens[ index ].type != type )
     {
@@ -45,8 +67,10 @@ void stride::ast::requiresToken(token_type_t type, ast_token_set_t &token_set, c
         token_t ref = token_set.tokens[
                 ( index >= token_set.token_count ? token_set.token_count - 1 : index == 0 ? 0 : index - 1 )
         ];
-
-        fprintf(stderr, "\n\nError at line %d column %d\n", ref.line, ref.column);
+        std::string line = capture_line(token_set, index);
+        fprintf(stderr, "\nError at line %d column %d\n", ref.line, ref.column);
+        fprintf(stderr, " %d | %s\n", ref.line, line.c_str());
+        fprintf(stderr, " %*s^\n", ref.column, "");
         vfprintf(stderr, error_message, args);
         va_end(args);
         exit(1);

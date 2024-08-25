@@ -18,4 +18,5 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax_parsing/import_statement.cpp
         src/ast/syntax_parsing/function_declaration.cpp
         src/ast/syntax_parsing/variable_declaration.cpp
+        src/ast/syntax_parsing/identifiers.cpp
 )

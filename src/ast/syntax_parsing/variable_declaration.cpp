@@ -21,36 +21,36 @@ using namespace stride::ast;
 int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
 
-    int skipped = 0;
+    int skipped = 1;
+    bool hasNext;
 
-    bool hasNext = true;
     do
     {
         // Validate whether the variable has the 'name: type' format.
-        validate_variable_declaration(token_set, index);
+        validate_variable_declaration(token_set, index + 1);
 
         // We ensured this is not NULL in previous function call
-        token_t *type_token = peak(token_set, index, 2);
+        token_t *type_token = peak(token_set, index, 3);
         skipped += 3;
 
         // Variable declaration Node
-        auto *variable_declaration_node = new Node(AST_NODE_OP_VARIABLE_DECLARATION, 0);
+        auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
 
         // The identifier containing the name of the variable
         variable_declaration_node->addBranch(
-                new Node(AST_NODE_OP_IDENTIFIER, 0,
+                new Node(NODE_TYPE_IDENTIFIER, 0,
                          token_set.tokens[ index ].value)
         );
 
         // Node containing the variable type
         variable_declaration_node->addBranch(
-                new Node(AST_NODE_OP_VARIABLE_TYPE, 0,
+                new Node(NODE_TYPE_VARIABLE_TYPE, 0,
                          type_token->value)
         );
 
-        variable_declaration_node->flags = isPrevious(token_set, TOKEN_KEYWORD_CONST, index) ?
+        variable_declaration_node->flags = is_previous(token_set, TOKEN_KEYWORD_CONST, index) ?
                                            AST_VARIABLE_IMMUTABLE : 0;
-        token_t *nextToken = peak(token_set, index, 3);
+        token_t *nextToken = peak(token_set, index, 4);
 
         // Ensure there's a next token. We want either a comma or a value assignment
         if ( nextToken == nullptr )
@@ -60,13 +60,29 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 
         if ( nextToken->type == TOKEN_EQUALS )
         {
+            int length = 0;
+            // Calculate expression length
+            for ( int i = index; i < token_set.token_count; i++ )
+            {
+                if ( token_set.tokens[i].type == TOKEN_SEMICOLON)
+                {
+                    length = i - index;
+                    break;
+                }
+            }
+            printf("Variable declaration with value assignment\n");
             // Parse the expression after the equals sign
             skipped += parse_expression(token_set, index + 4, token_set.token_count, *variable_declaration_node);
+            nextToken = peak(token_set, index, skipped);
+            hasNext = nextToken->type == TOKEN_COMMA;
         }
         else
         {
             hasNext = nextToken->type == TOKEN_COMMA;
         }
+        printf("Variable declaration: %s - type: %s, const: %s, value: %s\n", token_set.tokens[ index + 1 ].value,
+               type_token->value, variable_declaration_node->flags == AST_VARIABLE_IMMUTABLE ? "true" : "false",
+               (char *)variable_declaration_node->branches[ variable_declaration_node->branch_count - 1 ].value);
 
     } while ( hasNext );
 
@@ -87,10 +103,11 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
  */
 void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, cursor_t index)
 {
-    requiresToken(TOKEN_IDENTIFIER, token_set, index, "Expected variable name, but received none.");
-    requiresToken(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name, but received %s",
+                   token_set.tokens[ index ].value);
+    requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
     token_t *type_token = peak(token_set, index, 2);
-    if ( type_token == nullptr || !isValidType(type_token->type))
+    if ( type_token == nullptr || !is_valid_var_type(type_token->type))
     {
         error("Received invalid properties after token declaration at line %d column %d: %s",
               token_set.tokens[ index + 1 ].line, token_set.tokens[ index + 1 ].column,

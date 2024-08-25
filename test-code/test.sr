@@ -1,4 +1,6 @@
-const var local_scope: string = “I’m hidden”;
+const var local_scope: string = "I'm hidden";
+
+var balls: i32 = 0;
 
 /*
  * Functions have return type i32
@@ -18,17 +20,24 @@ const var local_scope: string = “I’m hidden”;
 
 shared module::name {
 
-   declare fname(p: param): i32 {
-      return 0;
-   }
+    // Reference external (C) library function
+    declare shared external f2();
 
-   // Function that is declared externally, like in a compiled C file
-   declare external fname();
+    declare f3(const param: i8) {}
 
-   // Enumerables
-   enum ename {
-      ENAME =
-   }
+    declare fname(varname: i8) {
+        return 0;
+    }
+
+    declare ts(p: ...string) {}
+
+    // Function that is declared externally, like in a compiled C file
+    declare external fname();
+
+    // Enumerables
+    enum ename {
+        ENAME =
+    }
 }
 
 // Single function sharing

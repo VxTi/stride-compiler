@@ -10,7 +10,7 @@ using namespace stride::ast;
  * Checks if there is a next token in the token stream.
  * @return True if there is a next token, false otherwise.
  */
-bool stride::ast::hasNext(ast_token_set_t &token_set, cursor_t index)
+bool stride::ast::has_next(ast_token_set_t &token_set, cursor_t index)
 {
     return index + 1 < token_set.token_count;
 }
@@ -19,7 +19,7 @@ bool stride::ast::hasNext(ast_token_set_t &token_set, cursor_t index)
  * Whether there is a token before the current one
  * @return
  */
-bool stride::ast::hasPrevious(cursor_t index)
+bool stride::ast::has_previous(cursor_t index)
 {
     return index > 0;
 }
@@ -31,32 +31,12 @@ bool stride::ast::hasPrevious(cursor_t index)
  */
 token_t *stride::ast::next(ast_token_set_t &token_set, cursor_t index)
 {
-    if ( !hasNext(token_set, index))
+    if ( !has_next(token_set, index))
     {
         return nullptr;
     }
 
     return &token_set.tokens[ index + 1 ];
-}
-
-/**
- * Returns the index of the first token of the provided properties.
- * @param token_set The token set to search in.
- * @param type The properties to search for.
- * @param token_count The amount of tokens in the subset.
- * @param from_index_incl The index to start searching from.
- * @return The index of the token, or -1 if not found.
- */
-int stride::ast::indexOfToken(ast_token_set_t &token_set, token_type_t type, int token_count, int from_index_incl)
-{
-    for ( int i = from_index_incl; i < token_count; i++ )
-    {
-        if ( token_set.tokens[ i ].type == type )
-        {
-            return i;
-        }
-    }
-    return -1;
 }
 
 /**
@@ -66,7 +46,7 @@ int stride::ast::indexOfToken(ast_token_set_t &token_set, token_type_t type, int
  */
 token_t *stride::ast::previous(ast_token_set_t &token_set, cursor_t index)
 {
-    if ( !hasPrevious(index))
+    if ( !has_previous(index))
     {
         return nullptr;
     }
@@ -97,9 +77,9 @@ token_t *stride::ast::peak(ast_token_set_t &token_set, cursor_t index, int offse
  * @param type The properties to check for
  * @return
  */
-bool stride::ast::isPrevious(ast_token_set_t &token_set, token_type_t type, cursor_t index)
+bool stride::ast::is_previous(ast_token_set_t &token_set, token_type_t type, cursor_t index)
 {
-    if ( !hasPrevious(index))
+    if ( !has_previous(index))
     {
         return false;
     }
@@ -113,9 +93,9 @@ bool stride::ast::isPrevious(ast_token_set_t &token_set, token_type_t type, curs
  * @param type The properties to check for
  * @return
  */
-bool stride::ast::isNext(ast_token_set_t &token_set, token_type_t type, cursor_t index)
+bool stride::ast::is_next(ast_token_set_t &token_set, token_type_t type, cursor_t index)
 {
-    if ( !hasNext(token_set, index))
+    if ( !has_next(token_set, index))
     {
         return false;
     }
@@ -132,7 +112,7 @@ bool stride::ast::isNext(ast_token_set_t &token_set, token_type_t type, cursor_t
  * @param range The offset to provide
  * @return
  */
-bool stride::ast::isInRange(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range)
+bool stride::ast::within_range(ast_token_set_t &token_set, token_type_t type, cursor_t index, int range)
 {
     if ( range == 0 )
     {

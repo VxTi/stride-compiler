@@ -21,12 +21,12 @@ using namespace stride::ast;
  */
 int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
-    requiresToken(TOKEN_STRING_LITERAL, token_set, index, "Expected string literal for import");
+    requires_token(TOKEN_STRING_LITERAL, token_set, index, "Expected string literal for import");
 
-    auto *importNode = new Node(AST_NODE_OP_IMPORT, 0);
-    importNode->addBranch(new Node(AST_NODE_OP_IDENTIFIER, 0, token_set.tokens[ index ].value));
+    auto *importNode = new Node(NODE_TYPE_IMPORT, 0);
+    importNode->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
 
-    requiresToken(TOKEN_SEMICOLON, token_set, index + 1, "Expected semicolon after import statement");
+    requires_token(TOKEN_SEMICOLON, token_set, index + 1, "Expected semicolon after import statement");
 
     root.addBranch(importNode);
 
