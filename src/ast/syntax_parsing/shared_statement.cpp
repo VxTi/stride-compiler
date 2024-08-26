@@ -45,17 +45,16 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
     requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier, but received '%s.'",
                    token_set.tokens[ index ].value);
 
-
     int skipped = parse_identifier(token_set, index, *node);
 
     // Capture the closure after the namespace
-    int closureLength = parse_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
+    int shared_block_length = parse_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
 
-    if ( closureLength == 0 )
+    if ( shared_block_length == 0 )
     {
         error("Expected block after namespace declaration");
     }
 
-    root.addBranch(node);
-    return closureLength + skipped;
+    root.add_branch(node);
+    return shared_block_length + skipped;
 }

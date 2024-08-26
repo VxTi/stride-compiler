@@ -3,7 +3,7 @@
 //
 
 #include "../ast.h"
-#include "types.h"
+#include "variable_types.h"
 
 #define ENUM_IDENTIFIER_REGEXP ("([A-Z][A-Z0-9_]*)")
 
@@ -84,7 +84,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
     Node *enum_block = new Node(NODE_TYPE_ENUMERATION);
 
-    enum_block->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
+    enum_block->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
 
     // If the enum is shared, add the SHARED flag.
     if ( peakeq(*block, index, -2, TOKEN_KEYWORD_SHARED))
@@ -115,7 +115,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         auto enum_member = new Node(NODE_TYPE_ENUMERATION_MEMBER);
 
         // Add identifier
-        enum_member->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, current.value));
+        enum_member->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, current.value));
 
         enum_value = enum_id;
 
@@ -126,7 +126,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
             // Check whether the value after enum entry assignment is an integer
             // This is required.
             if ( peak(*block, i, 2) == nullptr
-                 || !type_is_integer(block->tokens[ i + 2 ].type))
+                 || !types::is_integer(block->tokens[ i + 2 ].type))
             {
                 error("Value of enumerable must be an integer, received: %s, at line %d column %d (type %d)",
                       (char *) block->tokens[ i + 2 ].value,
@@ -142,7 +142,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         int * enum_value_allocated = (int *) malloc(sizeof(int));
         *enum_value_allocated = enum_value;
 
-        enum_member->addBranch(new Node(NODE_TYPE_VALUE, 0, enum_value_allocated));
+        enum_member->add_branch(new Node(NODE_TYPE_VALUE, 0, enum_value_allocated));
 
         // There's a next enum member if there's a comma after the previous one.
         enum_id++;
@@ -157,10 +157,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         i += offset;
 
         // Add enumerable member to enum object.
-        enum_block->addBranch(enum_member);
+        enum_block->add_branch(enum_member);
     } while ( has_next_entry );
 
-    root.addBranch(enum_block);
+    root.add_branch(enum_block);
 
     return block->token_count + 2;
 }

@@ -34,10 +34,7 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
               token_set.tokens[ index + try_body_tokens->token_count + 3 ].column);
         return 0;
     }
-
-    requires_token(TOKEN_IDENTIFIER, *catch_variable_tokens, 0, "Catch expression requires variable declaration after catch keyword.");
-    requires_token(TOKEN_COLON, *catch_variable_tokens, 1, "Catch expression requires variable declaration after catch keyword.");
-    requires_token(TOKEN_IDENTIFIER, *catch_variable_tokens, 2, "Catch expression requires Error type after colon.");
+    validate_variable_declaration(*catch_variable_tokens, 0);
 
     if ( strcmp((char *) catch_variable_tokens->tokens[2].value, "Error") != 0 )
     {
@@ -62,17 +59,17 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
     auto *try_catch_node = new Node(NODE_TYPE_TRY_CATCH);
     auto *try_body_node = new Node(NODE_TYPE_BLOCK);
     auto *catch_expression_node = new Node(NODE_TYPE_VARIABLE_DECLARATION);
-    catch_expression_node->addBranch(new Node(NODE_TYPE_VARIABLE_TYPE, 0, catch_variable_tokens->tokens[2].value));
-    catch_expression_node->addBranch(new Node(NODE_TYPE_VALUE, 0, catch_variable_tokens->tokens[0].value));
+    catch_expression_node->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, 0, catch_variable_tokens->tokens[ 2 ].value));
+    catch_expression_node->add_branch(new Node(NODE_TYPE_VALUE, 0, catch_variable_tokens->tokens[ 0 ].value));
     auto *catch_body_node = new Node(NODE_TYPE_BLOCK);
 
     parse_tokens(try_body_node, *try_body_tokens);
     parse_tokens(catch_body_node, *catch_variable_tokens);
 
-    try_catch_node->addBranch(try_body_node);
-    try_catch_node->addBranch(catch_expression_node);
-    try_catch_node->addBranch(catch_body_node);
+    try_catch_node->add_branch(try_body_node);
+    try_catch_node->add_branch(catch_expression_node);
+    try_catch_node->add_branch(catch_body_node);
 
-    root.addBranch(try_catch_node);
+    root.add_branch(try_catch_node);
     return try_body_tokens->token_count + catch_variable_tokens->token_count + catch_body_tokens->token_count + 6;
 }

@@ -30,11 +30,11 @@ int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t ind
     }
 
     auto *importNode = new Node(NODE_TYPE_IMPORT, 0);
-    importNode->addBranch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ index ].value));
+    importNode->add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ index ].value));
 
     requires_token(TOKEN_SEMICOLON, token_set, index + 1, "Expected semicolon after import statement");
 
-    root.addBranch(importNode);
+    root.add_branch(importNode);
 
     return 2;
 }

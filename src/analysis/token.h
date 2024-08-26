@@ -79,6 +79,7 @@ typedef enum
 
     /* Keywords */
     TOKEN_KEYWORD_AS,
+    TOKEN_KEYWORD_ASYNC,
     TOKEN_KEYWORD_DEFINE,
     TOKEN_KEYWORD_LET,
     TOKEN_KEYWORD_CONST,

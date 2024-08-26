@@ -71,7 +71,7 @@ void Node::ensureMinimumBranches()
  * Adds a branch to the Node.
  * @param node The Node to add.
  */
-void Node::addBranch(Node *node)
+void Node::add_branch(Node *node)
 {
     this->ensureMinimumBranches();
     this->branches[ this->branch_count++ ] = *node;
@@ -131,6 +131,10 @@ void Node::print(Node &reference, int depth)
             {
                 printf(" (external)");
             }
+            if ( reference.flags & FLAG_FUNCTION_ASYNC)
+            {
+                printf(" (async)");
+            }
             break;
         case NODE_TYPE_FOR_LOOP:
             printf("FOR LOOP");
@@ -171,33 +175,6 @@ void Node::print(Node &reference, int depth)
     for ( int i = 0; i < reference.branch_count; i++ )
     {
         print(reference.branches[ i ], depth + 1);
-    }
-}
-
-/**
- * Whether the provided token properties is an acceptable
- * variable properties. This is only true for primitives and identifiers.
- * @param type The properties to check.
- * @return
- */
-bool stride::ast::is_valid_var_type(token_type_t type)
-{
-    switch ( type )
-    {
-        case TOKEN_IDENTIFIER:
-        case TOKEN_PRIMITIVE_INT8:
-        case TOKEN_PRIMITIVE_INT16:
-        case TOKEN_PRIMITIVE_INT32:
-        case TOKEN_PRIMITIVE_INT64:
-        case TOKEN_PRIMITIVE_FLOAT32:
-        case TOKEN_PRIMITIVE_FLOAT64:
-        case TOKEN_PRIMITIVE_BOOL:
-        case TOKEN_PRIMITIVE_STRING:
-        case TOKEN_PRIMITIVE_CHAR:
-        case TOKEN_PRIMITIVE_UNKNOWN:
-            return true;
-        default:
-            return false;
     }
 }
 
@@ -281,7 +258,6 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                  */
             case TOKEN_KEYWORD_SHARED:
             {
-
                 cursor += parse_shared_statement(token_set, ++cursor, *root);
             }
                 break;

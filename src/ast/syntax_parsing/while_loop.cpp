@@ -51,12 +51,12 @@ int stride::ast::parse_while_loop(ast_token_set_t &token_set, cursor_t index, No
 
     parse_expression(*while_expression_tokens, 0, while_expression_tokens->token_count, *while_body_conditional_node);
 
-    while_node->addBranch(while_body_conditional_node);
-    while_node->addBranch(while_body_node);
+    while_node->add_branch(while_body_conditional_node);
+    while_node->add_branch(while_body_node);
 
     parse_tokens(while_body_node, *while_body_tokens);
 
-    root.addBranch(while_node);
+    root.add_branch(while_node);
 
     return while_expression_tokens->token_count + while_body_tokens->token_count + 4;
 }

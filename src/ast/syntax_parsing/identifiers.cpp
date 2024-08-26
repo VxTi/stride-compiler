@@ -24,40 +24,43 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
     if ( token == nullptr )
     {
         error("Expected keyword, but received nothing.");
+        return 0;
     }
-    else if ( token->type != TOKEN_IDENTIFIER )
+
+    if ( token->type != TOKEN_IDENTIFIER )
     {
         error("Expected keyword, but received '%s'.", token->value);
+        return 0;
     }
 
-    Node *keywordNode;
+    Node *keyword_node;
 
-    token_t *next;
-    if (( next = peak(token_set, index, 1)) != nullptr && next->type == TOKEN_DOUBLE_COLON )
+    // If the next token is a double colon, we have a secondary keyword
+    // This is the case when a module has a submodule, e.g. module::submodule
+    // We will parse this as a separate identifier.
+    if ( peakeq(token_set, index, 1, TOKEN_DOUBLE_COLON))
     {
-        bool accepts_next = true;
-        keywordNode = new Node(NODE_TYPE_IDENTIFIER_REFERENCE, 0);
-
-        for ( ++index; index < token_set.token_count && accepts_next; index += 2, skipped += 2 )
+        keyword_node = new Node(NODE_TYPE_IDENTIFIER_REFERENCE, 0);
+        keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token->value));
+        for ( ++index; index < token_set.token_count; index += 2 )
         {
             if ( token_set.tokens[ index ].type != TOKEN_DOUBLE_COLON )
             {
-                accepts_next = false;
-            }
-            else if ( token_set.tokens[ index ].type == TOKEN_IDENTIFIER )
-            {
-                keywordNode->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
-            }
-            else
-            {
                 break;
             }
+            requires_token(TOKEN_DOUBLE_COLON, token_set, index, "Expected '::' but received '%s.'",
+                           token_set.tokens[ index ].value);
+            requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier, but received '%s.'",
+                           token_set.tokens[ index + 1 ].value);
+
+            keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 1 ].value));
+            skipped += 2;
         }
     }
     else
     {
-        keywordNode = new Node(NODE_TYPE_IDENTIFIER, 0, token->value);
+        keyword_node = new Node(NODE_TYPE_IDENTIFIER, 0, token->value);
     }
-    root.addBranch(keywordNode);
+    root.add_branch(keyword_node);
     return skipped;
 }

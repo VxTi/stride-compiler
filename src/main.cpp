@@ -3,13 +3,15 @@
 #include "analysis/lexer.h"
 #include "ast/ast.h"
 
+using namespace stride;
+
 int main(const int argc, const char **argv)
 {
 
     if ( argc < 3 ) {
         std::cerr << "No input file provided" << std::endl;
         std::cerr << "Run the program as followed:" << std::endl;
-        std::cerr << "./cstride <input file> <output file>" << std::endl;
+        std::cerr << "./cstride <options?> <input file>" << std::endl;
         exit(1);
     }
     std::cout << "Compiling file " << argv[ 1 ] << " to path " << argv[ 2 ] << std::endl;
@@ -18,10 +20,9 @@ int main(const int argc, const char **argv)
     std::string content(( std::istreambuf_iterator<char>(file_in)),
                         ( std::istreambuf_iterator<char>()));
 
-    stride::ast::ast_token_set_t token_set;
-    stride::lexer::tokenize(content.c_str(), content.size(), token_set);
-    std::cout << "Lexical analysis generated " << token_set.token_count << " tokens. \n" << std::endl;
-    stride::ast::parse(token_set);
+    ast::ast_token_set_t token_set;
+    lexer::tokenize(content.c_str(), content.size(), token_set);
+    ast::parse(token_set);
 
     return 0;
 }

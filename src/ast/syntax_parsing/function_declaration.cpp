@@ -3,6 +3,7 @@
 //
 
 #include "../ast.h"
+#include "variable_types.h"
 
 using namespace stride::ast;
 
@@ -63,11 +64,20 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 skipped++;
             }
                 break;
+            case TOKEN_KEYWORD_ASYNC:
+            {
+                if ( function_flags & FLAG_FUNCTION_ASYNC)
+                {
+                    error("Double async keyword at line %d column %d",
+                          next->line, next->column);
+                }
+                function_flags |= FLAG_FUNCTION_ASYNC;
+                skipped++;
+            }
+                break;
                 // This is when the name of the function os stated.
             case TOKEN_IDENTIFIER:
             {
-                func_identifier = *next;
-                requires_token(TOKEN_LPAREN, token_set, ++index, "Expected opening parenthesis");
                 skipped++;
                 goto DECLARATION; // Only way to get out of this mess
             }
@@ -82,7 +92,10 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
     // Create function Node with the function name as value
     auto *function_declaration = new Node(NODE_TYPE_FUNCTION_DEFINITION, function_flags);
-    function_declaration->addBranch(new Node(NODE_TYPE_IDENTIFIER, 0, func_identifier.value));
+    function_declaration->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
+    requires_token(TOKEN_LPAREN, token_set, index + 1, "Expected opening parenthesis, but received %s",
+                   token_set.tokens[ index ].value);
+    index++;
 
     // Capture block for function parameter body, aka the part after the function name between the parenthesis
     ast_token_set_t *function_parameters_body = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
@@ -118,7 +131,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                            function_parameters_body->tokens[ index ].value);
 
             auto function_parameter = new Node(NODE_TYPE_VARIABLE_DECLARATION);
-            function_parameter->addBranch(
+            function_parameter->add_branch(
                     new Node(NODE_TYPE_IDENTIFIER, 0, function_parameters_body->tokens[ i ].value));
 
             // Check if parameter is variadic
@@ -130,7 +143,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
             // Validate type after expression
             token_t *type = peak(*function_parameters_body, i, 2);
-            if ( type == nullptr || !is_valid_var_type(type->type))
+            if ( type == nullptr || !types::is_valid_variable_type(type->type))
             {
                 error("Variadic expression requires valid type, but didn't receive one.");
                 return 0;
@@ -143,15 +156,15 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 if ( var_flags & FLAG_VARIABLE_ARRAY)
                 {
                     error("Cannot have variadic expression and array at the same time, at line %d column %d.",
-                          function_parameters_body->tokens[i + 2].line,
-                          function_parameters_body->tokens[i + 2].column);
+                          function_parameters_body->tokens[ i + 2 ].line,
+                          function_parameters_body->tokens[ i + 2 ].column);
                     return 0;
                 }
                 var_flags |= FLAG_VARIABLE_ARRAY;
                 i += 2;
             }
 
-            function_parameter->addBranch(new Node(NODE_TYPE_VARIABLE_TYPE, var_flags, type->value));
+            function_parameter->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, var_flags, type->value));
 
             if ( i + 3 < function_parameters_body->token_count && !peakeq(*function_parameters_body, i, 3, TOKEN_COMMA))
             {
@@ -162,9 +175,9 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 return 0;
             }
             i += 4;
-            parameters_node->addBranch(function_parameter);
+            parameters_node->add_branch(function_parameter);
         }
-        function_declaration->addBranch(parameters_node);
+        function_declaration->add_branch(parameters_node);
     }
 
     // If the function is not external, it must have a body.
@@ -184,17 +197,17 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
         // Add the parsed function body to the function declaration node.
         auto content_node = new Node(NODE_TYPE_BLOCK);
         parse_tokens(content_node, *function_body);
-        function_declaration->addBranch(content_node);
+        function_declaration->add_branch(content_node);
         skipped += function_body->token_count + 2;
 
     }
     else
     {
         requires_token(TOKEN_SEMICOLON, token_set, index + skipped + function_parameters_body->token_count,
-                       "External function declaration must have a semicolon after parameter declaration.");
+                       "External functions are not allowed to have a function body.\nExternal functions must end with a semicolon.");
     }
 
-    root.addBranch(function_declaration);
+    root.add_branch(function_declaration);
 
     return skipped + function_parameters_body->token_count + 2;
 }

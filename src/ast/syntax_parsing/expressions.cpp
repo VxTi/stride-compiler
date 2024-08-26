@@ -3,6 +3,7 @@
 //
 
 #include "../ast.h"
+#include "variable_types.h"
 
 using namespace stride::ast;
 
@@ -33,15 +34,12 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
     if ( token_count == 1 )
     {
         token_type_t type = token_set.tokens[ cursor ].type;
-        if ( type == TOKEN_NUMBER_INTEGER ||
-             type == TOKEN_NUMBER_FLOAT ||
-             type == TOKEN_STRING_LITERAL ||
-             type == TOKEN_BOOLEAN_LITERAL ||
-             type == TOKEN_IDENTIFIER )
+        if ( types::is_valid_literal_value(type) )
         {
-            parent_node.addBranch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
+            parent_node.add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
             return 1;
         }
+        error("Expected value or expression, but received '%s'.", token_set.tokens[ cursor ].value);
     }
 
     // TODO: Implement.

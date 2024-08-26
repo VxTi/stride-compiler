@@ -3,6 +3,7 @@
 //
 
 #include "../ast.h"
+#include "variable_types.h"
 
 using namespace stride::ast;
 
@@ -37,13 +38,13 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
 
         // The identifier containing the name of the variable
-        variable_declaration_node->addBranch(
+        variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_IDENTIFIER, 0,
                          token_set.tokens[ index + 1 ].value)
         );
 
         // Node containing the variable type
-        variable_declaration_node->addBranch(
+        variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_VARIABLE_TYPE, 0,
                          type_token->value)
         );
@@ -79,7 +80,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         {
             hasNext = nextToken->type == TOKEN_COMMA;
         }
-        root.addBranch(variable_declaration_node);
+        root.add_branch(variable_declaration_node);
 
     } while ( hasNext );
 
@@ -104,7 +105,7 @@ void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, curs
                    token_set.tokens[ index ].value);
     requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
     token_t *type_token = peak(token_set, index, 2);
-    if ( type_token == nullptr || !is_valid_var_type(type_token->type))
+    if ( type_token == nullptr || !types::is_valid_variable_type(type_token->type))
     {
         error("Received invalid properties after token declaration at line %d column %d: %s",
               token_set.tokens[ index + 1 ].line, token_set.tokens[ index + 1 ].column,

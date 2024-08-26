@@ -58,6 +58,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token_kw("class", TOKEN_KEYWORD_CLASS),
         gen_token_kw("const", TOKEN_KEYWORD_CONST),
         gen_token_kw("define", TOKEN_KEYWORD_DEFINE),
+        gen_token_kw("async", TOKEN_KEYWORD_ASYNC),
         gen_token_kw("this", TOKEN_KEYWORD_THIS),
         gen_token_kw("enum", TOKEN_KEYWORD_ENUM),
         gen_token_kw("struct", TOKEN_KEYWORD_STRUCT),

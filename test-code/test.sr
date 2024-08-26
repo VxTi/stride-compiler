@@ -1,31 +1,8 @@
 import "external library";
 
-shared test {
+shared test::module {
 
-    define main(p: i8, p1: ...i8) {
-
-        let test: i8 = 8;
-
-        while ( true ) {
-            // DO something
-        }
+    define async module(args: string[]) {
+        system::println("Hello, World!");
     }
-
-    define test(param: ...string) {
-        for (let i: i8 = 0; i < 10; i++) {
-            io::println(param);
-        }
-
-        try {} catch(e: Error) {}
-
-        try {
-            let i: i32 = 0;
-        } catch (error: Error) {
-            io::println(error);
-        }
-
-    }
-    define t(p3: i8, const p0: ...string) {}
-
-    define nuts() {}
 }

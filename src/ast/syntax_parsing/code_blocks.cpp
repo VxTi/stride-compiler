@@ -28,6 +28,8 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
                              int starting_index,
                              Node &parent_node)
 {
+    requires_token(start_token, token_set, starting_index, "Expected opening token with id %d, but received %s.", start_token, token_set.tokens[ starting_index ].value);
+
     int index, skipped_tokens, branch_depth;
     auto *closureNode = new Node(NODE_TYPE_BLOCK, 0);
 
@@ -64,7 +66,7 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
         // This allows us to add code branching, otherwise the parsing will end immediately after
         // the first closure.
         parse_tokens(closureNode, subset);
-        parent_node.addBranch(closureNode);
+        parent_node.add_branch(closureNode);
     }
 
     return skipped_tokens;

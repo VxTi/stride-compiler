@@ -52,16 +52,16 @@
 #define NODE_TYPE_TRY_CATCH            (0x21)
 #define NODE_TYPE_DO_WHILE             (0x22)
 
+#define FLAG_VARIABLE_IMMUTABLE (0x100) // Whether a variable is immutable
+#define FLAG_VARIABLE_ARRAY     (0x200) // Whether a variable is an array
 
-#define FLAG_VARIABLE_IMMUTABLE (0x1) // Whether a variable is immutable
-#define FLAG_VARIABLE_ARRAY     (0x2) // Whether a variable is an array
+#define FLAG_SCOPE_GLOBAL (0x1000)
+#define FLAG_SCOPE_LOCAL  (0x2000)
+#define FLAG_SCOPE_CLASS  (0x3000)
 
-
-#define FLAG_SCOPE_GLOBAL (0x1)
-#define FLAG_SCOPE_LOCAL  (0x2)
-#define FLAG_SCOPE_CLASS  (0x3)
 #define FLAG_OBJECT_SHARED     (0x4) // Whether the function or variable declaration is shared with other modules.
-#define FLAG_FUNCTION_EXTERNAL (0x5)
+#define FLAG_FUNCTION_EXTERNAL (0x8)
+#define FLAG_FUNCTION_ASYNC    (0x10)
 
 /**
  * Definitions of operations.
@@ -154,7 +154,6 @@ namespace stride::ast
 
     void requires_token(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message, ...);
 
-    bool is_valid_var_type(token_type_t type);
 
 /*
  * Abstract syntax tree Node.
@@ -230,12 +229,7 @@ namespace stride::ast
 
         Node *parent;
 
-        void addBranch(Node *node);
-
-        void setValue(void *newVal)
-        {
-            this->value = newVal;
-        }
+        void add_branch(Node *node);
 
         /**
          * Default destructor for Node.
