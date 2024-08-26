@@ -42,9 +42,12 @@
 #define NODE_TYPE_BLOCK                (0x18)
 
 #define NODE_TYPE_VARIABLE_TYPE        (0x19)
-#define NODE_TYPE_VALUE       (0x1A)
+#define NODE_TYPE_VALUE                (0x1A)
 #define NODE_TYPE_EXPRESSION           (0x1B)
 #define NODE_TYPE_SHARED               (0x1C)
+#define NODE_TYPE_FOR_LOOP             (0x1D)
+#define NODE_TYPE_FOR_LOOP_INIT        (0x1E)
+#define NODE_TYPE_FOR_LOOP_CONDITIONAL (0x1F)
 
 
 #define FLAG_VARIABLE_IMMUTABLE (0x1) // Whether a variable is immutable
@@ -130,7 +133,7 @@ namespace stride::ast
      * @return An integer representing whether the token at the given location is equal to the provided type.
      * Returns 1 for a match, 0 otherwise.
      */
-    int peakcmp(ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type);
+    int peakeq(ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type);
 
     bool has_next(ast_token_set_t &token_set, cursor_t index);
 
@@ -432,6 +435,24 @@ namespace stride::ast
      * @return How many tokens were skipped.
      */
     int parse_enumerable(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     * Parsing of a for loop.
+     * This accepts a few different kinds of formats.
+     * The regular format, e.g. 'for (var i: i8 = 0; i < ...; i++) { ... }
+     * and the iterable one: 'for (var k: string in [...]) {}'
+     * @param token_set The token set to parse the for loop from
+     * @param index The index to start parsing from
+     * @param root The root element to add the resulting nodes to.
+     * @return How many tokens were skipped.
+     */
+    int parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     * Parses a function call.
+     * Function calls can be in the format of 'module::function(...)'
+     */
+    int parse_function_call(ast_token_set_t &token_set, cursor_t index, Node &root);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

@@ -17,7 +17,7 @@ using namespace stride::ast;
  */
 inline int type_is_integer(token_type_t type)
 {
-    switch (type)
+    switch ( type )
     {
         case TOKEN_PRIMITIVE_INT64:
         case TOKEN_PRIMITIVE_INT32:

@@ -1,80 +1,18 @@
-const var local_scope: string = "I'm hidden";
+import "external library";
 
-var balls: i32 = 0;
+shared test {
 
-define test(p1: i8, p2: i32, p3: string[]) {}
+    define main(p: i8, p1: ...i8) {
 
-/*
- * Functions have return type i32
- * by default, if no return type
- * is provided, and return 0 if
- * no return is stated.
- *
- * The data is shared through
- * either a ‘shared’ keyword,
- * followed by the module name,
- * or the ‘shared’ keyword after
- * abstraction declaration. The
- * latter is advised against due
- * to the possibility of naming
- * collisions.
- */
-
-shared modulename {
-
-    // Reference external (C) library function
-    define shared external f2();
-
-    define f3(const param: i8) {}
-
-    define fname(varname: i8) {
-
-        var f: unknown = f3(1);
-        return 0;
+        var test: i8 = 8;
     }
 
-    define ts(p: ...string) {}
-
-    // Function that is defined externally, like in a compiled C file
-    define external fname();
-    enum t { G; }
-    enum gg {
-        NAME,
-        SECOND,
-         THIRD;
-    }
-
-    // Enumerables
-    enum ename {
-        ENAME = 1,
-        ENAME2 = 2,
-        ENAME3 = 3;
-    }
-}
-shared enum K { G; }
-
-// Single function sharing
-define shared external fname();
-
-// publicly shared class
-shared class cname {
-    define constructor() {
+    define test(param: ...string) {
         for (var i: i8 = 0; i < 10; i++) {
-
-            io::print("Hello, World!");
-
+            io::println(param);
         }
     }
-}
+    define t(p3: i8, const p0: ...string) {}
 
-define main() {
-
-   // Automatically gets transformed to 3 by syntax analysis
-   var len: i8 = [0, 1, 2].length;
-
-   for ( var i: i32 = 0; i < 10; i++) {
-
-   }
-
-   return 0;
+    define nuts() {}
 }

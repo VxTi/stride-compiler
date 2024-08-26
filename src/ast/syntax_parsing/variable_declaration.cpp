@@ -64,7 +64,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
             // Calculate expression length
             for ( int i = index; i < token_set.token_count; i++ )
             {
-                if ( token_set.tokens[i].type == TOKEN_SEMICOLON)
+                if ( token_set.tokens[ i ].type == TOKEN_SEMICOLON )
                 {
                     length = i - index;
                     break;

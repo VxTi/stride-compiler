@@ -144,6 +144,4 @@ typedef struct
  */
 extern std::vector<token_def_t> token_definitions;
 
-void define_token(const char *expression, token_type_t token);
-
 #endif //STRIDE_LANGUAGE_TOKEN_H

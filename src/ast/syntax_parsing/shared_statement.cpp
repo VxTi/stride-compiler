@@ -27,21 +27,23 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
     Node *node = new Node(NODE_TYPE_SHARED, 0);
 
     token_t *next_token = peak(token_set, index, 0);
-    if (next_token == nullptr)
+    if ( next_token == nullptr )
     {
         error("Expected identifier, but received nothing.");
         return 0;
     }
 
-    if (next_token->type == TOKEN_KEYWORD_CLASS)
+    if ( next_token->type == TOKEN_KEYWORD_CLASS )
     {
         node->node_type = NODE_TYPE_CLASS;
         index++;
-    } else if ( next_token->type == TOKEN_KEYWORD_ENUM )
+    }
+    else if ( next_token->type == TOKEN_KEYWORD_ENUM )
     {
         return parse_enumerable(token_set, ++index, *node);
     }
-    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier, but received '%s.'", token_set.tokens[index].value);
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier, but received '%s.'",
+                   token_set.tokens[ index ].value);
 
 
     int skipped = parse_identifier(token_set, index, *node);

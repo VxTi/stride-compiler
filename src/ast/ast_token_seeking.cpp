@@ -71,7 +71,7 @@ token_t *stride::ast::peak(ast_token_set_t &token_set, cursor_t index, int offse
     return &token_set.tokens[ i ];
 }
 
-int stride::ast::peakcmp(stride::ast::ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type)
+int stride::ast::peakeq(ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type)
 {
     token_t *peaked = peak(token_set, index, offset);
 

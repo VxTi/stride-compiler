@@ -82,8 +82,10 @@ void Node::addBranch(Node *node)
 void Node::print(Node &reference, int depth)
 {
     printf("%*s", depth * 2, "");
-    if (depth > 0) printf("↳ ");
-    switch (reference.node_type) {
+    if ( depth > 0 )
+    { printf("↳ "); }
+    switch ( reference.node_type )
+    {
         case NODE_TYPE_IMPORT:
             printf("IMPORT");
             break;
@@ -101,23 +103,30 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_VARIABLE_TYPE:
             printf("VARIABLE TYPE (%s)", (char *) reference.value);
-            if (reference.flags & FLAG_VARIABLE_ARRAY)
+            if ( reference.flags & FLAG_VARIABLE_ARRAY)
             {
                 printf(" (array)");
             }
             break;
         case NODE_TYPE_BLOCK:
-            printf("BLOCK");
+            printf("BODY");
+            if ( reference.branch_count == 0)
+            {
+                printf(" (empty) ");
+            }
             break;
         case NODE_TYPE_VALUE:
             printf("VALUE (%s)", (char *) reference.value);
             break;
         case NODE_TYPE_FUNCTION_DEFINITION:
             printf("FUNCTION DECLARATION");
-            if (reference.flags & FLAG_FUNCTION_EXTERNAL)
+            if ( reference.flags & FLAG_FUNCTION_EXTERNAL)
             {
                 printf(" (external)");
             }
+            break;
+        case NODE_TYPE_FOR_LOOP:
+            printf("FOR LOOP");
             break;
         case NODE_TYPE_SHARED:
             printf("SHARED BLOCK");
@@ -137,7 +146,7 @@ void Node::print(Node &reference, int depth)
         default:
             printf("%d", reference.node_type);
     }
-    if (reference.flags & FLAG_OBJECT_SHARED)
+    if ( reference.flags & FLAG_OBJECT_SHARED)
     {
         printf(" (shared)");
     }
@@ -145,7 +154,7 @@ void Node::print(Node &reference, int depth)
 
     for ( int i = 0; i < reference.branch_count; i++ )
     {
-        print(reference.branches[i], depth + 1);
+        print(reference.branches[ i ], depth + 1);
     }
 }
 
@@ -215,17 +224,32 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
                 cursor += parse_variable_declaration(token_set, cursor, *root);
             }
                 break;
-            /**
-             * Parsing of an enum statement.
-             * An enum statement is denoted in the following format:
-             * enum <name> { KEYWORD: ..., ... }
-             */
+            case TOKEN_IDENTIFIER:
+            {
+                cursor += parse_function_call(token_set, cursor, *root);
+            }
+                break;
+                /**
+                 * Parsing of an enum statement.
+                 * An enum statement is denoted in the following format:
+                 * enum <name> { KEYWORD: ..., ... }
+                 */
             case TOKEN_KEYWORD_ENUM:
             {
                 cursor += parse_enumerable(token_set, ++cursor, *root);
             }
                 break;
-
+                /**
+                 * Parses a for loop.
+                 * This statement must be in the following formats:
+                 * 'for (var name: type = value; name comparison value; name operation value) { ... }'
+                 * 'for (var name: type in array) { ... }'
+                 */
+            case TOKEN_KEYWORD_FOR:
+            {
+                cursor += parse_for_loop(token_set, ++cursor, *root);
+            }
+                break;
                 /**
                  * Declares a namespace to group code together.
                  */

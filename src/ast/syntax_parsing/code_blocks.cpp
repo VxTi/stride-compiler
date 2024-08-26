@@ -24,7 +24,8 @@ using namespace stride::ast;
  * @param parent_node The parent Node to append the closure to.
  * @return
  */
-int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index,
+int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
+                             int starting_index,
                              Node &parent_node)
 {
     int index, skipped_tokens, branch_depth;
@@ -69,7 +70,9 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
     return skipped_tokens;
 }
 
-ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index)
+ast_token_set_t *
+stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
+                           int starting_index)
 {
     int index, skipped_tokens, branch_depth;
     int block_start_index = starting_index;
@@ -82,7 +85,7 @@ ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_ty
     {
         if ( token_set.tokens[ index ].type == start_token )
         {
-            if (branch_depth++ == 0)
+            if ( branch_depth++ == 0 )
             {
                 block_start_index = index + 1;
             }
@@ -102,7 +105,7 @@ ast_token_set_t *stride::ast::capture_block(ast_token_set_t &token_set, token_ty
     // If there aren't any tokens skipped, there's no closure to append.
     if ( skipped_tokens > 0 )
     {
-        auto *subset = (ast_token_set_t *) malloc(sizeof (ast_token_set_t));
+        auto *subset = (ast_token_set_t *) malloc(sizeof(ast_token_set_t));
         subset->tokens = token_set.tokens + block_start_index;
         subset->token_count = skipped_tokens - 1;
         return subset;
