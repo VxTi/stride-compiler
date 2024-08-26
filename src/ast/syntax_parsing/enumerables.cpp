@@ -105,7 +105,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         // Check whether all characters are uppercase
         if ( !validate_enum_identifier((char *) current.value))
         {
-            error("Enum entries must be in MACRO_CASE, but received %s at line %d column %d.",
+            error("Enumerable members must be formatted in MACRO_CASE\n.Found: '%s' at line %d column %d.",
                   (char *) current.value,
                   current.line,
                   current.column);
@@ -139,7 +139,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
             offset = 4;
         }
 
-        enum_member->addBranch(new Node(NODE_TYPE_VALUE, 0, new int(enum_value)));
+        int * enum_value_allocated = (int *) malloc(sizeof(int));
+        *enum_value_allocated = enum_value;
+
+        enum_member->addBranch(new Node(NODE_TYPE_VALUE, 0, enum_value_allocated));
 
         // There's a next enum member if there's a comma after the previous one.
         enum_id++;
@@ -162,6 +165,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
     return block->token_count + 2;
 }
 
+/**
+ * Compiles the regular expression for checking whether the enumerable
+ * entry is in the right format, MACRO_CASE.
+ */
 void compile_reg()
 {
 

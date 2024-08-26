@@ -30,15 +30,18 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
      * we'll just return that as a Node and return the ast.
      * No need to check for any other cases.
      */
-    if ( token_count == 1 &&
-         token_set.tokens[ cursor ].type == TOKEN_NUMBER_INTEGER ||
-         token_set.tokens[ cursor ].type == TOKEN_STRING_LITERAL ||
-         token_set.tokens[ cursor ].type == TOKEN_IDENTIFIER )
+    if ( token_count == 1 )
     {
-        auto *node = new Node(TOKEN_IDENTIFIER, 0);
-        node->setValue((void *) token_set.tokens[ cursor ].value);
-        parent_node.addBranch(node);
-        return 1;
+        token_type_t type = token_set.tokens[ cursor ].type;
+        if ( type == TOKEN_NUMBER_INTEGER ||
+             type == TOKEN_NUMBER_FLOAT ||
+             type == TOKEN_STRING_LITERAL ||
+             type == TOKEN_BOOLEAN_LITERAL ||
+             type == TOKEN_IDENTIFIER )
+        {
+            parent_node.addBranch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
+            return 1;
+        }
     }
 
     // TODO: Implement.

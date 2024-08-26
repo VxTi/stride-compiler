@@ -14,7 +14,7 @@ to be generated yet.
 A syntax example of the language can be found below:
 
 ```
-const var externally_invisible: string = "I'm hidden";
+const let externally_invisible: string = "I'm hidden";
 
 define test(p1: i8, p2: i32, p3: string[]) {}
 
@@ -22,7 +22,7 @@ define test(p1: i8, p2: i32, p3: string[]) {}
  * Functions have return type i32 and return 0 by default,
  * if no type or return value is provided.
  *
- * Classes, modules or variables are shared through the 'shared' keyword.
+ * Classes, modules or letiables are shared through the 'shared' keyword.
  * This allows objects to be exposed to other modules.
  * Below is a representation of how one can write code in this language.
  */
@@ -34,11 +34,11 @@ shared module::name {
 
     define f3(const param: i8) {}
 
-    define fname(varname: i8) {
+    define fname(letname: i8) {
         return 0;
     }
 
-    define ts(variadic: ...string) {}
+    define ts(letiadic: ...string) {}
 
     // Enumerables
     enum ename {
@@ -55,9 +55,9 @@ shared class cname {
     define main() {
     
        // Automatically gets transformed to 3 by syntax analysis
-       var len: i8 = [0, 1, 2].length;
+       let len: i8 = [0, 1, 2].length;
     
-       for ( var i: i32 = 0; i < 10; i++) {
+       for ( let i: i32 = 0; i < 10; i++) {
     
        }
     

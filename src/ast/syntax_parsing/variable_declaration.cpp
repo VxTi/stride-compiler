@@ -14,7 +14,7 @@ using namespace stride::ast;
  * var name1: type1 = value1, name2: type2 = value2;
  * var name1: type1, name2: type2;
  * ```
- * This function starts parsing after the 'var' keyword, in the parsePartial function.
+ * This function starts parsing after the 'var' keyword, in the parse_tokens function.
  * @param token_set The token set to parse the variable declaration from.
  * @param index  The index of the token set to start parsing from.
  */
@@ -71,7 +71,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
                 }
             }
             // Parse the expression after the equals sign
-            skipped += parse_expression(token_set, index + 4, token_set.token_count, *variable_declaration_node);
+            skipped += parse_expression(token_set, index + 4, length, *variable_declaration_node);
             nextToken = peak(token_set, index, skipped);
             hasNext = nextToken->type == TOKEN_COMMA;
         }

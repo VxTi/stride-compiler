@@ -48,17 +48,20 @@
 #define NODE_TYPE_FOR_LOOP             (0x1D)
 #define NODE_TYPE_FOR_LOOP_INIT        (0x1E)
 #define NODE_TYPE_FOR_LOOP_CONDITIONAL (0x1F)
+#define NODE_TYPE_WHILE_LOOP           (0x20)
+#define NODE_TYPE_TRY_CATCH            (0x21)
+#define NODE_TYPE_DO_WHILE             (0x22)
 
 
 #define FLAG_VARIABLE_IMMUTABLE (0x1) // Whether a variable is immutable
 #define FLAG_VARIABLE_ARRAY     (0x2) // Whether a variable is an array
 
-#define FLAG_OBJECT_SHARED     (0x1) // Whether the function or variable declaration is shared with other modules.
-#define FLAG_FUNCTION_EXTERNAL (0x2)
 
 #define FLAG_SCOPE_GLOBAL (0x1)
 #define FLAG_SCOPE_LOCAL  (0x2)
 #define FLAG_SCOPE_CLASS  (0x3)
+#define FLAG_OBJECT_SHARED     (0x4) // Whether the function or variable declaration is shared with other modules.
+#define FLAG_FUNCTION_EXTERNAL (0x5)
 
 /**
  * Definitions of operations.
@@ -206,7 +209,7 @@ namespace stride::ast
          * This is an array of AST nodes, which are the children of this Node.
          */
         Node *branches;
-        
+
         /**
          * The amount of branches this Node has.
          */
@@ -224,6 +227,8 @@ namespace stride::ast
          * This is used to store the node_type of the Node, such as addition, subtraction, etc.
          */
         unsigned int node_type;
+
+        Node *parent;
 
         void addBranch(Node *node);
 
@@ -257,7 +262,8 @@ namespace stride::ast
          * @param props The properties of the Node.
          * @param value The value of the Node.
          */
-        Node(unsigned int node_type, unsigned int flags, void *value) : Node(node_type, flags, 0, nullptr, value) {}
+        Node(unsigned int node_type, unsigned int flags, void *value) : Node(node_type, flags, 0, nullptr, value)
+        {}
 
         /**
          * Constructor for an Node without a value.
@@ -266,7 +272,8 @@ namespace stride::ast
          * keywords, such as `return` or `break`.
          * @param props The properties of the Node.
          */
-        Node(unsigned int node_type, unsigned int flags = 0) : Node(node_type, flags, 0, nullptr, nullptr) {}
+        Node(unsigned int node_type, unsigned int flags = 0) : Node(node_type, flags, 0, nullptr, nullptr)
+        {}
 
         /**
          * Default constructor for Node.
@@ -278,6 +285,7 @@ namespace stride::ast
          */
         Node(unsigned int node_type, unsigned int flags, size_t branch_count, Node *branches, void *value)
         {
+            this->parent = nullptr;
             this->flags = flags;
             this->node_type = node_type;
             this->branch_count = branch_count;
@@ -294,9 +302,21 @@ namespace stride::ast
         }
     };
 
-    void parsePartial(Node *root, ast_token_set_t &token_set);
+    /**
+     * Parses the tokens in the token set.
+     * This function will parse the tokens in the token set and create an AST node from it.
+     * @param root The root Node to append the parsed tokens to.
+     * @param token_set The token set to parse the tokens from.
+     */
+    void parse_tokens(Node *root, ast_token_set_t &token_set);
 
-    Node *parse(ast_token_set_t & token_set);
+    /**
+     * Parses the tokens in the token set.
+     * This function will parse the tokens in the token set and create an AST node from it.
+     * @param token_set The token set to parse the tokens from.
+     * @return The root Node of the parsed tokens.
+     */
+    Node *parse(ast_token_set_t &token_set);
 
     /**
      * Captures a closure with specified token boundaries.
@@ -325,7 +345,8 @@ namespace stride::ast
      * @param starting_index The index to start scanning from
      * @return An object containing the parsed tokens.
      */
-    ast_token_set_t *capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index);
+    ast_token_set_t *
+    capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token, int starting_index);
 
     /**
      * Parses a 'shared' code block, which is similar to declaring a module.
@@ -453,6 +474,34 @@ namespace stride::ast
      * Function calls can be in the format of 'module::function(...)'
      */
     int parse_function_call(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     *
+     * @param token_set
+     * @param index
+     * @param root
+     * @return
+     */
+    int parse_while_loop(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     *
+     * @param token_set
+     * @param index
+     * @param root
+     * @return
+     */
+    int parse_try_catch(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     *
+     * @param token_set
+     * @param index
+     * @param root
+     * @return
+     */
+    int parse_do_while(ast_token_set_t &token_set, cursor_t index, Node &root);
+
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

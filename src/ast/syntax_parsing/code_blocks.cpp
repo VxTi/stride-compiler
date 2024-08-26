@@ -63,7 +63,7 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
         // Now we'll have to parse the content of the closure and append that to the closure Node.
         // This allows us to add code branching, otherwise the parsing will end immediately after
         // the first closure.
-        parsePartial(closureNode, subset);
+        parse_tokens(closureNode, subset);
         parent_node.addBranch(closureNode);
     }
 
@@ -74,6 +74,7 @@ ast_token_set_t *
 stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
                            int starting_index)
 {
+    requires_token(start_token, token_set, starting_index, "Expected opening token with id %d, but received %s.", start_token, token_set.tokens[ starting_index ].value);
     int index, skipped_tokens, branch_depth;
     int block_start_index = starting_index;
 

@@ -183,7 +183,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
         // Add the parsed function body to the function declaration node.
         auto content_node = new Node(NODE_TYPE_BLOCK);
-        parsePartial(content_node, *function_body);
+        parse_tokens(content_node, *function_body);
         function_declaration->addBranch(content_node);
         skipped += function_body->token_count + 2;
 

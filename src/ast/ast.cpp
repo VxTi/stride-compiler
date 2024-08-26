@@ -15,6 +15,7 @@ bool Node::isLeaf() const
     return this->branch_count == 0;
 }
 
+
 /**
  * Checks whether the Node has
  * @return
@@ -74,6 +75,7 @@ void Node::addBranch(Node *node)
 {
     this->ensureMinimumBranches();
     this->branches[ this->branch_count++ ] = *node;
+    node->parent = this;
 }
 
 /**
@@ -110,13 +112,18 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_BLOCK:
             printf("BODY");
-            if ( reference.branch_count == 0)
+            if ( reference.branch_count == 0 )
             {
                 printf(" (empty) ");
             }
             break;
         case NODE_TYPE_VALUE:
-            printf("VALUE (%s)", (char *) reference.value);
+            if ( reference.parent != nullptr && reference.parent->node_type == NODE_TYPE_ENUMERATION_MEMBER)
+            {
+                printf("ENUM VALUE (%lld)", (long long) reference.value);
+            }
+            else
+            { printf("VALUE (%s)", (char *) reference.value); }
             break;
         case NODE_TYPE_FUNCTION_DEFINITION:
             printf("FUNCTION DECLARATION");
@@ -134,6 +141,9 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_ARRAY:
             printf("ARRAY");
             break;
+        case NODE_TYPE_TRY_CATCH:
+            printf("TRY CATCH");
+            break;
         case NODE_TYPE_CLASS:
             printf("CLASS");
             break;
@@ -142,6 +152,12 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_ENUMERATION:
             printf("ENUMERABLE DEF");
+            break;
+        case NODE_TYPE_CONDITIONAL:
+            printf("CONDITIONAL");
+            break;
+        case NODE_TYPE_WHILE_LOOP:
+            printf("WHILE LOOP");
             break;
         default:
             printf("%d", reference.node_type);
@@ -193,7 +209,7 @@ bool stride::ast::is_valid_var_type(token_type_t type)
  * @param index The current index.
  * @return The parsed bracket Node.
  */
-void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
+void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
 {
     cursor_t cursor;
 
@@ -219,9 +235,14 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
                  * var a: i8, b: i8;
                  * ```
                  */
-            case TOKEN_KEYWORD_VAR:
+            case TOKEN_KEYWORD_LET:
             {
                 cursor += parse_variable_declaration(token_set, cursor, *root);
+            }
+                break;
+            case TOKEN_KEYWORD_TRY:
+            {
+                cursor += parse_try_catch(token_set, ++cursor, *root);
             }
                 break;
             case TOKEN_IDENTIFIER:
@@ -237,6 +258,11 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
             case TOKEN_KEYWORD_ENUM:
             {
                 cursor += parse_enumerable(token_set, ++cursor, *root);
+            }
+                break;
+            case TOKEN_KEYWORD_WHILE:
+            {
+                cursor += parse_while_loop(token_set, ++cursor, *root);
             }
                 break;
                 /**
@@ -280,8 +306,8 @@ void stride::ast::parsePartial(Node *root, ast_token_set_t &token_set)
  */
 Node *stride::ast::parse(ast_token_set_t &token_set)
 {
-    auto *root = new Node(NODE_TYPE_BLOCK, FLAG_SCOPE_LOCAL);
-    stride::ast::parsePartial(root, token_set);
+    auto *root = new Node(NODE_TYPE_BLOCK, FLAG_SCOPE_GLOBAL);
+    stride::ast::parse_tokens(root, token_set);
     Node::print(*root);
     return root;
 }

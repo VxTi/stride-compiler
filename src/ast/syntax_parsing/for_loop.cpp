@@ -34,7 +34,7 @@ int stride::ast::parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node
 
     auto *for_loop_node = new Node(NODE_TYPE_FOR_LOOP);
 
-    parsePartial(for_loop_node, *content);
+    parse_tokens(for_loop_node, *content);
     root.addBranch(for_loop_node);
 
     // Now we're sure we have a statement and content for the loop.
