@@ -72,6 +72,10 @@ stride::ast::requires_token(token_type_t type, ast_token_set_t &token_set, curso
         fprintf(stderr, " %d | %s\n", ref.line, line.c_str());
         fprintf(stderr, " %*s^\n", ref.column, "");
         vfprintf(stderr, error_message, args);
+
+        if (index < token_set.token_count && token_set.tokens[index].type != type)
+            fprintf(stderr, "\nFaulty token: %s\n", token_set.tokens[index].value);
+
         va_end(args);
         exit(1);
     }

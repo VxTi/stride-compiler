@@ -26,4 +26,7 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax_parsing/while_loop.cpp
         src/ast/syntax_parsing/try_catch.cpp
         src/ast/syntax_parsing/variable_types.cpp
+        src/ast/syntax_parsing/do_while.cpp
+        src/ast/syntax_parsing/if_else.cpp
+        src/ast/syntax_parsing/throw.cpp
 )

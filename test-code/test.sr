@@ -5,4 +5,24 @@ shared test::module {
     define async module(args: string[]) {
         system::println("Hello, World!");
     }
+
+    define external println(message: string, args: ...string);
+
+    define func(test: string, test2: ...string) {
+
+        const let x: i8 = 0;
+
+        let nil: unknown = null;
+        do {
+            system::println("Hello, World!");
+        } while (x < 10);
+
+        try {
+            system::println("Hello, World!");
+        } catch (e: Error) {
+            system::println("Hello, World!");
+            throw Error("fuck");
+        }
+
+     }
 }

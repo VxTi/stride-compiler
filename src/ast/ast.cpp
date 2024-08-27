@@ -83,6 +83,9 @@ void Node::add_branch(Node *node)
  */
 void Node::print(Node &reference, int depth)
 {
+    /** ** ** TO BE REMOVED IN THE FUTURE ** ** **/
+    // This is a temporary function to print the AST to the console, for debugging purposes.
+
     printf("%*s", depth * 2, "");
     if ( depth > 0 )
     { printf("↳ "); }
@@ -153,6 +156,13 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_VARIABLE_DECLARATION:
             printf("VARIABLE DECLARATION");
+            if ( reference.flags & FLAG_VARIABLE_IMMUTABLE)
+            {
+                printf(" (immutable)");
+            }
+            break;
+        case NODE_TYPE_FUNCTION_CALL:
+            printf("FUNCTION CALL");
             break;
         case NODE_TYPE_ENUMERATION:
             printf("ENUMERABLE DEF");
@@ -162,6 +172,15 @@ void Node::print(Node &reference, int depth)
             break;
         case NODE_TYPE_WHILE_LOOP:
             printf("WHILE LOOP");
+            break;
+        case NODE_TYPE_THROW:
+            printf("THROW");
+            break;
+        case NODE_TYPE_DO_WHILE:
+            printf("DO WHILE LOOP");
+            break;
+        case NODE_TYPE_EXPRESSION:
+            printf("EXPRESSION");
             break;
         default:
             printf("%d", reference.node_type);
@@ -224,7 +243,19 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 break;
             case TOKEN_IDENTIFIER:
             {
-                cursor += parse_function_call(token_set, cursor, *root);
+                if ( is_function_call(token_set, cursor) )
+                {
+                    cursor += parse_function_call(token_set, cursor, *root);
+                } else
+                {
+                    printf("Identifier is not a function call:\n");
+                    int tokens = is_identifier_sequence(token_set, cursor);
+                    for ( int i = 0; i < tokens; i++ )
+                    {
+                        printf("%s ", token_set.tokens[ cursor + i ].value);
+                    }
+                    cursor++;
+                }
             }
                 break;
                 /**
@@ -237,6 +268,16 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 cursor += parse_enumerable(token_set, ++cursor, *root);
             }
                 break;
+            case TOKEN_KEYWORD_THROW:
+            {
+                cursor += parse_throw(token_set, ++cursor, *root);
+            }
+            break;
+            case TOKEN_KEYWORD_DO:
+            {
+                cursor += parse_do_while(token_set, ++cursor, *root);
+            }
+            break;
             case TOKEN_KEYWORD_WHILE:
             {
                 cursor += parse_while_loop(token_set, ++cursor, *root);

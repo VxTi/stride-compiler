@@ -42,8 +42,7 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
     {
         return parse_enumerable(token_set, ++index, *node);
     }
-    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier, but received '%s.'",
-                   token_set.tokens[ index ].value);
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier after 'shared' keyword.");
 
     int skipped = parse_identifier(token_set, index, *node);
 

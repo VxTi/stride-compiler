@@ -101,8 +101,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
  */
 void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, cursor_t index)
 {
-    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name, but received %s",
-                   token_set.tokens[ index ].value);
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name");
     requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
     token_t *type_token = peak(token_set, index, 2);
     if ( type_token == nullptr || !types::is_valid_variable_type(type_token->type))

@@ -28,7 +28,7 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
                              int starting_index,
                              Node &parent_node)
 {
-    requires_token(start_token, token_set, starting_index, "Expected opening token with id %d, but received %s.", start_token, token_set.tokens[ starting_index ].value);
+    requires_token(start_token, token_set, starting_index, "Expected opening token with id %d", start_token);
 
     int index, skipped_tokens, branch_depth;
     auto *closureNode = new Node(NODE_TYPE_BLOCK, 0);
@@ -76,7 +76,7 @@ ast_token_set_t *
 stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
                            int starting_index)
 {
-    requires_token(start_token, token_set, starting_index, "Expected opening token with id %d, but received %s.", start_token, token_set.tokens[ starting_index ].value);
+    requires_token(start_token, token_set, starting_index, "Expected opening token with ID %d", start_token);
     int index, skipped_tokens, branch_depth;
     int block_start_index = starting_index;
 

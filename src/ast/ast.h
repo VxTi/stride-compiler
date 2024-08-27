@@ -429,6 +429,14 @@ namespace stride::ast
     int parse_expression(ast_token_set_t &token_set, size_t cursor, size_t token_count, Node &parent_node);
 
     /**
+     * Checks whether the token set at the given index is an identifier sequence,
+     * e.g: 'module::submodule::function'.
+     * This function will return the length of the identifier sequence if it is an identifier sequence,
+     * and 0 otherwise.
+     */
+    int is_identifier_sequence(ast_token_set_t &token_set, cursor_t index);
+
+    /**
      * Parses an identifier into either a single or multiple nodes.
      * This parsing depends on whether the identifier refers to a module,
      * or a locally declared variable/function.
@@ -464,6 +472,11 @@ namespace stride::ast
     int parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node &root);
 
     /**
+     * Checks whether the token set at the given index is a function call.
+     */
+    int is_function_call(ast_token_set_t &token_set, cursor_t index);
+
+    /**
      * Parses a function call.
      * Function calls can be in the format of 'module::function(...)'
      */
@@ -496,6 +509,20 @@ namespace stride::ast
      */
     int parse_do_while(ast_token_set_t &token_set, cursor_t index, Node &root);
 
+
+    /**
+     * Parses a throw statement.
+     * This function will parse a throw statement in the following format:
+     * ```
+     * throw "error message"
+     * ```
+     * @param token_set The token set to parse the throw statement from.
+     * @param cursor The cursor position in the token set.
+     * @param token_count The amount of tokens in the subset.
+     * @param parent_node The parent AST Node to append the throw statement to.
+     * @return How many tokens were skipped.
+     */
+    int parse_throw(ast_token_set_t &token_set, cursor_t index, Node &parent_node);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

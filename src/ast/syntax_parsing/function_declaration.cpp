@@ -93,8 +93,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     // Create function Node with the function name as value
     auto *function_declaration = new Node(NODE_TYPE_FUNCTION_DEFINITION, function_flags);
     function_declaration->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
-    requires_token(TOKEN_LPAREN, token_set, index + 1, "Expected opening parenthesis, but received %s",
-                   token_set.tokens[ index ].value);
+    requires_token(TOKEN_LPAREN, token_set, index + 1, "Expected opening parenthesis after function name.");
     index++;
 
     // Capture block for function parameter body, aka the part after the function name between the parenthesis
@@ -112,6 +111,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     if ( function_parameters_body->token_count > 0 )
     {
         auto *parameters_node = new Node(NODE_TYPE_FUNCTION_PARAMETERS, 0);
+        int variadic_declarations = 0;
 
         for ( int i = 0; i < function_parameters_body->token_count; )
         {
@@ -123,11 +123,11 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             }
             // Ensure the variable declaration has
             requires_token(TOKEN_IDENTIFIER, *function_parameters_body, i,
-                           "Function definition: Expected parameter name, but received %s",
+                           "Expected parameter name after function declaration.",
                            function_parameters_body->tokens[ index ].value);
 
             requires_token(TOKEN_COLON, *function_parameters_body, i + 1,
-                           "Function definition: Expected colon after parameter name, but received %s",
+                           "Expected colon after parameter name in function definition.\nThis is required to denote the type of the parameter.",
                            function_parameters_body->tokens[ index ].value);
 
             auto function_parameter = new Node(NODE_TYPE_VARIABLE_DECLARATION);
@@ -137,6 +137,13 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             // Check if parameter is variadic
             if ( peakeq(*function_parameters_body, i, 2, TOKEN_THREE_DOTS))
             {
+                if (variadic_declarations++ > 0)
+                {
+                    error("\nFound double variadic expression at line %d column %d.\nVariadic expressions must be the last parameter in a function declaration.\n",
+                          function_parameters_body->tokens[ i + 2 ].line,
+                          function_parameters_body->tokens[ i + 2 ].column);
+                    return 0;
+                }
                 i++;
                 var_flags |= FLAG_VARIABLE_ARRAY;
             }
@@ -168,10 +175,11 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
             if ( i + 3 < function_parameters_body->token_count && !peakeq(*function_parameters_body, i, 3, TOKEN_COMMA))
             {
+                token_t culprit = function_parameters_body->tokens[ i + 3 ];
                 error("Non-last function parameter requires comma after declaration, but received '%s' at line %d column %d.",
-                      function_parameters_body->tokens[ i + 3 ].value,
-                      function_parameters_body->tokens[ i + 3 ].line,
-                      function_parameters_body->tokens[ i + 3 ].column);
+                      culprit.value,
+                      culprit.line,
+                      culprit.column);
                 return 0;
             }
             i += 4;

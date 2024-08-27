@@ -48,8 +48,6 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
             {
                 break;
             }
-            requires_token(TOKEN_DOUBLE_COLON, token_set, index, "Expected '::' but received '%s.'",
-                           token_set.tokens[ index ].value);
             requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier, but received '%s.'",
                            token_set.tokens[ index + 1 ].value);
 
@@ -63,4 +61,37 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
     }
     root.add_branch(keyword_node);
     return skipped;
+}
+
+int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set, cursor_t index)
+{
+    if ( !peakeq(token_set, index, 0, TOKEN_IDENTIFIER))
+    {
+        return 0;
+    }
+
+    // If the next token is a double colon, we have a secondary keyword
+    // This is the case when a module has a submodule, e.g. module::submodule
+    // We will parse this as a separate identifier.
+    if ( peakeq(token_set, index, 1, TOKEN_DOUBLE_COLON))
+    {
+        int length = 1;
+        if ( !peakeq(token_set, index, 2, TOKEN_IDENTIFIER))
+        {
+            return length;
+        }
+
+        for ( ++index; index < token_set.token_count; index += 2 )
+        {
+            // If the next token is not a double colon, we have reached the end of the identifier sequence
+            if ( !peakeq(token_set, index, 0, TOKEN_DOUBLE_COLON) ||
+                 !peakeq(token_set, index, 1, TOKEN_IDENTIFIER))
+            {
+                break;
+            }
+            length += 2;
+        }
+        return length;
+    }
+    return 1;
 }

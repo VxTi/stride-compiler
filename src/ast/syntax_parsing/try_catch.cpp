@@ -38,7 +38,7 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
 
     if ( strcmp((char *) catch_variable_tokens->tokens[2].value, "Error") != 0 )
     {
-        error("Catch expression requires Error type after colon, at line %d column %d.",
+        error("\nCatch expression requires 'Error' type after parameter name, at line %d column %d.\nThis is to ensure all exceptions are handled properly.\n",
               catch_variable_tokens->tokens[2].line,
               catch_variable_tokens->tokens[2].column);
     }
@@ -57,14 +57,15 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
 
     // All nodes for the try catch AST entry
     auto *try_catch_node = new Node(NODE_TYPE_TRY_CATCH);
+    auto *catch_body_node = new Node(NODE_TYPE_BLOCK);
     auto *try_body_node = new Node(NODE_TYPE_BLOCK);
+
     auto *catch_expression_node = new Node(NODE_TYPE_VARIABLE_DECLARATION);
     catch_expression_node->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, 0, catch_variable_tokens->tokens[ 2 ].value));
     catch_expression_node->add_branch(new Node(NODE_TYPE_VALUE, 0, catch_variable_tokens->tokens[ 0 ].value));
-    auto *catch_body_node = new Node(NODE_TYPE_BLOCK);
 
     parse_tokens(try_body_node, *try_body_tokens);
-    parse_tokens(catch_body_node, *catch_variable_tokens);
+    parse_tokens(catch_body_node, *catch_body_tokens);
 
     try_catch_node->add_branch(try_body_node);
     try_catch_node->add_branch(catch_expression_node);
