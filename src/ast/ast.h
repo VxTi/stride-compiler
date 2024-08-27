@@ -51,6 +51,7 @@
 #define NODE_TYPE_WHILE_LOOP           (0x20)
 #define NODE_TYPE_TRY_CATCH            (0x21)
 #define NODE_TYPE_DO_WHILE             (0x22)
+#define NODE_TYPE_IF                   (0x23)
 
 #define FLAG_VARIABLE_IMMUTABLE (0x100) // Whether a variable is immutable
 #define FLAG_VARIABLE_ARRAY     (0x200) // Whether a variable is an array
@@ -316,7 +317,7 @@ namespace stride::ast
      * Captures a closure with specified token boundaries.
      * If the boundaries are not found or there's an imbalance of boundaries,
      *
-     * Defined in src/ast/syntax_parsing/code_blocks.cpp
+     * Defined in src/ast/syntax/code_blocks.cpp
      *
      * @param token_set The token set to capture the block from.
      * @param start_token The token that indicates the start of the block.
@@ -345,7 +346,7 @@ namespace stride::ast
     /**
      * Parses a 'shared' code block, which is similar to declaring a module.
      *
-     * Defined in src/ast/syntax_parsing/shared_statement.cpp
+     * Defined in src/ast/syntax/shared_statement.cpp
      *
      * @param token_set The token set to parse the shared statement from.
      * @param index The index of the token set to start parsing from.
@@ -362,7 +363,7 @@ namespace stride::ast
      * import "path/to/file"
      * ```
      *
-     * Defined in src/ast/syntax_parsing/import_statement.cpp
+     * Defined in src/ast/syntax/import_statement.cpp
      * @param token_set The token set to parse the import declaration from.
      * @param index The index of the token set to start parsing from.in
      * @param root The root Node to append the import declaration to.
@@ -523,6 +524,16 @@ namespace stride::ast
      * @return How many tokens were skipped.
      */
     int parse_throw(ast_token_set_t &token_set, cursor_t index, Node &parent_node);
+
+    /**
+     * Parses an if-else statement.
+     * This function will parse an if-else statement in the following format:
+     * `
+     * if (condition) { ... } else { ... }
+     * `
+     * The else clause is optional, and can be omitted.
+     */
+    int parse_if_else(ast_token_set_t &token_set, cursor_t index, Node &parent_node);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

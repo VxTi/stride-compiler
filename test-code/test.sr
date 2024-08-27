@@ -24,5 +24,12 @@ shared test::module {
             throw Error("fuck");
         }
 
+        if (true) {
+        }
+         else if (true) {} else {
+
+         }
+
+
      }
 }

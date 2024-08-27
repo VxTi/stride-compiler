@@ -139,6 +139,9 @@ void Node::print(Node &reference, int depth)
                 printf(" (async)");
             }
             break;
+        case NODE_TYPE_IF:
+            printf("IF STATEMENT");
+            break;
         case NODE_TYPE_FOR_LOOP:
             printf("FOR LOOP");
             break;
@@ -218,6 +221,11 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
             case TOKEN_KEYWORD_DEFINE:
             {
                 cursor += parse_function_declaration(token_set, ++cursor, *root);
+            }
+                break;
+            case TOKEN_KEYWORD_IF:
+            {
+                cursor += parse_if_else(token_set, ++cursor, *root);
             }
                 break;
 
