@@ -43,8 +43,12 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
 
     if_node->add_branch(if_body_node);
 
-    // If there's an 'else' statement, check all possibilities
-    if ( peakeq(token_set, index + skipped, 0, TOKEN_KEYWORD_ELSE))
+    // If there's an 'elif' statement, parse it as an 'else if'
+    if ( peakeq(token_set, index + skipped, 0, TOKEN_KEYWORD_ELIF))
+    {
+        skipped += parse_if_else(token_set, index + skipped, *if_node);
+    }
+    else if ( peakeq(token_set, index + skipped, 0, TOKEN_KEYWORD_ELSE))
     {
         if ( peakeq(token_set, index + skipped, 1, TOKEN_KEYWORD_IF)) // If there's an 'else if' statement, parse it
         {

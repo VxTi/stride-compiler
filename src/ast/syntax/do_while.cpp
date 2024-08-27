@@ -8,7 +8,6 @@ using namespace stride::ast;
 
 int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_t index, stride::ast::Node &root)
 {
-    printf("Parsing do while statement\n");
     ast_token_set_t *do_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index);
     if ( do_block_tokens == nullptr )
     {

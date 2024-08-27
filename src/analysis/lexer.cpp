@@ -96,6 +96,7 @@ void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_s
                 get_cursor_position(source, i, &line, &col);
                 token.line = line;
                 token.column = col;
+                token.index = i;
 
                 memcpy((void *) token.value, source + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value )[ match.rm_eo - match.rm_so ] = '\0';

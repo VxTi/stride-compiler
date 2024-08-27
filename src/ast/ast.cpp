@@ -6,6 +6,9 @@
 
 using namespace stride::ast;
 
+std::string stride::ast::current_file_name;
+std::string stride::ast::current_file_content;
+
 /**
  * Returns whether the AST Node is a leaf or not (no branches)
  * @return
@@ -74,6 +77,7 @@ void Node::ensureMinimumBranches()
 void Node::add_branch(Node *node)
 {
     this->ensureMinimumBranches();
+    node->parent_index = (int) this->branch_count;
     this->branches[ this->branch_count++ ] = *node;
     node->parent = this;
 }
@@ -145,7 +149,7 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_FOR_LOOP:
             printf("FOR LOOP");
             break;
-        case NODE_TYPE_SHARED:
+        case NODE_TYPE_MODULE:
             printf("SHARED BLOCK");
             break;
         case NODE_TYPE_ARRAY:
@@ -214,6 +218,7 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
 
     for ( cursor = 0; cursor < token_set.token_count; )
     {
+        printf("Handling token %s\n", token_set.tokens[ cursor ].value);
         switch ( token_set.tokens[ cursor ].type )
         {
 
@@ -241,7 +246,7 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                  */
             case TOKEN_KEYWORD_LET:
             {
-                cursor += parse_variable_declaration(token_set, cursor, *root);
+                cursor += parse_variable_declaration(token_set, ++cursor, *root);
             }
                 break;
             case TOKEN_KEYWORD_TRY:
@@ -251,18 +256,16 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 break;
             case TOKEN_IDENTIFIER:
             {
-                if ( is_function_call(token_set, cursor) )
+                if ( is_function_call(token_set, cursor))
                 {
                     cursor += parse_function_call(token_set, cursor, *root);
-                } else
+                }
+                else
                 {
-                    printf("Identifier is not a function call:\n");
-                    int tokens = is_identifier_sequence(token_set, cursor);
-                    for ( int i = 0; i < tokens; i++ )
-                    {
-                        printf("%s ", token_set.tokens[ cursor + i ].value);
-                    }
-                    cursor++;
+                    error("Unexpected identifier '%s' at line %d column %d",
+                          token_set.tokens[ cursor ].value,
+                          token_set.tokens[ cursor ].line,
+                          token_set.tokens[ cursor ].column);
                 }
             }
                 break;
@@ -280,12 +283,12 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
             {
                 cursor += parse_throw(token_set, ++cursor, *root);
             }
-            break;
+                break;
             case TOKEN_KEYWORD_DO:
             {
                 cursor += parse_do_while(token_set, ++cursor, *root);
             }
-            break;
+                break;
             case TOKEN_KEYWORD_WHILE:
             {
                 cursor += parse_while_loop(token_set, ++cursor, *root);
@@ -305,9 +308,9 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 /**
                  * Declares a namespace to group code together.
                  */
-            case TOKEN_KEYWORD_SHARED:
+            case TOKEN_KEYWORD_MODULE:
             {
-                cursor += parse_shared_statement(token_set, ++cursor, *root);
+                cursor += parse_module_statement(token_set, ++cursor, *root);
             }
                 break;
                 /**
@@ -318,8 +321,17 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 cursor += parse_import_statement(token_set, ++cursor, *root);
             }
                 break;
-            default:
+            case TOKEN_KEYWORD_CLASS:
+            {
+                cursor += parse_class(token_set, ++cursor, *root);
+            }
+                break;
+            case TOKEN_KEYWORD_CONST:
                 cursor++;
+                break;
+            default:
+                blame_token(token_set.tokens[ cursor ], "Unexpected token found.");
+                exit(1);
                 break;
         }
     }

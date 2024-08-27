@@ -21,10 +21,11 @@ using namespace stride::ast;
  * @param index The index of the token set to start parsing from.
  * @param root The root Node to append the shared statement to.
  */
-int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
+int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
 
-    Node *node = new Node(NODE_TYPE_SHARED, 0);
+    Node *node = new Node(NODE_TYPE_MODULE, 0);
+    int skipped = 0;
 
     token_t *next_token = peak(token_set, index, 0);
     if ( next_token == nullptr )
@@ -35,25 +36,28 @@ int stride::ast::parse_shared_statement(ast_token_set_t &token_set, cursor_t ind
 
     if ( next_token->type == TOKEN_KEYWORD_CLASS )
     {
-        node->node_type = NODE_TYPE_CLASS;
-        index++;
+        return 1;
     }
-    else if ( next_token->type == TOKEN_KEYWORD_ENUM )
+
+    if ( next_token->type == TOKEN_KEYWORD_ENUM )
     {
         return parse_enumerable(token_set, ++index, *node);
     }
+
     requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier after 'shared' keyword.");
 
-    int skipped = parse_identifier(token_set, index, *node);
+    skipped += parse_identifier(token_set, index, *node);
 
     // Capture the closure after the namespace
-    int shared_block_length = parse_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped, *node);
+    ast_token_set_t *shared_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped);
 
-    if ( shared_block_length == 0 )
+    if (shared_block_tokens->token_count == 0)
     {
         error("Expected block after namespace declaration");
     }
 
+    parse_tokens(node, *shared_block_tokens);
+
     root.add_branch(node);
-    return shared_block_length + skipped;
+    return shared_block_tokens->token_count + 2;
 }

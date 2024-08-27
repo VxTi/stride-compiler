@@ -32,7 +32,6 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     {
         error("Expected function name or identifiers, but received none.");
     }
-    token_t func_identifier;
     token_t *next = peak(token_set, index, 0);
 
     // Move the cursor to the right and iterate over the tokens until we find the function name
@@ -40,6 +39,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     for ( ; next != nullptr && index < token_set.token_count;
             next = peak(token_set, ++index, 0))
     {
+        printf("Next token: %s\n", next->value);
         switch ( next->type )
         {
             case TOKEN_KEYWORD_SHARED:
@@ -82,8 +82,10 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 goto DECLARATION; // Only way to get out of this mess
             }
             default:
-                error("Expected function name or identifiers, but received %s",
-                      next->value);
+                error("Illegal identifier '%s' found after function declaration at line %d column %d.\n",
+                      next->value,
+                      next->line,
+                      next->column);
                 return 0;
         }
     }
@@ -217,5 +219,5 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
     root.add_branch(function_declaration);
 
-    return skipped + function_parameters_body->token_count + 2;
+    return skipped + function_parameters_body->token_count + 3;
 }

@@ -21,70 +21,107 @@ using namespace stride::ast;
  */
 int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
-
-    int skipped = 1;
+    // We start from the keyword of the declaration, e.g. after 'let'
     bool hasNext;
+    int var_flags = peakeq(token_set, index, -2, TOKEN_KEYWORD_CONST) ? FLAG_VARIABLE_IMMUTABLE : 0;
+    int statement_length = distance_next_token(token_set, index, TOKEN_SEMICOLON);
 
-    do
+    if ( statement_length == -1 )
     {
-        // Validate whether the variable has the 'name: type' format.
-        validate_variable_declaration(token_set, index + 1);
+        error("Expected semicolon after variable declaration, but received none, starting at line %d column %d.",
+              token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+        return 0;
+    }
 
-        // We ensured this is not NULL in previous function call
-        token_t *type_token = peak(token_set, index, 3);
-        skipped += 3;
+    // Calculate the length of the secondary expression.
+    int sub_expression_length = distance_next_token_outside_block(token_set, index, TOKEN_COMMA);
 
-        // Variable declaration Node
+    /*
+     * Regular variable declaration (singular expression)
+     * This is the parsing for when there's only one variable declared on the same line.
+     */
+    if ( sub_expression_length == -1 || sub_expression_length > statement_length )
+    {
         auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
-
-        // The identifier containing the name of the variable
+        validate_variable_declaration(token_set, index);
         variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_IDENTIFIER, 0,
-                         token_set.tokens[ index + 1 ].value)
+                         token_set.tokens[ index ].value)
         );
-
-        // Node containing the variable type
         variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_VARIABLE_TYPE, 0,
-                         type_token->value)
+                         token_set.tokens[ index + 2 ].value)
         );
+        variable_declaration_node->flags = var_flags;
 
-        variable_declaration_node->flags = is_previous(token_set, TOKEN_KEYWORD_CONST, index) ?
-                                           FLAG_VARIABLE_IMMUTABLE : 0;
-        token_t *nextToken = peak(token_set, index, 4);
-
-        // Ensure there's a next token. We want either a comma or a value assignment
-        if ( nextToken == nullptr )
+        // If there's an equals sign, parse the expression after it.
+        if ( peakeq(token_set, index, 3, TOKEN_EQUALS))
         {
-            error("Expected semicolon or variable value after variable declaration, but received neither.");
-        }
-
-        if ( nextToken->type == TOKEN_EQUALS )
-        {
-            int length = 0;
-            // Calculate expression length
-            for ( int i = index; i < token_set.token_count; i++ )
+            int length = statement_length - index - 3;
+            if ( length == -1 )
             {
-                if ( token_set.tokens[ i ].type == TOKEN_SEMICOLON )
-                {
-                    length = i - index;
-                    break;
-                }
+                length = 1;
             }
-            // Parse the expression after the equals sign
-            skipped += parse_expression(token_set, index + 4, length, *variable_declaration_node);
-            nextToken = peak(token_set, index, skipped);
-            hasNext = nextToken->type == TOKEN_COMMA;
-        }
-        else
-        {
-            hasNext = nextToken->type == TOKEN_COMMA;
+            parse_expression(token_set, index + 4, length, *variable_declaration_node);
         }
         root.add_branch(variable_declaration_node);
+        return statement_length + 1;
+    }
+    /*
+     * Multiple variable declaration (multiple expressions)
+     * This is the parsing for when there's multiple variables declared on the same line,
+     * such as: `var name1: type1, name2: type2;`
+     */
+    for ( int i = index;
+          i < index + statement_length;
+          sub_expression_length = distance_next_token_outside_block(token_set, i, TOKEN_COMMA))
+    {
+        validate_variable_declaration(token_set, i);
+        auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
+        variable_declaration_node->flags = var_flags;
 
-    } while ( hasNext );
+        variable_declaration_node->add_branch(
+                new Node(NODE_TYPE_IDENTIFIER, 0,
+                         token_set.tokens[ i ].value)
+        );
 
-    return skipped;
+        variable_declaration_node->add_branch(
+                new Node(NODE_TYPE_VARIABLE_TYPE, 0,
+                         token_set.tokens[ i + 2 ].value)
+        );
+
+        // If there's an equals sign, parse the expression after it.
+
+        if ( peakeq(token_set, i, 3, TOKEN_EQUALS))
+        {
+            int length = distance_next_token(token_set, i + 3, TOKEN_COMMA) - 1;
+            if ( length == -1 )
+            {
+                length = statement_length - i + 1;
+            }
+            else if (i + length + 3 > index + statement_length)
+            {
+                printf("Length: %d, statement len: %d, i: %d, newLen: %d\n", length, statement_length, i,
+                       statement_length - i + 1);
+                length = statement_length - i + 1;
+            }
+            printf("Multi variable declaration length: %d\n", length);
+            printf("Variable name: %s\n", token_set.tokens[ i ].value);
+            parse_expression(token_set, i + 4, length, *variable_declaration_node);
+        }
+
+        root.add_branch(variable_declaration_node);
+
+        // If there's no next expression, break the loop and prevent infinity
+        if ( sub_expression_length == -1 || i + sub_expression_length + 1 > index + statement_length )
+        {
+            break;
+        }
+
+        i += sub_expression_length + 1;
+    }
+
+    return statement_length + 1;
 }
 
 
@@ -106,8 +143,8 @@ void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, curs
     token_t *type_token = peak(token_set, index, 2);
     if ( type_token == nullptr || !types::is_valid_variable_type(type_token->type))
     {
+        token_t culprit = token_set.tokens[ index + 1 ];
         error("Received invalid properties after token declaration at line %d column %d: %s",
-              token_set.tokens[ index + 1 ].line, token_set.tokens[ index + 1 ].column,
-              token_set.tokens[ index + 1 ].value);
+              culprit.line, culprit.column, culprit.value);
     }
 }

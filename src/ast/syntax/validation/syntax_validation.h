@@ -13,7 +13,19 @@
 
 namespace stride::ast::validation {
 
-    void validate(stride::ast::Node &root);
+    void validate(Node &root);
+
+    /**
+     * Checks whether the provided node is being accessed before declaration.
+     */
+    void check_variable_scope_order_accessibility(Node &node);
+
+    /**
+     * Checks whether the provided node is attempting to reassign an already
+     * existing variable.
+     * @param node
+     */
+    void check_variable_redeclaration(Node &original);
 
 }
 

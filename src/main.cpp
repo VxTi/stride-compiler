@@ -2,6 +2,7 @@
 #include <fstream>
 #include "analysis/lexer.h"
 #include "ast/ast.h"
+#include "ast/syntax/validation/syntax_validation.h"
 
 using namespace stride;
 
@@ -21,8 +22,12 @@ int main(const int argc, const char **argv)
                         ( std::istreambuf_iterator<char>()));
 
     ast::ast_token_set_t token_set;
+    ast::current_file_name = argv[ 1 ];
+    ast::current_file_content = content;
+
     lexer::tokenize(content.c_str(), content.size(), token_set);
-    ast::parse(token_set);
+    auto root = ast::parse(token_set);
+    ast::validation::validate(*root);
 
     return 0;
 }

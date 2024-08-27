@@ -25,7 +25,6 @@ using namespace stride::ast;
 int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, size_t token_count, Node &parent_node)
 {
     int skipped = 0;
-    auto *expression_node = new Node(NODE_TYPE_EXPRESSION);
 
     /*
      * In case the expression is just a singular value,
@@ -37,8 +36,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
         token_type_t type = token_set.tokens[ cursor ].type;
         if ( types::is_valid_literal_value(type) )
         {
-            expression_node->add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
-            parent_node.add_branch(expression_node);
+            parent_node.add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
             return 1;
         }
         error("Expected value or expression, but received '%s'.", token_set.tokens[ cursor ].value);

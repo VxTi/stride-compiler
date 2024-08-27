@@ -116,3 +116,71 @@ stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token,
 
     return nullptr;
 }
+
+int stride::ast::distance_next_token(ast_token_set_t &token_set, int starting_index, token_type_t token)
+{
+    int distance = -1, index = starting_index;
+    for ( ;
+            index < token_set.token_count;
+            index++
+            )
+    {
+        if ( token_set.tokens[ index ].type == token )
+        {
+            distance = index - starting_index;
+            break;
+        }
+    }
+
+    return distance;
+}
+
+int stride::ast::distance_next_token_outside_block(ast_token_set_t &token_set, int starting_index, token_type_t token)
+{
+    int
+            distance = -1,
+            brace_depth = 0,
+            bracket_depth = 0,
+            square_bracket_depth = 0,
+            index = starting_index;
+
+    for ( ;
+            index < token_set.token_count;
+            index++
+            )
+    {
+        switch ( token_set.tokens[ index ].type )
+        {
+            case TOKEN_LBRACE:
+                brace_depth++;
+                break;
+            case TOKEN_RBRACE:
+                brace_depth--;
+                break;
+            case TOKEN_LPAREN:
+                bracket_depth++;
+                break;
+            case TOKEN_RPAREN:
+                bracket_depth--;
+                break;
+            case TOKEN_LSQUARE_BRACKET:
+                square_bracket_depth++;
+                break;
+            case TOKEN_RSQUARE_BRACKET:
+                square_bracket_depth--;
+                break;
+            default:
+                break;
+        }
+        if ( token_set.tokens[ index ].type == token &&
+             brace_depth == 0 &&
+             bracket_depth == 0 &&
+             square_bracket_depth == 0 )
+        {
+            distance = index - starting_index;
+            break;
+        }
+    }
+
+    return distance;
+}

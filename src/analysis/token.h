@@ -99,6 +99,7 @@ typedef enum
     TOKEN_KEYWORD_STRUCT,
     TOKEN_KEYWORD_IMPORT,
     TOKEN_KEYWORD_SHARED,
+    TOKEN_KEYWORD_MODULE,
     TOKEN_KEYWORD_EXTERNAL,
     TOKEN_KEYWORD_NULL,
     TOKEN_KEYWORD_OVERRIDE,
@@ -136,7 +137,7 @@ typedef struct
 {
     token_type_t type;
     char *value;
-    int valueLength;
+    int index;
     int line;
     int column;
 } token_t;

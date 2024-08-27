@@ -47,6 +47,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token("//[^\n]*", TOKEN_COMMENT),
         gen_token("/\\*.*\\*/", TOKEN_COMMENT_MULTILINE),
         gen_token_kw("shared", TOKEN_KEYWORD_SHARED),
+        gen_token_kw("module", TOKEN_KEYWORD_MODULE),
         gen_token_kw("as", TOKEN_KEYWORD_AS),
         gen_token_kw("let", TOKEN_KEYWORD_LET),
         gen_token_kw("return", TOKEN_KEYWORD_RETURN),

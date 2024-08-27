@@ -44,7 +44,7 @@
 #define NODE_TYPE_VARIABLE_TYPE        (0x19)
 #define NODE_TYPE_VALUE                (0x1A)
 #define NODE_TYPE_EXPRESSION           (0x1B)
-#define NODE_TYPE_SHARED               (0x1C)
+#define NODE_TYPE_MODULE               (0x1C)
 #define NODE_TYPE_FOR_LOOP             (0x1D)
 #define NODE_TYPE_FOR_LOOP_INIT        (0x1E)
 #define NODE_TYPE_FOR_LOOP_CONDITIONAL (0x1F)
@@ -94,6 +94,10 @@ typedef unsigned long cursor_t;
 
 namespace stride::ast
 {
+
+    // Information about the current file being parsed.
+    extern std::string current_file_name;
+    extern std::string current_file_content;
 
     /**
      * Structure definition of a token set.
@@ -154,6 +158,8 @@ namespace stride::ast
     void error(const char *errorMessage, ...);
 
     void requires_token(token_type_t type, ast_token_set_t &token_set, cursor_t index, const char *error_message, ...);
+
+    void blame_token(token_t token, const char *error_message, ...);
 
 
 /*
@@ -229,6 +235,8 @@ namespace stride::ast
         unsigned int node_type;
 
         Node *parent;
+
+        int parent_index = -1;
 
         void add_branch(Node *node);
 
@@ -353,7 +361,7 @@ namespace stride::ast
      * @param root The root Node to append the shared statement to.
      * @return The amount of tokens that were skipped.
      */
-    int parse_shared_statement(ast_token_set_t &token_set, cursor_t index, Node &root);
+    int parse_module_statement(ast_token_set_t &token_set, cursor_t index, Node &root);
 
 
     /**
@@ -534,6 +542,28 @@ namespace stride::ast
      * The else clause is optional, and can be omitted.
      */
     int parse_if_else(ast_token_set_t &token_set, cursor_t index, Node &parent_node);
+
+    /*
+     * Seeks the distance to the previous token of the given type,
+     * from the starting index.
+     */
+    int distance_next_token(ast_token_set_t &token_set, int starting_index, token_type_t token);
+
+    /*
+     * Seeks the distance to the next token of the given type,
+     * from the starting index. This function is similar to `distance_next_token`,
+     * except this one skips the provided token if it resides in a block or closure,
+     * e.g. [], {}, or ().
+     */
+    int distance_next_token_outside_block(ast_token_set_t &token_set, int starting_index, token_type_t token);
+
+    int parse_class(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    //int parse_structure(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    //int parse_switch(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    int parse_module(ast_token_set_t &token_set, cursor_t index, Node &root);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

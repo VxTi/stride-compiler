@@ -14,7 +14,7 @@ add_executable(stride_language src/main.cpp
         src/ast/ast_error_handling.cpp
         src/ast/syntax/expressions.cpp
         src/ast/syntax/code_blocks.cpp
-        src/ast/syntax/shared_statement.cpp
+        src/ast/syntax/module_statement.cpp
         src/ast/syntax/import_statement.cpp
         src/ast/syntax/function_declaration.cpp
         src/ast/syntax/variable_declaration.cpp
@@ -31,4 +31,9 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/throw.cpp
         src/ast/syntax/validation/syntax_validation.cpp
         src/ast/syntax/validation/syntax_validation.h
+        src/ast/syntax/validation/variables/variable_scope_access_order.cpp
+        src/ast/syntax/validation/variables/variable_redeclaration.cpp
+        src/ast/syntax/validation/if_statement_validation.cpp
+        src/assembly.h
+        src/ast/syntax/classes.cpp
 )

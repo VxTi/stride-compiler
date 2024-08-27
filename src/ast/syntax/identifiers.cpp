@@ -48,8 +48,7 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
             {
                 break;
             }
-            requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier, but received '%s.'",
-                           token_set.tokens[ index + 1 ].value);
+            requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier after double colon.");
 
             keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 1 ].value));
             skipped += 2;
