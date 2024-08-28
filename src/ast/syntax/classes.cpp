@@ -23,7 +23,7 @@ int stride::ast::parse_class(ast_token_set_t &token_set, cursor_t index, Node &r
 
     if ( class_block_tokens->token_count == 0 )
     {
-        error("Expected block after class declaration");
+        blame_token(token_set.tokens[index], "Expected block after class declaration");
     }
 
     node->flags = cflags;

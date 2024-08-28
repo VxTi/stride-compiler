@@ -61,8 +61,8 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
     auto *try_body_node = new Node(NODE_TYPE_BLOCK);
 
     auto *catch_expression_node = new Node(NODE_TYPE_VARIABLE_DECLARATION);
+    catch_expression_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, catch_variable_tokens->tokens[ 0 ].value));
     catch_expression_node->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, 0, catch_variable_tokens->tokens[ 2 ].value));
-    catch_expression_node->add_branch(new Node(NODE_TYPE_VALUE, 0, catch_variable_tokens->tokens[ 0 ].value));
 
     parse_tokens(try_body_node, *try_body_tokens);
     parse_tokens(catch_body_node, *catch_body_tokens);
@@ -72,5 +72,5 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
     try_catch_node->add_branch(catch_body_node);
 
     root.add_branch(try_catch_node);
-    return try_body_tokens->token_count + catch_variable_tokens->token_count + catch_body_tokens->token_count + 6;
+    return try_body_tokens->token_count + catch_variable_tokens->token_count + catch_body_tokens->token_count + 7;
 }

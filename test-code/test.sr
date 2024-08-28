@@ -1,24 +1,27 @@
-const let x: i8 = k;
-
-let k: string = balls;
-
-
-let a: i8 = 0, b: i8 = 2;
 import "external library";
 
+const x: i8 = k;
 
-module test::cock {
+let k: string = invalid;
+
+let a: i8 = 0, b: i8 = 2;
+
+const i: i8 = 0;
+
+
+module test::modulename {
 
     define external test();
 
-    define blyat(i: nigga) {
+    define blyat(i: none) {
+        for (let i: i8 = 0; i < 10; i++) {
 
+        }
     }
-    define shared async fn() {}
 
-    define async module(args: string[]) {
+
+    define main(args: string[]) {
         system::println("Hello, World!");
-        }}}}}}}}}}
     }
 
     define external println(message: string, args: ...string);
@@ -54,8 +57,9 @@ module test::cock {
         for (;;) {}
 
         do {
+            sock::s();
 
-        } while (true);
+        } while (true);;;
 
      }
 }

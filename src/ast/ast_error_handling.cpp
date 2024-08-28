@@ -74,6 +74,7 @@ void stride::ast::blame_token(token_t token, const char *error_message, ...)
     for (int i = 0; i < line_number.length() + 1; i++) printf("─");
     printf("─╯\n");
     va_end(args);
+    exit(1);
 }
 
 /**

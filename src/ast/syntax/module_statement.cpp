@@ -34,17 +34,7 @@ int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t ind
         return 0;
     }
 
-    if ( next_token->type == TOKEN_KEYWORD_CLASS )
-    {
-        return 1;
-    }
-
-    if ( next_token->type == TOKEN_KEYWORD_ENUM )
-    {
-        return parse_enumerable(token_set, ++index, *node);
-    }
-
-    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier after 'shared' keyword.");
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected identifier after 'module' keyword.");
 
     skipped += parse_identifier(token_set, index, *node);
 
@@ -53,11 +43,11 @@ int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t ind
 
     if (shared_block_tokens->token_count == 0)
     {
-        error("Expected block after namespace declaration");
+        blame_token(*next_token, "Expected block after module declaration");
     }
 
     parse_tokens(node, *shared_block_tokens);
 
     root.add_branch(node);
-    return shared_block_tokens->token_count + 2;
+    return skipped + shared_block_tokens->token_count + 2;
 }

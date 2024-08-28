@@ -150,7 +150,7 @@ void Node::print(Node &reference, int depth)
             printf("FOR LOOP");
             break;
         case NODE_TYPE_MODULE:
-            printf("SHARED BLOCK");
+            printf("MODULE");
             break;
         case NODE_TYPE_ARRAY:
             printf("ARRAY");
@@ -218,7 +218,6 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
 
     for ( cursor = 0; cursor < token_set.token_count; )
     {
-        printf("Handling token %s\n", token_set.tokens[ cursor ].value);
         switch ( token_set.tokens[ cursor ].type )
         {
 
@@ -245,8 +244,9 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                  * ```
                  */
             case TOKEN_KEYWORD_LET:
+            case TOKEN_KEYWORD_CONST:
             {
-                cursor += parse_variable_declaration(token_set, ++cursor, *root);
+                cursor += parse_variable_declaration(token_set, cursor, *root);
             }
                 break;
             case TOKEN_KEYWORD_TRY:
@@ -262,10 +262,7 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 }
                 else
                 {
-                    error("Unexpected identifier '%s' at line %d column %d",
-                          token_set.tokens[ cursor ].value,
-                          token_set.tokens[ cursor ].line,
-                          token_set.tokens[ cursor ].column);
+                    blame_token(token_set.tokens[ cursor ], "Unexpected identifier found.");
                 }
             }
                 break;
@@ -326,13 +323,11 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 cursor += parse_class(token_set, ++cursor, *root);
             }
                 break;
-            case TOKEN_KEYWORD_CONST:
+            case TOKEN_SEMICOLON:
                 cursor++;
                 break;
             default:
                 blame_token(token_set.tokens[ cursor ], "Unexpected token found.");
-                exit(1);
-                break;
         }
     }
 }

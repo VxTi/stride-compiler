@@ -50,8 +50,7 @@ int stride::ast::parse_block(ast_token_set_t &token_set, token_type_t start_toke
         // Make sure there's a balance...
         if ( branch_depth < 0 )
         {
-            error("Imbalanced closure at line %d column %d",
-                  token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+            blame_token(token_set.tokens[index], "Imbalance of enclosing tokens found.");
         }
     }
 
@@ -76,7 +75,7 @@ ast_token_set_t *
 stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
                            int starting_index)
 {
-    requires_token(start_token, token_set, starting_index, "Expected opening token with ID %d", start_token);
+    requires_token(start_token, token_set, starting_index, "Expected opening token after expression");
     int index, skipped_tokens, branch_depth;
     int block_start_index = starting_index;
 

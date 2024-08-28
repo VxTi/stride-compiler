@@ -22,19 +22,24 @@ using namespace stride::ast;
 int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
     // We start from the keyword of the declaration, e.g. after 'let'
-    bool hasNext;
-    int var_flags = peakeq(token_set, index, -2, TOKEN_KEYWORD_CONST) ? FLAG_VARIABLE_IMMUTABLE : 0;
-    int statement_length = distance_next_token(token_set, index, TOKEN_SEMICOLON);
+
+    if ( !peakeq(token_set, index, 0, TOKEN_KEYWORD_LET) &&
+         !peakeq(token_set, index, 0, TOKEN_KEYWORD_CONST))
+    {
+        blame_token(token_set.tokens[ index ], "Variable declaration requires either 'const' or 'let' as initializer.");
+    }
+
+    int var_flags = peakeq(token_set, index, 0, TOKEN_KEYWORD_CONST) ? FLAG_VARIABLE_IMMUTABLE : 0;
+    int statement_length = distance_next_token(token_set, index + 1, TOKEN_SEMICOLON);
 
     if ( statement_length == -1 )
     {
-        error("Expected semicolon after variable declaration, but received none, starting at line %d column %d.",
-              token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+        blame_token(token_set.tokens[index], "Expected semicolon after variable declaration, but received none");
         return 0;
     }
 
     // Calculate the length of the secondary expression.
-    int sub_expression_length = distance_next_token_outside_block(token_set, index, TOKEN_COMMA);
+    int sub_expression_length = distance_next_token_outside_block(token_set, index + 1, TOKEN_COMMA);
 
     /*
      * Regular variable declaration (singular expression)
@@ -43,26 +48,26 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
     if ( sub_expression_length == -1 || sub_expression_length > statement_length )
     {
         auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
-        validate_variable_declaration(token_set, index);
+        validate_variable_declaration(token_set, index + 1);
         variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_IDENTIFIER, 0,
-                         token_set.tokens[ index ].value)
+                         token_set.tokens[ index + 1 ].value)
         );
         variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_VARIABLE_TYPE, 0,
-                         token_set.tokens[ index + 2 ].value)
+                         token_set.tokens[ index + 3 ].value)
         );
         variable_declaration_node->flags = var_flags;
 
         // If there's an equals sign, parse the expression after it.
-        if ( peakeq(token_set, index, 3, TOKEN_EQUALS))
+        if ( peakeq(token_set, index, 4, TOKEN_EQUALS))
         {
-            int length = statement_length - index - 3;
+            int length = statement_length - index - 4;
             if ( length == -1 )
             {
                 length = 1;
             }
-            parse_expression(token_set, index + 4, length, *variable_declaration_node);
+            parse_expression(token_set, index + 5, length, *variable_declaration_node);
         }
         root.add_branch(variable_declaration_node);
         return statement_length + 1;
@@ -72,8 +77,8 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
      * This is the parsing for when there's multiple variables declared on the same line,
      * such as: `var name1: type1, name2: type2;`
      */
-    for ( int i = index;
-          i < index + statement_length;
+    for ( int i = index + 1;
+          i < index + statement_length + 1;
           sub_expression_length = distance_next_token_outside_block(token_set, i, TOKEN_COMMA))
     {
         validate_variable_declaration(token_set, i);
@@ -92,14 +97,14 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 
         // If there's an equals sign, parse the expression after it.
 
-        if ( peakeq(token_set, i, 3, TOKEN_EQUALS))
+        if ( peakeq(token_set, i, 4, TOKEN_EQUALS))
         {
-            int length = distance_next_token(token_set, i + 3, TOKEN_COMMA) - 1;
+            int length = distance_next_token(token_set, i + 4, TOKEN_COMMA) - 1;
             if ( length == -1 )
             {
                 length = statement_length - i + 1;
             }
-            else if (i + length + 3 > index + statement_length)
+            else if ( i + length + 4 > index + statement_length )
             {
                 printf("Length: %d, statement len: %d, i: %d, newLen: %d\n", length, statement_length, i,
                        statement_length - i + 1);
@@ -113,7 +118,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         root.add_branch(variable_declaration_node);
 
         // If there's no next expression, break the loop and prevent infinity
-        if ( sub_expression_length == -1 || i + sub_expression_length + 1 > index + statement_length )
+        if ( sub_expression_length == -1 || i + sub_expression_length + 1 > index + statement_length + 1 )
         {
             break;
         }

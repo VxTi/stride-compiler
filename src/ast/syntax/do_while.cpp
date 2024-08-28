@@ -22,12 +22,10 @@ int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_
     ast_token_set_t *while_condition_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN,
                                                             index + do_block_tokens->token_count + 3);
 
-    if ( while_condition_tokens == nullptr )
+    if ( while_condition_tokens == nullptr || while_condition_tokens->token_count == 0 )
     {
-        error("While expression requires condition after while keyword.\nThis might have gone wrong due to a missing closing parenthesis, at line %d column %d.",
-              token_set.tokens[ index + do_block_tokens->token_count + 3 ].line,
-              token_set.tokens[ index + do_block_tokens->token_count + 3 ].column);
-        return 0;
+        blame_token(token_set.tokens[ index + do_block_tokens->token_count + 3 ],
+                    "While expression requires condition after while keyword.\nThis might have gone wrong due to a missing closing parenthesis");
     }
 
     requires_token(TOKEN_SEMICOLON, token_set,
@@ -43,8 +41,8 @@ int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_
     parse_tokens(do_body_node, *do_block_tokens);
     parse_expression(*while_condition_tokens, 0, while_condition_tokens->token_count, *while_condition_node);
 
-    do_while_node->add_branch(do_body_node);
     do_while_node->add_branch(while_condition_node);
+    do_while_node->add_branch(do_body_node);
 
     root.add_branch(do_while_node);
 
