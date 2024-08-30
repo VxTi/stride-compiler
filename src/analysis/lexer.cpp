@@ -67,13 +67,6 @@ void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_s
             i++;
             continue;
         }
-        // Prevent illegal characters
-        if ( source[ i ] < 32 || source[ i ] > 126 )
-        {
-            get_cursor_position(source, i, &line, &col);
-            fprintf(stderr, "Invalid character at line %d, column %d\n", line, col);
-            exit(1);
-        }
 
         for ( j = 0, matched = 0; j < token_definitions.size(); j++ )
         {
@@ -108,9 +101,14 @@ void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_s
         }
         if ( !matched )
         {
-            get_cursor_position(source, i, &line, &col);
-            fprintf(stderr, "Illegal character found at line %d column %d: %s\n", line, col, source + i);
-            exit(1);
+            token_t illegal = {
+                .value = (char *) malloc(sizeof(char)),
+                .index = i,
+                };
+            illegal.value[ 0 ] = source[ i ];
+            get_cursor_position(source, i, &illegal.line, &illegal.column);
+            blame_token(illegal, "Illegal character found", i);
+            free(illegal.value);
         }
     }
 }

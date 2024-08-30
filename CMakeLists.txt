@@ -36,4 +36,6 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/validation/if_statement_validation.cpp
         src/assembly.h
         src/ast/syntax/classes.cpp
+        src/ast/syntax/switch_case.cpp
+        src/ast/ast_error_handling.h
 )

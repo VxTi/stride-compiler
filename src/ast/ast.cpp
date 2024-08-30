@@ -78,6 +78,7 @@ void Node::add_branch(Node *node)
 {
     this->ensureMinimumBranches();
     node->parent_index = (int) this->branch_count;
+    this->self_index = (int) node->branch_count + 1;
     this->branches[ this->branch_count++ ] = *node;
     node->parent = this;
 }
@@ -92,7 +93,9 @@ void Node::print(Node &reference, int depth)
 
     printf("%*s", depth * 2, "");
     if ( depth > 0 )
-    { printf("↳ "); }
+    {
+            printf("─ ");
+    }
     switch ( reference.node_type )
     {
         case NODE_TYPE_IMPORT:
@@ -142,6 +145,15 @@ void Node::print(Node &reference, int depth)
             {
                 printf(" (async)");
             }
+            break;
+        case NODE_TYPE_SWITCH:
+            printf("SWITCH");
+            break;
+        case NODE_TYPE_CASE:
+            printf("CASE");
+            break;
+        case NODE_TYPE_DEFAULT:
+            printf("DEFAULT");
             break;
         case NODE_TYPE_IF:
             printf("IF STATEMENT");
@@ -254,6 +266,11 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 cursor += parse_try_catch(token_set, ++cursor, *root);
             }
                 break;
+            case TOKEN_KEYWORD_SWITCH:
+            {
+                cursor += parse_switch_case(token_set, ++cursor, *root);
+            }
+            break;
             case TOKEN_IDENTIFIER:
             {
                 if ( is_function_call(token_set, cursor))
@@ -262,7 +279,7 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 }
                 else
                 {
-                    blame_token(token_set.tokens[ cursor ], "Unexpected identifier found.");
+                    blame_token(token_set.tokens[ cursor ], "Unexpected trailing token found.");
                 }
             }
                 break;

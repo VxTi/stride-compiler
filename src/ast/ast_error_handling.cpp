@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include "ast.h"
+#include "ast_error_handling.h"
 
 /**
  * Exits the program with an error message.
@@ -35,8 +36,8 @@ std::string capture_line(token_t token, int index)
             break;
         }
     }
-            line += std::string("\e[0;33m") + std::string(token.value) + std::string("\e[0m");
-    for (int i = index + strlen(token.value); i < stride::ast::current_file_content.size(); i++)
+    line += std::string("\e[0;31m") + std::string(token.value) + std::string("\e[0m");
+    for ( int i = index + strlen(token.value); i < stride::ast::current_file_content.size(); i++ )
     {
         if ( file_content[ i ] == '\n' || i == stride::ast::current_file_content.size() - 1 )
         {
@@ -62,16 +63,19 @@ void stride::ast::blame_token(token_t token, const char *error_message, ...)
            (int) line_number.length() + 2, "", stride::ast::current_file_name.c_str(),
            token.line, token.column,
            token.line, line.c_str());
-    printf("%*s·%*s\e[31m┬ \e[0;33m│\n",
-           (int) line_number.length() + 2, " ", token.column - 1 + half_token_len, " ");
-    printf("%*s·%*s\e[31m│ \e[0;33m╰─ Faulty token: %s\e[0m\n",
-           (int) line_number.length() + 2, " ", token.column - 1 + half_token_len, " ",
-           token.value);
+    printf("%*s·%*s\e[31m", (int) line_number.length() + 2, " ", token.column - half_token_len + 4, " ");
+    for ( int i = 0; i <= half_token_len; i++ )
+        printf("─");
 
-    printf("%*s·%*s\e[31m╰── ", (int) line_number.length() + 2, " ", token.column - 1 + half_token_len, " ");
+    printf("\e[31m┬");
+    for ( int i = 1; i < half_token_len; i++ ) printf("─");
+
+    int left_offset = 5 + token.column - strlen(error_message) / 2;
+    if ( left_offset < 2) left_offset = 2;
+    printf("\n\e[0m%*s·%*s\e[31m", (int) line_number.length() + 2, " ", left_offset, " ");
     vprintf(error_message, args);
     printf("\e[0m\n");
-    for (int i = 0; i < line_number.length() + 1; i++) printf("─");
+    for ( int i = 0; i < line_number.length() + 1; i++ ) printf("─");
     printf("─╯\n");
     va_end(args);
     exit(1);
@@ -109,4 +113,45 @@ stride::ast::requires_token(token_type_t type, ast_token_set_t &token_set, curso
         va_end(args);
         exit(1);
     }
+}
+
+// Definitions for more complex error handling.
+
+std::queue<const char *> stride::error::error_queue;
+
+void stride::error::begin(const char *file_path)
+{
+    char buffer[ERROR_LINE_BUFFER_SIZE];
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "╭─[ %s ]", file_path);
+    error_queue.push(buffer);
+}
+
+void stride::error::blame_line(const char *line, unsigned int line_number, int start_index, int length, const char *message, ...)
+{
+    // Appends the faulty line to the error queue
+    char buffer[ERROR_LINE_BUFFER_SIZE];
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "%d │ %s", line_number, line);
+    error_queue.push(buffer);
+
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "· %*s");
+
+    if ( length == 1)
+    {
+
+    }
+    else
+    {
+
+    }
+
+}
+
+void stride::error::empty_line() {
+    error_queue.push("·");
+}
+
+void stride::error::end()
+{
+    printf("\r────╯\n");
+    exit(1);
 }

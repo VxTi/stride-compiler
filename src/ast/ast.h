@@ -238,6 +238,8 @@ namespace stride::ast
 
         int parent_index = -1;
 
+        int self_index = -1;
+
         void add_branch(Node *node);
 
         /**
@@ -561,7 +563,7 @@ namespace stride::ast
 
     //int parse_structure(ast_token_set_t &token_set, cursor_t index, Node &root);
 
-    //int parse_switch(ast_token_set_t &token_set, cursor_t index, Node &root);
+    int parse_switch_case(ast_token_set_t &token_set, cursor_t index, Node &root);
 
     int parse_module(ast_token_set_t &token_set, cursor_t index, Node &root);
 }

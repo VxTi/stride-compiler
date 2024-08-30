@@ -39,7 +39,6 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     for ( ; next != nullptr && index < token_set.token_count;
             next = peak(token_set, ++index, 0))
     {
-        printf("Next token: %s\n", next->value);
         switch ( next->type )
         {
             case TOKEN_KEYWORD_SHARED:
@@ -141,9 +140,8 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             {
                 if (variadic_declarations++ > 0)
                 {
-                    error("\nFound double variadic expression at line %d column %d.\nVariadic expressions must be the last parameter in a function declaration.\n",
-                          function_parameters_body->tokens[ i + 2 ].line,
-                          function_parameters_body->tokens[ i + 2 ].column);
+                    blame_token(function_parameters_body->tokens[ i + 2],
+                                "Found double variadic expression in function declaration.");
                     return 0;
                 }
                 i++;
@@ -164,9 +162,8 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             {
                 if ( var_flags & FLAG_VARIABLE_ARRAY)
                 {
-                    error("Cannot have variadic expression and array at the same time, at line %d column %d.",
-                          function_parameters_body->tokens[ i + 2 ].line,
-                          function_parameters_body->tokens[ i + 2 ].column);
+                    blame_token(function_parameters_body->tokens[ i + 3],
+                                "Cannot have variadic expression and array at the same time.");
                     return 0;
                 }
                 var_flags |= FLAG_VARIABLE_ARRAY;
@@ -178,10 +175,8 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             if ( i + 3 < function_parameters_body->token_count && !peakeq(*function_parameters_body, i, 3, TOKEN_COMMA))
             {
                 token_t culprit = function_parameters_body->tokens[ i + 3 ];
-                error("Non-last function parameter requires comma after declaration, but received '%s' at line %d column %d.",
-                      culprit.value,
-                      culprit.line,
-                      culprit.column);
+                blame_token(function_parameters_body->tokens[ i + 3 ],
+                            "Non-last function parameter requires comma after declaration, but received '%s' at line %d column %d.");
                 return 0;
             }
             i += 4;
@@ -199,8 +194,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
         if ( function_body == nullptr )
         {
-            error("Function declaration requires a function body, but received none.\nThis can be caused by a missing closing bracket, starting at line %d column %d.",
-                  token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+            blame_token(token_set.tokens[index], "Function declaration requires a function body, but received none.\nThis can be caused by a missing closing bracket, starting at line %d column %d.");
             return 0;
         }
 

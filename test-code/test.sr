@@ -1,23 +1,42 @@
 import "external library";
 
-const x: i8 = k;
+let k: unknown = f();
 
-let k: string = invalid;
+switch (k) {
+
+            case 0:
+                system::println("Hello, World!");
+                break;
+            case 1:
+
+                    break;
+
+}
+
+
+let k: i8 = 1 + 10 * sin(g * 2) + 3 * 2;
 
 let a: i8 = 0, b: i8 = 2;
 
+
 const i: i8 = 0;
 
+define external test();
 
 module test::modulename {
 
     define external test();
 
     define blyat(i: none) {
+        for (let i: i8 = 0; i < 10; i++) {}
         for (let i: i8 = 0; i < 10; i++) {
 
         }
+
+
+        throw Error("oops");
     }
+
 
 
     define main(args: string[]) {
@@ -26,9 +45,19 @@ module test::modulename {
 
     define external println(message: string, args: ...string);
 
+
+    define external println(message: string, args: ...string);
+
     define func(test: string, test2: ...string) {
 
-        let nil: unknown = null;
+        let nil: i8 = null;
+
+        do {
+
+        } while (knee);
+
+        const k: unknown = 0;
+
         do {
             system::println("Hello, World!");
         } while (++x < 10);
@@ -40,7 +69,7 @@ module test::modulename {
             throw Error("fuck");
         }
 
-        if (true) {
+        if (kek) {
             try {
                 let content: string = io::read_file("/file/path");
                 let socket: socket = io::socket::create();

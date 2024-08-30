@@ -34,7 +34,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 
     if ( statement_length == -1 )
     {
-        blame_token(token_set.tokens[index], "Expected semicolon after variable declaration, but received none");
+        blame_token(token_set.tokens[ index ], "Expected semicolon after variable declaration, but received none");
         return 0;
     }
 
@@ -45,7 +45,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
      * Regular variable declaration (singular expression)
      * This is the parsing for when there's only one variable declared on the same line.
      */
-    if ( sub_expression_length == -1 || sub_expression_length > statement_length )
+    if ( sub_expression_length < 0 || sub_expression_length >= statement_length )
     {
         auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
         validate_variable_declaration(token_set, index + 1);
@@ -62,12 +62,17 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
         // If there's an equals sign, parse the expression after it.
         if ( peakeq(token_set, index, 4, TOKEN_EQUALS))
         {
-            int length = statement_length - index - 4;
-            if ( length == -1 )
+            int length = statement_length - 4;
+            if ( length < 1 )
             {
                 length = 1;
             }
             parse_expression(token_set, index + 5, length, *variable_declaration_node);
+        }
+        else if ( !peakeq(token_set, index, 4, TOKEN_COMMA) && !peakeq(token_set, index, 4, TOKEN_SEMICOLON))
+        {
+            blame_token(token_set.tokens[ index + 4 ],
+                        "Expected equals sign, semicolon or comma after variable declaration.");
         }
         root.add_branch(variable_declaration_node);
         return statement_length + 1;
@@ -97,28 +102,20 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 
         // If there's an equals sign, parse the expression after it.
 
-        if ( peakeq(token_set, i, 4, TOKEN_EQUALS))
+        if ( peakeq(token_set, i, 3, TOKEN_EQUALS))
         {
-            int length = distance_next_token(token_set, i + 4, TOKEN_COMMA) - 1;
-            if ( length == -1 )
+            int length = distance_next_token(token_set, i + 4, TOKEN_COMMA);
+            if ( length < 0 || i + length + 4 > index + statement_length + 1 )
             {
-                length = statement_length - i + 1;
+                length = statement_length - ( index - i ) + 1;
             }
-            else if ( i + length + 4 > index + statement_length )
-            {
-                printf("Length: %d, statement len: %d, i: %d, newLen: %d\n", length, statement_length, i,
-                       statement_length - i + 1);
-                length = statement_length - i + 1;
-            }
-            printf("Multi variable declaration length: %d\n", length);
-            printf("Variable name: %s\n", token_set.tokens[ i ].value);
             parse_expression(token_set, i + 4, length, *variable_declaration_node);
         }
 
         root.add_branch(variable_declaration_node);
 
         // If there's no next expression, break the loop and prevent infinity
-        if ( sub_expression_length == -1 || i + sub_expression_length + 1 > index + statement_length + 1 )
+        if ( sub_expression_length < 0 || i + sub_expression_length > statement_length )
         {
             break;
         }
@@ -148,8 +145,6 @@ void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, curs
     token_t *type_token = peak(token_set, index, 2);
     if ( type_token == nullptr || !types::is_valid_variable_type(type_token->type))
     {
-        token_t culprit = token_set.tokens[ index + 1 ];
-        error("Received invalid properties after token declaration at line %d column %d: %s",
-              culprit.line, culprit.column, culprit.value);
+        blame_token(token_set.tokens[ index + 2 ], "Variable declaration requires valid type after colon.");
     }
 }

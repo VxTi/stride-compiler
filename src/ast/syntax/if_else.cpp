@@ -15,13 +15,13 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
 
     if ( if_condition_tokens == nullptr )
     {
-        error("If statement requires condition block after declaration.\nThis might have gone wrong due to a missing closing parenthesis, at line %d column %d.",
-              token_set.tokens[ index ].line, token_set.tokens[ index ].column);
+        blame_token(token_set.tokens[index], "If statement requires condition block after declaration.\nThis might have gone wrong due to a missing closing parenthesis.");
         return 0;
     }
     skipped += if_condition_tokens->token_count + 2;
 
     auto *if_node = new Node(NODE_TYPE_IF);
+    printf("parsing expression in if (%zu)\n", if_condition_tokens->token_count);
     parse_expression(*if_condition_tokens, 0, if_condition_tokens->token_count, *if_node);
 
     // Capture the if body block

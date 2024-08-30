@@ -179,6 +179,10 @@ int stride::ast::distance_next_token_outside_block(ast_token_set_t &token_set, i
             distance = index - starting_index;
             break;
         }
+        if ( brace_depth < 0 || bracket_depth < 0 || square_bracket_depth < 0 )
+        {
+            break;
+        }
     }
 
     return distance;

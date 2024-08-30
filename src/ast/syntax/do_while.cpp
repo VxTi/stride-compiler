@@ -18,6 +18,8 @@ int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_
 
     requires_token(TOKEN_KEYWORD_WHILE, token_set, index + do_block_tokens->token_count + 2,
                    "A do-while statement requires 'while' keyword after body.");
+    requires_token(TOKEN_LPAREN, token_set, index + do_block_tokens->token_count + 3,
+                   "Expected opening parenthesis after 'while' keyword.");
 
     ast_token_set_t *while_condition_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN,
                                                             index + do_block_tokens->token_count + 3);
