@@ -7,6 +7,40 @@
 
 using namespace stride::ast;
 
+void parse_variable_declaration_segment(ast_token_set_t &token_set, cursor_t index, int token_count, Node &root)
+{
+    requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name");
+    requires_token(TOKEN_COLON, token_set, index +1, "Expected colon after variable name, but received none.");
+
+    auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
+
+    // Check if the type is a valid variable type.
+    if ( !types::is_valid_variable_type(token_set.tokens[ index + 2 ].type))
+    {
+        delete variable_declaration_node;
+        blame_token(token_set.tokens[ index + 2 ], "Variable declaration requires valid type after colon.");
+        return;
+    }
+
+    int identifier_len = 1;
+
+    if ( peakeq(token_set, index + 2, 0, TOKEN_IDENTIFIER) )
+    {
+        identifier_len = is_identifier_sequence(token_set, index + 2);
+        auto *variable_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, 0);
+        parse_identifier(token_set, index + 2, *variable_type_node);
+        variable_declaration_node->add_branch(variable_type_node);
+    } else
+    {
+        variable_declaration_node->add_branch(
+                new Node(NODE_TYPE_VARIABLE_TYPE, 0,
+                         token_set.tokens[ index + 2 ].value)
+        );
+    }
+    parse_expression(token_set, index + identifier_len + 3, token_count - identifier_len - 3, *variable_declaration_node);
+    root.add_branch(variable_declaration_node);
+}
+
 /**
  * Parses a variable declaration expression.
  * This must be in one of the following formats:
@@ -47,7 +81,8 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
      */
     if ( sub_expression_length < 0 || sub_expression_length >= statement_length )
     {
-        auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
+        parse_variable_declaration_segment(token_set, index + 1, statement_length, root);
+       /* auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
         validate_variable_declaration(token_set, index + 1);
         variable_declaration_node->add_branch(
                 new Node(NODE_TYPE_IDENTIFIER, 0,
@@ -74,7 +109,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
             blame_token(token_set.tokens[ index + 4 ],
                         "Expected equals sign, semicolon or comma after variable declaration.");
         }
-        root.add_branch(variable_declaration_node);
+        root.add_branch(variable_declaration_node);*/
         return statement_length + 1;
     }
     /*
@@ -141,10 +176,13 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, cursor_t index)
 {
     requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name");
-    requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
-    token_t *type_token = peak(token_set, index, 2);
+    int identifier_len = is_identifier_sequence(token_set, index + 1);
+    requires_token(TOKEN_COLON, token_set, index + identifier_len + 1,
+                   "Expected colon after variable name, but received none.");
+    token_t *type_token = peak(token_set, index, identifier_len + 2);
     if ( type_token == nullptr || !types::is_valid_variable_type(type_token->type))
     {
-        blame_token(token_set.tokens[ index + 2 ], "Variable declaration requires valid type after colon.");
+        blame_token(token_set.tokens[ index + identifier_len + 1 ],
+                    "Variable declaration requires valid type after colon.");
     }
 }

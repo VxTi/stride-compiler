@@ -46,12 +46,11 @@
 #define NODE_TYPE_EXPRESSION           (0x1B)
 #define NODE_TYPE_MODULE               (0x1C)
 #define NODE_TYPE_FOR_LOOP             (0x1D)
-#define NODE_TYPE_FOR_LOOP_INIT        (0x1E)
-#define NODE_TYPE_FOR_LOOP_CONDITIONAL (0x1F)
-#define NODE_TYPE_WHILE_LOOP           (0x20)
-#define NODE_TYPE_TRY_CATCH            (0x21)
-#define NODE_TYPE_DO_WHILE             (0x22)
-#define NODE_TYPE_IF                   (0x23)
+#define NODE_TYPE_WHILE_LOOP           (0x1E)
+#define NODE_TYPE_TRY_CATCH            (0x1F)
+#define NODE_TYPE_DO_WHILE             (0x20)
+#define NODE_TYPE_IF                   (0x21)
+#define NODE_TYPE_TERNARY              (0x22)
 
 #define FLAG_VARIABLE_IMMUTABLE (0x100) // Whether a variable is immutable
 #define FLAG_VARIABLE_ARRAY     (0x200) // Whether a variable is an array
@@ -77,18 +76,24 @@
 #define AST_OPERATION_OR  (0x7)
 #define AST_OPERATION_XOR (0x8)
 #define AST_OPERATION_NOT (0x9)
+#define AST_OPERATION_POW (0xA)
+#define AST_OPERATION_LSF (0xB)
+#define AST_OPERATION_RSF (0xC)
 
 /**
  * Definitions of conditionals.
  * Similar to node_type types, these are also used as value in
  * structure `ast_node_props_t`.
  */
-#define AST_CONDITIONAL_LESS_THAN          (0x1)
-#define AST_CONDITIONAL_GREATER_THAN       (0x2)
-#define AST_CONDITIONAL_LESS_THAN_EQUAL    (0x3)
-#define AST_CONDITIONAL_GREATER_THAN_EQUAL (0x4)
-#define AST_CONDITIONAL_EQUAL              (0x5)
-#define AST_CONDITIONAL_NOT_EQUAL          (0x6)
+#define AST_CONDITIONAL_LESS_THAN          (0x1001) // <
+#define AST_CONDITIONAL_GREATER_THAN       (0x1002) // >
+#define AST_CONDITIONAL_LESS_THAN_EQUAL    (0x1003) // >=
+#define AST_CONDITIONAL_GREATER_THAN_EQUAL (0x1004) // <=
+#define AST_CONDITIONAL_EQUAL              (0x1005) // ==
+#define AST_CONDITIONAL_NOT_EQUAL          (0x1006) // !=
+#define AST_CONDITIONAL_AND                (0x1007) // &&
+#define AST_CONDITIONAL_OR                 (0x1008) // ||
+#define AST_CONDITIONAL_NOT                (0x1009) // !
 
 typedef unsigned long cursor_t;
 

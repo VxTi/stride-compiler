@@ -46,8 +46,10 @@ int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t ind
         blame_token(*next_token, "Expected block after module declaration");
     }
 
-    parse_tokens(node, *shared_block_tokens);
+    auto *content_block_node = new Node(NODE_TYPE_BLOCK, 0);
 
+    parse_tokens(content_block_node, *shared_block_tokens);
+    node->add_branch(content_block_node);
     root.add_branch(node);
     return skipped + shared_block_tokens->token_count + 2;
 }

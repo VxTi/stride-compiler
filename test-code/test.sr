@@ -2,6 +2,8 @@ import "external library";
 
 let k: unknown = f();
 
+let illegal: string = "test" + () "balls";
+
 switch (k) {
 
             case 0:
@@ -11,7 +13,11 @@ switch (k) {
 
                     break;
 
+
+
 }
+
+let l: kneo::balls::nigga::test = kek;
 
 
 let k: i8 = 1 + 10 * sin(g * 2) + 3 * 2;
