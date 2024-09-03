@@ -194,6 +194,9 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_FUNCTION_CALL:
             printf("FUNCTION CALL");
             break;
+        case NODE_TYPE_RETURN:
+            printf("RETURN");
+            break;
         case NODE_TYPE_ENUMERATION:
             printf("ENUMERABLE DEF");
             break;
@@ -374,6 +377,11 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
                 case TOKEN_KEYWORD_CLASS:
                 {
                     cursor += parse_class(token_set, cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_RETURN:
+                {
+                    cursor += parse_returning(token_set, cursor, *root);
                 }
                     break;
                 case TOKEN_SEMICOLON:

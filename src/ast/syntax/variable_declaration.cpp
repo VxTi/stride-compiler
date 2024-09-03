@@ -113,7 +113,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
     if ( sub_expression_length < 0 || sub_expression_length >= statement_length )
     {
         parse_variable_declaration_segment(token_set, index + 1, statement_length, true, root);
-        return statement_length + 1;
+        return statement_length + 2;
     }
     /*
      * Multiple variable declaration (multiple expressions)

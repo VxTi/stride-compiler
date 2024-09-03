@@ -580,6 +580,9 @@ namespace stride::ast
     /*
      * Seeks the distance to the previous token of the given type,
      * from the starting index.
+     * This will return the amount of tokens that were skipped,
+     * excluding the token itself. If the token is not found,
+     * the function will return -1.
      */
     int distance_next_token(ast_token_set_t &token_set, int starting_index, token_type_t token);
 
@@ -593,9 +596,53 @@ namespace stride::ast
 
     int parse_class(ast_token_set_t &token_set, cursor_t index, Node &root);
 
+    /**
+     * Parses a structure.
+     * This function will parse a structure in the following format: <br />
+     * <code>
+     * struct name&lt;GENERIC&gt; { <br />
+     * &nbsp;&nbsp;&nbsp;variable: type; <br />
+     * } <br />
+     * </code>
+     * @param token_set The token set to parse the structure from.
+     * @param index The index of the token set to start parsing from.
+     * @param root The root Node to append the structure to.
+     * @return How many tokens were skipped.
+     */
     int parse_structure(ast_token_set_t &token_set, cursor_t index, Node &root);
 
+    /**
+     * Parses a switch statement.
+     * This function will parse a switch statement in the following format:
+     * <code>
+     * switch expression {
+     *     case value: {
+     *         // code
+     *     }
+     *     default: {
+     *         // code
+     *     }
+     * }
+     * </code>
+     * @param token_set The token set to parse the switch statement from.
+     * @param index The index of the token set to start parsing from.
+     * @param root The root Node to append the switch statement to.
+     * @return How many tokens were skipped.
+     */
     int parse_switch_case(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     * Parses a return statement.
+     * This function will parse a return statement in the following format:
+     * <code>
+     * return expression;
+     * </code>
+     * @param token_set The token set to parse the return statement from.
+     * @param index The index of the token set to start parsing from.
+     * @param root The root Node to append the return statement to.
+     * @return How many tokens were skipped.
+     */
+    int parse_returning(ast_token_set_t &token_set, cursor_t index, Node &root);
 
     /**
      * Parses a generic type.

@@ -106,7 +106,7 @@ stride::ast::requires_token(token_type_t type, ast_token_set_t &token_set, curso
         }
 
         token_t ref = token_set.tokens[
-                ( index >= token_set.token_count ? token_set.token_count - 1 : index == 0 ? 0 : index - 1 )
+                ( index >= token_set.token_count ? token_set.token_count - 1 : index == 0 ? 0 : index )
         ];
 
         blame_token(ref, error_message, args);

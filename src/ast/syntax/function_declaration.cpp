@@ -208,7 +208,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     }
     else
     {
-        requires_token(TOKEN_SEMICOLON, token_set, index + skipped + function_parameters_body->token_count,
+        requires_token(TOKEN_SEMICOLON, token_set, index + function_parameters_body->token_count + 2,
                        "External functions are not allowed to have a function body.\nExternal functions must end with a semicolon.");
         skipped++;
     }

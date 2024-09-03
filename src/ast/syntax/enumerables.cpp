@@ -72,10 +72,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 {
     requires_token(TOKEN_IDENTIFIER, token_set, index, "An identifier is required after an enum statement.");
     requires_token(TOKEN_LBRACE, token_set, index + 1, "An opening bracket is required after enum identifier.");
-    ast_token_set_t *block = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
-    if ( block == nullptr )
+    ast_token_set_t *enumerable_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
+    if ( enumerable_block_tokens == nullptr )
     {
-        error("Failed to acquire block after enum definition, likely due to a missing closing bracket.");
+        error("Failed to acquire enumerable_block_tokens after enum definition, likely due to a missing closing bracket.");
         return 0;
     }
 
@@ -87,9 +87,8 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
     enum_block->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
 
     // If the enum is shared, add the SHARED flag.
-    if ( peekeq(*block, index - 2, TOKEN_KEYWORD_PUBLIC))
+    if ( peekeq(*enumerable_block_tokens, index - 2, TOKEN_KEYWORD_PUBLIC))
     {
-        printf("Enum is shared\n");
         enum_block->flags |= FLAG_OBJECT_PUBLIC;
     }
 
@@ -97,9 +96,9 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
     do
     {
-        current = block->tokens[ i ];
+        current = enumerable_block_tokens->tokens[ i ];
         offset = 2;
-        requires_token(TOKEN_IDENTIFIER, *block, i,
+        requires_token(TOKEN_IDENTIFIER, *enumerable_block_tokens, i,
                        "Enumerable names requires an identifier, but received '%s'", (char *) current.value);
 
         // Check whether all characters are uppercase
@@ -120,36 +119,36 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         enum_value = enum_id;
 
         // Check if a custom value is assigned
-        if ( peekeq(*block, i + 1, TOKEN_EQUALS))
+        if ( peekeq(*enumerable_block_tokens, i + 1, TOKEN_EQUALS))
         {
 
             // Check whether the value after enum entry assignment is an integer
             // This is required.
-            if ( peak(*block, i, 2) == nullptr
-                 || !types::is_integer(block->tokens[ i + 2 ].type))
+            if ( peak(*enumerable_block_tokens, i, 2) == nullptr
+                 || !types::is_integer(enumerable_block_tokens->tokens[ i + 2 ].type))
             {
                 error("Value of enumerable must be an integer, received: %s, at line %d column %d (type %d)",
-                      (char *) block->tokens[ i + 2 ].value,
-                      block->tokens[ i + 2 ].line,
-                      block->tokens[ i + 2 ].column,
-                      block->tokens[ i + 2 ].type
+                      (char *) enumerable_block_tokens->tokens[ i + 2 ].value,
+                      enumerable_block_tokens->tokens[ i + 2 ].line,
+                      enumerable_block_tokens->tokens[ i + 2 ].column,
+                      enumerable_block_tokens->tokens[ i + 2 ].type
                 );
             }
-            enum_value = atoi(block->tokens[ i + 2 ].value);
+            enum_value = atoi(enumerable_block_tokens->tokens[ i + 2 ].value);
             offset = 4;
         }
 
         int * enum_value_allocated = (int *) malloc(sizeof(int));
-        *enum_value_allocated = enum_value;
+        *enum_value_allocated = '0' + enum_value;
 
         enum_member->add_branch(new Node(NODE_TYPE_VALUE, 0, enum_value_allocated));
 
         // There's a next enum member if there's a comma after the previous one.
         enum_id++;
-        has_next_entry = peekeq(*block, i + offset - 1, TOKEN_COMMA);
+        has_next_entry = peekeq(*enumerable_block_tokens, i + offset - 1, TOKEN_COMMA);
 
         // If there's no next entry (comma), and there's no semicolon, exit.
-        if ( !has_next_entry && !peekeq(*block, i + offset - 1, TOKEN_SEMICOLON))
+        if ( !has_next_entry && !peekeq(*enumerable_block_tokens, i + offset - 1, TOKEN_SEMICOLON))
         {
             error("The last enum entry requires a semicolon after definition.");
         }
@@ -162,7 +161,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
     root.add_branch(enum_block);
 
-    return block->token_count + 2;
+    return enumerable_block_tokens->token_count + 3;
 }
 
 /**
