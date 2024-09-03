@@ -71,7 +71,8 @@ void stride::ast::blame_token(token_t token, const char *error_message, ...)
     for ( int i = 1; i < half_token_len; i++ ) printf("─");
 
     int left_offset = 5 + token.column - strlen(error_message) / 2;
-    if ( left_offset < 2) left_offset = 2;
+    if ( left_offset < 2 )
+    { left_offset = 2; }
     printf("\n\e[0m%*s·%*s\e[31m", (int) line_number.length() + 2, " ", left_offset, " ");
     vprintf(error_message, args);
     printf("\e[0m\n");
@@ -126,27 +127,27 @@ void stride::error::begin(const char *file_path)
     error_queue.push(buffer);
 }
 
-void stride::error::blame_line(const char *line, unsigned int line_number, int start_index, int length, const char *message, ...)
+void stride::error::blame_line(const char *referring_source_line, unsigned int source_line_number, int start_index,
+                               int length, const char *message, ...)
 {
-    // Appends the faulty line to the error queue
+    // Appends the faulty referring_source_line to the error queue
     char buffer[ERROR_LINE_BUFFER_SIZE];
-    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "%d │ %s", line_number, line);
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "%d │ %s", source_line_number, referring_source_line);
     error_queue.push(buffer);
 
-    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "· %*s");
+    memset(buffer, 0, ERROR_LINE_BUFFER_SIZE);
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, "· %*s|", start_index, " ");
+    error_queue.push(buffer);
 
-    if ( length == 1)
-    {
-
-    }
-    else
-    {
-
-    }
-
+    va_list args;
+    va_start(args, message);
+    memset(buffer, 0, ERROR_LINE_BUFFER_SIZE);
+    snprintf(buffer, ERROR_LINE_BUFFER_SIZE, message, args);
+    error_queue.push(buffer);
 }
 
-void stride::error::empty_line() {
+void stride::error::empty_line()
+{
     error_queue.push("·");
 }
 

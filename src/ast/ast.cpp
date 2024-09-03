@@ -3,6 +3,7 @@
 //
 
 #include "ast.h"
+#include "syntax/variable_types.h"
 
 using namespace stride::ast;
 
@@ -94,7 +95,7 @@ void Node::print(Node &reference, int depth)
     printf("%*s", depth * 2, "");
     if ( depth > 0 )
     {
-            printf("─ ");
+        printf("─ ");
     }
     switch ( reference.node_type )
     {
@@ -135,6 +136,9 @@ void Node::print(Node &reference, int depth)
             else
             { printf("VALUE (%s)", (char *) reference.value); }
             break;
+        case NODE_TYPE_GENERICS:
+            printf("GENERICS");
+            break;
         case NODE_TYPE_FUNCTION_DEFINITION:
             printf("FUNCTION DECLARATION");
             if ( reference.flags & FLAG_FUNCTION_EXTERNAL)
@@ -161,6 +165,9 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_FOR_LOOP:
             printf("FOR LOOP");
             break;
+        case NODE_TYPE_STRUCTURE:
+            printf("STRUCTURE");
+            break;
         case NODE_TYPE_MODULE:
             printf("MODULE");
             break;
@@ -178,6 +185,10 @@ void Node::print(Node &reference, int depth)
             if ( reference.flags & FLAG_VARIABLE_IMMUTABLE)
             {
                 printf(" (immutable)");
+            }
+            if ( reference.flags & FLAG_VARIABLE_ARRAY)
+            {
+                printf(" (array)");
             }
             break;
         case NODE_TYPE_FUNCTION_CALL:
@@ -204,9 +215,9 @@ void Node::print(Node &reference, int depth)
         default:
             printf("%d", reference.node_type);
     }
-    if ( reference.flags & FLAG_OBJECT_SHARED)
+    if ( reference.flags & FLAG_OBJECT_PUBLIC)
     {
-        printf(" (shared)");
+        printf(" (public)");
     }
     printf("\n");
 
@@ -230,121 +241,147 @@ void stride::ast::parse_tokens(Node *root, ast_token_set_t &token_set)
 
     for ( cursor = 0; cursor < token_set.token_count; )
     {
-        switch ( token_set.tokens[ cursor ].type )
+        if ( token_set.tokens[ cursor ].type == 0 )
         {
+            cursor++;
+        }
+        else
+        {
+            switch ( token_set.tokens[ cursor ].type )
+            {
 
-            // Function definitions must follow the format 'fn <name>( ... )' where ... = param: (...)properties([]), ...
-            case TOKEN_KEYWORD_DEFINE:
-            {
-                cursor += parse_function_declaration(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_IF:
-            {
-                cursor += parse_if_else(token_set, ++cursor, *root);
-            }
-                break;
+                // Function definitions must follow the format 'fn <name>( ... )' where ... = param: (...)properties([]), ...
+                case TOKEN_KEYWORD_DEFINE:
+                {
+                    cursor += parse_function_declaration(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_IF:
+                {
+                    cursor += parse_if_else(token_set, ++cursor, *root);
+                }
+                    break;
 
-                /**
-                 * Variable parsing.
-                 * A variable must be declared in the following format:
-                 * ```
-                 * var name: type = value;
-                 *
-                 * // Declaring multiple at the same time:
-                 * var a: i8, b: i8;
-                 * ```
-                 */
-            case TOKEN_KEYWORD_LET:
-            case TOKEN_KEYWORD_CONST:
-            {
-                cursor += parse_variable_declaration(token_set, cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_TRY:
-            {
-                cursor += parse_try_catch(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_SWITCH:
-            {
-                cursor += parse_switch_case(token_set, ++cursor, *root);
-            }
-            break;
-            case TOKEN_IDENTIFIER:
-            {
-                if ( is_function_call(token_set, cursor))
+                    /**
+                     * Variable parsing.
+                     * A variable must be declared in the following format:
+                     * ```
+                     * var name: type = value;
+                     *
+                     * // Declaring multiple at the same time:
+                     * var a: i8, b: i8;
+                     * ```
+                     */
+                case TOKEN_KEYWORD_LET:
+                case TOKEN_KEYWORD_CONST:
                 {
-                    cursor += parse_function_call(token_set, cursor, *root);
+                    cursor += parse_variable_declaration(token_set, cursor, *root);
                 }
-                else
+                    break;
+                case TOKEN_KEYWORD_STRUCT:
                 {
-                    blame_token(token_set.tokens[ cursor ], "Unexpected trailing token found.");
+                    cursor += parse_structure(token_set, ++cursor, *root);
                 }
+                    break;
+                case TOKEN_KEYWORD_TRY:
+                {
+                    cursor += parse_try_catch(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_SWITCH:
+                {
+                    cursor += parse_switch_case(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_IDENTIFIER:
+                {
+                    if ( is_function_call(token_set, cursor))
+                    {
+                        cursor += parse_function_call(token_set, cursor, *root);
+                    }
+                    else
+                    {
+                        blame_token(token_set.tokens[ cursor ], "Unexpected trailing token found.");
+                    }
+                }
+                    break;
+                    /**
+                     * Parsing of an enum statement.
+                     * An enum statement is denoted in the following format:
+                     * enum <name> { KEYWORD: ..., ... }
+                     */
+                case TOKEN_KEYWORD_ENUM:
+                {
+                    cursor += parse_enumerable(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_PUBLIC:
+                {
+                    token_t *next_token = peak(token_set, cursor, 1);
+                    if ( next_token != nullptr && types::is_functional_keyword(next_token->type))
+                    {
+                        cursor++;
+                    }
+                    else
+                    {
+                        blame_token(token_set.tokens[ cursor ],
+                                    "Illegal 'public' keyword found. Public identifiers may only be used before functional statements.");
+                    }
+                }
+                    break;
+                case TOKEN_KEYWORD_THROW:
+                {
+                    cursor += parse_throw(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_DO:
+                {
+                    cursor += parse_do_while(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_WHILE:
+                {
+                    cursor += parse_while_loop(token_set, ++cursor, *root);
+                }
+                    break;
+                    /**
+                     * Parses a for loop.
+                     * This statement must be in the following formats:
+                     * 'for (var name: type = value; name comparison value; name operation value) { ... }'
+                     * 'for (var name: type in array) { ... }'
+                     */
+                case TOKEN_KEYWORD_FOR:
+                {
+                    cursor += parse_for_loop(token_set, ++cursor, *root);
+                }
+                    break;
+                    /**
+                     * Declares a namespace to group code together.
+                     */
+                case TOKEN_KEYWORD_MODULE:
+                {
+                    cursor += parse_module_statement(token_set, ++cursor, *root);
+                }
+                    break;
+                    /**
+                     * Allows one to import external files using 'import "..."' or 'import "..." as keyword'
+                     */
+                case TOKEN_KEYWORD_IMPORT:
+                {
+                    cursor += parse_import_statement(token_set, ++cursor, *root);
+                }
+                    break;
+                case TOKEN_KEYWORD_CLASS:
+                {
+                    cursor += parse_class(token_set, cursor, *root);
+                }
+                    break;
+                case TOKEN_SEMICOLON:
+                    cursor++;
+                    break;
+                default:
+                    blame_token(token_set.tokens[ cursor ], "Unexpected token found.");
             }
-                break;
-                /**
-                 * Parsing of an enum statement.
-                 * An enum statement is denoted in the following format:
-                 * enum <name> { KEYWORD: ..., ... }
-                 */
-            case TOKEN_KEYWORD_ENUM:
-            {
-                cursor += parse_enumerable(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_THROW:
-            {
-                cursor += parse_throw(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_DO:
-            {
-                cursor += parse_do_while(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_WHILE:
-            {
-                cursor += parse_while_loop(token_set, ++cursor, *root);
-            }
-                break;
-                /**
-                 * Parses a for loop.
-                 * This statement must be in the following formats:
-                 * 'for (var name: type = value; name comparison value; name operation value) { ... }'
-                 * 'for (var name: type in array) { ... }'
-                 */
-            case TOKEN_KEYWORD_FOR:
-            {
-                cursor += parse_for_loop(token_set, ++cursor, *root);
-            }
-                break;
-                /**
-                 * Declares a namespace to group code together.
-                 */
-            case TOKEN_KEYWORD_MODULE:
-            {
-                cursor += parse_module_statement(token_set, ++cursor, *root);
-            }
-                break;
-                /**
-                 * Allows one to import external files using 'import "..."' or 'import "..." as keyword'
-                 */
-            case TOKEN_KEYWORD_IMPORT:
-            {
-                cursor += parse_import_statement(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_KEYWORD_CLASS:
-            {
-                cursor += parse_class(token_set, ++cursor, *root);
-            }
-                break;
-            case TOKEN_SEMICOLON:
-                cursor++;
-                break;
-            default:
-                blame_token(token_set.tokens[ cursor ], "Unexpected token found.");
         }
     }
 }

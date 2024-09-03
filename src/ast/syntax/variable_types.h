@@ -29,6 +29,15 @@ namespace stride::ast::types {
      * @return True if the token type is a valid variable type, false otherwise.
      */
     int is_valid_variable_type(token_type_t type);
+
+    /**
+     * Checks whether the provided token is a functional keyword.
+     * A functional keyword is a keyword that has meaning,
+     * such as 'class', 'enum', 'struct', etc.
+     * @param type The token to check.
+     * @return An integer representing the truthyness of the result. 1 for true, 0 otherwise.
+     */
+    int is_functional_keyword(token_type_t type);
 }
 
 #endif //STRIDE_LANGUAGE_VARIABLE_TYPES_H

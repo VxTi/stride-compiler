@@ -30,7 +30,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
     for ( cursor_t i = 0, block_start_offset; i < token_set.token_count; )
     {
         // Ensure either 'case' or 'default' keyword is present.
-        if ( !peakeq(token_set, i, 0, TOKEN_KEYWORD_CASE) && !peakeq(token_set, i, 0, TOKEN_KEYWORD_DEFAULT))
+        if ( !peekeq(token_set, i, TOKEN_KEYWORD_CASE) && !peekeq(token_set, i, TOKEN_KEYWORD_DEFAULT))
         {
             blame_token(token_set.tokens[ i ], "Unexpected token in switch statement.");
         }
@@ -78,7 +78,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
         auto *switch_case_content_node = new Node(NODE_TYPE_BLOCK);
         ast_token_set_t case_content_tokens = {
                 .tokens = token_set.tokens + i + 3,
-                .token_count = static_cast<size_t>(block_length)
+                .token_count = static_cast<unsigned int>(block_length)
         };
         parse_tokens(switch_case_content_node, case_content_tokens);
 

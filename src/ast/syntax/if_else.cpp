@@ -15,13 +15,13 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
 
     if ( if_condition_tokens == nullptr )
     {
-        blame_token(token_set.tokens[index], "If statement requires condition block after declaration.\nThis might have gone wrong due to a missing closing parenthesis.");
+        blame_token(token_set.tokens[ index ],
+                    "If statement requires condition block after declaration.\nThis might have gone wrong due to a missing closing parenthesis.");
         return 0;
     }
     skipped += if_condition_tokens->token_count + 2;
 
     auto *if_node = new Node(NODE_TYPE_IF);
-    printf("parsing expression in if (%zu)\n", if_condition_tokens->token_count);
     parse_expression(*if_condition_tokens, 0, if_condition_tokens->token_count, *if_node);
 
     // Capture the if body block
@@ -44,17 +44,17 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
     if_node->add_branch(if_body_node);
 
     // If there's an 'elif' statement, parse it as an 'else if'
-    if ( peakeq(token_set, index + skipped, 0, TOKEN_KEYWORD_ELIF))
+    if ( peekeq(token_set, index + skipped, TOKEN_KEYWORD_ELIF))
     {
         skipped += parse_if_else(token_set, index + skipped, *if_node);
     }
-    else if ( peakeq(token_set, index + skipped, 0, TOKEN_KEYWORD_ELSE))
+    else if ( peekeq(token_set, index + skipped, TOKEN_KEYWORD_ELSE))
     {
-        if ( peakeq(token_set, index + skipped, 1, TOKEN_KEYWORD_IF)) // If there's an 'else if' statement, parse it
+        if ( peekeq(token_set, index + skipped + 1, TOKEN_KEYWORD_IF)) // If there's an 'else if' statement, parse it
         {
             skipped += parse_if_else(token_set, index + skipped + 2, *if_node);
         }
-        else if ( peakeq(token_set, index + skipped, 1,
+        else if ( peekeq(token_set, index + skipped + 1,
                          TOKEN_LBRACE)) // If there's an 'else' statement, parse the block contents
         {
             auto *else_body_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped + 1);
@@ -80,7 +80,7 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
             // Peak until semicolon and parse
             for ( int i = skipped + 1; i < token_set.token_count; i++ )
             {
-                if ( peakeq(token_set, i, 0, TOKEN_SEMICOLON))
+                if ( peekeq(token_set, i, TOKEN_SEMICOLON))
                 {
                     semicolon_index = i;
                     break;
@@ -95,7 +95,7 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
             }
             ast_token_set_t segment = {
                     .tokens = token_set.tokens + skipped + 1,
-                    .token_count = static_cast<size_t>(semicolon_index - skipped - 1)
+                    .token_count = static_cast<unsigned int>((semicolon_index - skipped - 1))
             };
             parse_tokens(if_body_node, segment);
         }

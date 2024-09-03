@@ -87,10 +87,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
     enum_block->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
 
     // If the enum is shared, add the SHARED flag.
-    if ( peakeq(*block, index, -2, TOKEN_KEYWORD_SHARED))
+    if ( peekeq(*block, index - 2, TOKEN_KEYWORD_PUBLIC))
     {
         printf("Enum is shared\n");
-        enum_block->flags |= FLAG_OBJECT_SHARED;
+        enum_block->flags |= FLAG_OBJECT_PUBLIC;
     }
 
     int enum_id = 0, i = 0, enum_value, offset;
@@ -120,7 +120,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
         enum_value = enum_id;
 
         // Check if a custom value is assigned
-        if ( peakeq(*block, i, 1, TOKEN_EQUALS))
+        if ( peekeq(*block, i + 1, TOKEN_EQUALS))
         {
 
             // Check whether the value after enum entry assignment is an integer
@@ -146,10 +146,10 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
         // There's a next enum member if there's a comma after the previous one.
         enum_id++;
-        has_next_entry = peakeq(*block, i + offset, -1, TOKEN_COMMA);
+        has_next_entry = peekeq(*block, i + offset - 1, TOKEN_COMMA);
 
         // If there's no next entry (comma), and there's no semicolon, exit.
-        if ( !has_next_entry && !peakeq(*block, i + offset, -1, TOKEN_SEMICOLON))
+        if ( !has_next_entry && !peekeq(*block, i + offset - 1, TOKEN_SEMICOLON))
         {
             error("The last enum entry requires a semicolon after definition.");
         }

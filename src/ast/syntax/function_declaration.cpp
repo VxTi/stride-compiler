@@ -41,14 +41,14 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     {
         switch ( next->type )
         {
-            case TOKEN_KEYWORD_SHARED:
+            case TOKEN_KEYWORD_PUBLIC:
             {
-                if ( function_flags & FLAG_OBJECT_SHARED)
+                if ( function_flags & FLAG_OBJECT_PUBLIC)
                 {
-                    error("Double shared keyword at line %d column %d",
+                    error("Double 'public' keyword at line %d column %d",
                           next->line, next->column);
                 }
-                function_flags |= FLAG_OBJECT_SHARED;
+                function_flags |= FLAG_OBJECT_PUBLIC;
                 skipped++;
             }
                 break;
@@ -117,7 +117,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
         for ( int i = 0; i < function_parameters_body->token_count; )
         {
             int var_flags = 0;
-            if ( peakeq(*function_parameters_body, i, 0, TOKEN_KEYWORD_CONST))
+            if ( peekeq(*function_parameters_body, i, TOKEN_KEYWORD_CONST))
             {
                 var_flags |= FLAG_VARIABLE_IMMUTABLE;
                 i++;
@@ -136,11 +136,11 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                     new Node(NODE_TYPE_IDENTIFIER, 0, function_parameters_body->tokens[ i ].value));
 
             // Check if parameter is variadic
-            if ( peakeq(*function_parameters_body, i, 2, TOKEN_THREE_DOTS))
+            if ( peekeq(*function_parameters_body, i + 2, TOKEN_THREE_DOTS))
             {
-                if (variadic_declarations++ > 0)
+                if ( variadic_declarations++ > 0 )
                 {
-                    blame_token(function_parameters_body->tokens[ i + 2],
+                    blame_token(function_parameters_body->tokens[ i + 2 ],
                                 "Found double variadic expression in function declaration.");
                     return 0;
                 }
@@ -157,12 +157,12 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
             }
 
             // If the parameter has '[]' after it, make it an array (if it does not have '...')
-            if ( peakeq(*function_parameters_body, i, 3, TOKEN_LSQUARE_BRACKET)
-                 && peakeq(*function_parameters_body, i, 4, TOKEN_RSQUARE_BRACKET))
+            if ( peekeq(*function_parameters_body, i + 3, TOKEN_LSQUARE_BRACKET)
+                 && peekeq(*function_parameters_body, i + 4, TOKEN_RSQUARE_BRACKET))
             {
                 if ( var_flags & FLAG_VARIABLE_ARRAY)
                 {
-                    blame_token(function_parameters_body->tokens[ i + 3],
+                    blame_token(function_parameters_body->tokens[ i + 3 ],
                                 "Cannot have variadic expression and array at the same time.");
                     return 0;
                 }
@@ -172,11 +172,11 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
             function_parameter->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, var_flags, type->value));
 
-            if ( i + 3 < function_parameters_body->token_count && !peakeq(*function_parameters_body, i, 3, TOKEN_COMMA))
+            if ( i + 3 < function_parameters_body->token_count &&
+                 !peekeq(*function_parameters_body, i + 3, TOKEN_COMMA))
             {
-                token_t culprit = function_parameters_body->tokens[ i + 3 ];
                 blame_token(function_parameters_body->tokens[ i + 3 ],
-                            "Non-last function parameter requires comma after declaration, but received '%s' at line %d column %d.");
+                            "Function parameter requires comma or closing parenthesis after declaration.");
                 return 0;
             }
             i += 4;
@@ -194,7 +194,8 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
 
         if ( function_body == nullptr )
         {
-            blame_token(token_set.tokens[index], "Function declaration requires a function body, but received none.\nThis can be caused by a missing closing bracket, starting at line %d column %d.");
+            blame_token(token_set.tokens[ index ],
+                        "Function declaration requires a function body, but received none.\nThis can be caused by a missing closing bracket, starting at line %d column %d.");
             return 0;
         }
 

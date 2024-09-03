@@ -38,7 +38,7 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
     // If the next token is a double colon, we have a secondary keyword
     // This is the case when a module has a submodule, e.g. module::submodule
     // We will parse this as a separate identifier.
-    if ( peakeq(token_set, index, 1, TOKEN_DOUBLE_COLON))
+    if ( peekeq(token_set, index + 1, TOKEN_DOUBLE_COLON))
     {
         keyword_node = new Node(NODE_TYPE_IDENTIFIER_REFERENCE, 0);
         keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token->value));
@@ -64,7 +64,7 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
 
 int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set, cursor_t index)
 {
-    if ( !peakeq(token_set, index, 0, TOKEN_IDENTIFIER))
+    if ( !peekeq(token_set, index, TOKEN_IDENTIFIER))
     {
         return 0;
     }
@@ -72,10 +72,10 @@ int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set,
     // If the next token is a double colon, we have a secondary keyword
     // This is the case when a module has a submodule, e.g. module::submodule
     // We will parse this as a separate identifier.
-    if ( peakeq(token_set, index, 1, TOKEN_DOUBLE_COLON))
+    if ( peekeq(token_set, index + 1, TOKEN_DOUBLE_COLON))
     {
         int length = 1;
-        if ( !peakeq(token_set, index, 2, TOKEN_IDENTIFIER))
+        if ( !peekeq(token_set, index + 2, TOKEN_IDENTIFIER))
         {
             return length;
         }
@@ -83,8 +83,8 @@ int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set,
         for ( ++index; index < token_set.token_count; index += 2 )
         {
             // If the next token is not a double colon, we have reached the end of the identifier sequence
-            if ( !peakeq(token_set, index, 0, TOKEN_DOUBLE_COLON) ||
-                 !peakeq(token_set, index, 1, TOKEN_IDENTIFIER))
+            if ( !peekeq(token_set, index, TOKEN_DOUBLE_COLON) ||
+                 !peekeq(token_set, index + 1, TOKEN_IDENTIFIER))
             {
                 break;
             }

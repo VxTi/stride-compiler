@@ -50,7 +50,8 @@
 #define NODE_TYPE_TRY_CATCH            (0x1F)
 #define NODE_TYPE_DO_WHILE             (0x20)
 #define NODE_TYPE_IF                   (0x21)
-#define NODE_TYPE_TERNARY              (0x22)
+#define NODE_TYPE_TERNARY_EXPRESSION   (0x22)
+#define NODE_TYPE_GENERICS             (0x23)
 
 #define FLAG_VARIABLE_IMMUTABLE (0x100) // Whether a variable is immutable
 #define FLAG_VARIABLE_ARRAY     (0x200) // Whether a variable is an array
@@ -59,7 +60,7 @@
 #define FLAG_SCOPE_LOCAL  (0x2000)
 #define FLAG_SCOPE_CLASS  (0x3000)
 
-#define FLAG_OBJECT_SHARED     (0x4) // Whether the function or variable declaration is shared with other modules.
+#define FLAG_OBJECT_PUBLIC     (0x4) // Whether the function or variable declaration is shared with other modules.
 #define FLAG_FUNCTION_EXTERNAL (0x8)
 #define FLAG_FUNCTION_ASYNC    (0x10)
 
@@ -95,7 +96,7 @@
 #define AST_CONDITIONAL_OR                 (0x1008) // ||
 #define AST_CONDITIONAL_NOT                (0x1009) // !
 
-typedef unsigned long cursor_t;
+typedef long cursor_t;
 
 namespace stride::ast
 {
@@ -120,7 +121,7 @@ namespace stride::ast
         /**
          * The amount of tokens this structure stores.
          */
-        size_t token_count;
+        unsigned int token_count;
 
     } ast_token_set_t;
 
@@ -146,7 +147,7 @@ namespace stride::ast
      * @return An integer representing whether the token at the given location is equal to the provided type.
      * Returns 1 for a match, 0 otherwise.
      */
-    int peakeq(ast_token_set_t &token_set, cursor_t index, int offset, token_type_t type);
+    int peekeq(ast_token_set_t &token_set, cursor_t index, token_type_t type);
 
     bool has_next(ast_token_set_t &token_set, cursor_t index);
 
@@ -405,18 +406,39 @@ namespace stride::ast
     /**
      * Parses a variable declaration.
      * This function will parse a variable declaration in the following format:
-     * ```
-     * var name: type = value
-     * ```
-     * The function has to be called AFTER the var keyword, e.g. the input stream tokens
-     * must look like:
-     * var < 'keyword identifier: type = value'
+     * `var name: type = value`, `const name: type = value`, or
+     * `let name: type = value, name2: type2 = value2`.
+     * This parsing function must be called on the 'var' or 'const' keyword.
      * @param token_set The token set to parse the variable declaration from.
      * @param index The index of the token set to start parsing from.
      * @param root The root Node to append the variable declaration to.
      * @return
      */
     int parse_variable_declaration(ast_token_set_t &token_set, cursor_t index, Node &root);
+
+    /**
+     * Parses a variable declaration segment.
+     * A segment in this instance, is the part that comes after either the 'var' or 'const' keyword.
+     * This method is used in the `parse_variable_declaration` method, and can be used
+     * to parse multiple expressions after one another. This method can also be used to parse the parameter
+     * definitions in functions, with `allow_assignment` set to false.
+     * This function will generate the following AST Nodes:
+     *
+     * <li>IDENTIFIER (val = variable name)</li>
+     * <li>VARIABLE_TYPE (val = variable type) or IDENTIFIER_SEQUENCE -..-> IDENTIFIER (val = variable type segment)</li>
+     * <li>VALUE (val = value) or EXPRESSION -..-> VALUE (val = value)</li>
+     *
+     * If the variable assignment has an expression that requires evaluation,
+     * it is not certain which tokens will be generated. This will be evaluated upon AST
+     * analysis.
+     *
+     * @param token_set The token set to parse the segment from.
+     * @param index The index of the token set to start parsing from.
+     * @param token_count The amount of tokens in the subset.
+     * @param allow_assignment Whether the segment allows variable assignment.
+     * @param root The root Node to append the segment to.
+     */
+    void parse_variable_declaration_segment(ast_token_set_t &token_set, cursor_t index, int token_count, bool allow_assignment, Node &root);
 
     /**
      * Validates a variable declaration.
@@ -431,18 +453,23 @@ namespace stride::ast
      * Parses an expression, which can be after variable declaration / assignment,
      * or providing function parameters.
      * An expression can be in the following format:
-     * ```
-     * var k: unknown = (5 + (3 * 4))
-     * ```
-     * Here, the segment after the `unknown = ...` is the expression,
-     * which will be parsed using this function.
+     * `(5 + (3 * 4))` or `module::function()`
+     *
+     * This function will generate the following AST Nodes:
+     *
+     * <li>OPERATION (val = operation type)</li>
+     * <li>VALUE (val = value) or EXPRESSION -..-> VALUE (val = value)</li>
+     * <li>FUNCTION_CALL -..-> IDENTIFIER(val = function name), FUNCTION_PARAMETERS -..-> EXPRESSION (val = function parameters) or VALUE (val = param value)</li>
+     *
+     * The nodes this function generates are not certain, as the expression can be any kind of operation.
+     *
      * @param token_set The token set to parse a segment from
      * @param cursor The cursor position in the token set
      * @param token_count The amount of tokens in the subset
      * @param parent_node The parent AST Node to put the result into.
      * @return How many tokens were skipped.
      */
-    int parse_expression(ast_token_set_t &token_set, size_t cursor, size_t token_count, Node &parent_node);
+    int parse_expression(ast_token_set_t &token_set, int cursor, int token_count, Node &parent_node);
 
     /**
      * Checks whether the token set at the given index is an identifier sequence,
@@ -566,11 +593,23 @@ namespace stride::ast
 
     int parse_class(ast_token_set_t &token_set, cursor_t index, Node &root);
 
-    //int parse_structure(ast_token_set_t &token_set, cursor_t index, Node &root);
+    int parse_structure(ast_token_set_t &token_set, cursor_t index, Node &root);
 
     int parse_switch_case(ast_token_set_t &token_set, cursor_t index, Node &root);
 
-    int parse_module(ast_token_set_t &token_set, cursor_t index, Node &root);
+    /**
+     * Parses a generic type.
+     * A generic type is a type that can be used in a function or class definition.
+     * This function will parse a generic type in the following format:
+     * <code>
+     * &lt;T&gt;
+     * </code>
+     * @param token_set The token set to parse the generic type from.
+     * @param index The index of the token set to start parsing from.
+     * @param root The root Node to append the generic type to.
+     * @return How many tokens were skipped.
+     */
+    int parse_generic(ast_token_set_t &token_set, cursor_t index, Node &root);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

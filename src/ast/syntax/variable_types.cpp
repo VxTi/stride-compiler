@@ -18,6 +18,23 @@ int stride::ast::types::is_integer(token_type_t type)
     }
 }
 
+int stride::ast::types::is_functional_keyword(token_type_t type)
+{
+    switch (type )
+    {
+        case TOKEN_KEYWORD_CLASS:
+        case TOKEN_KEYWORD_MODULE:
+        case TOKEN_KEYWORD_STRUCT:
+        case TOKEN_KEYWORD_ENUM:
+        case TOKEN_KEYWORD_CONST:
+        case TOKEN_KEYWORD_LET:
+        case TOKEN_KEYWORD_ASYNC:
+            return true;
+        default:
+            return false;
+    }
+}
+
 int stride::ast::types::is_valid_literal_value(token_type_t type)
 {
     switch ( type )

@@ -17,7 +17,7 @@ namespace stride::error
 
     void begin(const char *file_path);
 
-    void blame_line(const char *line, unsigned int line_number, int start_index, int length, const char *message, ...);
+    void blame_line(const char *referring_source_line, unsigned int source_line_number, int start_index, int length, const char *message, ...);
 
     void empty_line();
 

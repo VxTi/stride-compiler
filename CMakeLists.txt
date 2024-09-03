@@ -38,4 +38,6 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/classes.cpp
         src/ast/syntax/switch_case.cpp
         src/ast/ast_error_handling.h
+        src/ast/syntax/generics.cpp
+        src/ast/syntax/structures.cpp
 )

@@ -113,23 +113,23 @@ const std::map<token_type_t, struct expression_segment_t> expressions = {
                                               .flags = AST_OPERATION_MUL }},
         { TOKEN_DOUBLE_STAR_EQUALS,   { .associativity = ASSOCIATIVITY_LEFT, .precedence = 50,  // **=
                                               .flags = AST_OPERATION_MUL }},
-        { TOKEN_CARET_EQUALS,         { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45, //  ^=
+        { TOKEN_CARET_EQUALS,  { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45, //  ^=
                                               .flags = AST_OPERATION_MUL }},
 
 
-        { TOKEN_DOUBLE_PLUS,          { .associativity = ASSOCIATIVITY_LEFT |
+        { TOKEN_DOUBLE_PLUS,   { .associativity = ASSOCIATIVITY_LEFT |
                                                          ASSOCIATIVITY_RIGHT, .precedence = 55 }}, // ++
-        { TOKEN_DOUBLE_MINUS,         { .associativity = ASSOCIATIVITY_LEFT |
+        { TOKEN_DOUBLE_MINUS,  { .associativity = ASSOCIATIVITY_LEFT |
                                                          ASSOCIATIVITY_RIGHT, .precedence = 55 }}, // --
 
         /* Comparison operators */
-        { TOKEN_LESS,                 { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <
-        { TOKEN_GREATER,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >
-        { TOKEN_LEQUALS,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <=
-        { TOKEN_GEQUALS,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >=
-        { TOKEN_DOUBLE_EQUALS,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // ==
-        { TOKEN_NOT_EQUALS,           { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // !=
-        { TOKEN_EQUALS,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // = (assignment)
+        { TOKEN_LARROW,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <
+        { TOKEN_RARROW,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >
+        { TOKEN_LEQUALS,       { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <=
+        { TOKEN_GEQUALS,       { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >=
+        { TOKEN_DOUBLE_EQUALS, { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // ==
+        { TOKEN_NOT_EQUALS,    { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // !=
+        { TOKEN_EQUALS,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // = (assignment)
 };
 
 /**
@@ -144,7 +144,7 @@ const std::map<token_type_t, struct expression_segment_t> expressions = {
  * @param parent_node The parent AST Node to put the result into.
  * @return How many tokens were skipped.
  */
-int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, size_t token_count, Node &parent_node)
+int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int token_count, Node &parent_node)
 {
     int skipped = 0;
 
@@ -178,10 +178,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
         j = cursor + i;
         if ( is_function_call(token_set,j ))
         {
-            auto *fn_call_node = new Node(NODE_TYPE_FUNCTION_CALL);
-            i += parse_identifier(token_set, j, *fn_call_node);
-            printf("Parsing function call\n");
-            expression_node->add_branch(fn_call_node);
+            i += parse_function_call(token_set, j, *expression_node);
         }
         else
         {
@@ -190,7 +187,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
             // Check whether the token is an operator or a value.
             if ( !has_key && !is_literal )
             {
-                blame_token(token_set.tokens[ j - 1], "Expected operator or value in expression.");
+                blame_token(token_set.tokens[ j], "Expected operator or value in expression.");
                 return 0;
             }
 
@@ -201,8 +198,6 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, size_t cursor, siz
             }
             else if ( has_key )
             {
-                struct expression_segment_t expr = expressions.at(token_set.tokens[ j ].type);
-
                 // String expression types only accept appending,
                 // or conditional expressions.
                 if ( is_string && token_set.tokens[ j].type != TOKEN_PLUS )

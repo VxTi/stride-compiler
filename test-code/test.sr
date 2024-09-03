@@ -1,23 +1,29 @@
 import "external library";
 
-let k: unknown = f();
+let k: type::something[] = function::call(null, 2, function::call());
 
-let illegal: string = "test" + () "balls";
+let illegal: string = "test" + + "balls";
 
 switch (k) {
 
-            case 0:
-                system::println("Hello, World!");
-                break;
-            case 1:
+    case 0:
+        system::println("Hello, World!");
+        break;
+    case 1:
 
-                    break;
-
-
+            break;
+    default:
+        break;
 
 }
 
-let l: kneo::balls::nigga::test = kek;
+public class Test {}
+
+public class Test<T> {
+    define async public fn(p: i8) {};
+}
+
+let l: outer::inner::clazz = kek;
 
 
 let k: i8 = 1 + 10 * sin(g * 2) + 3 * 2;
@@ -25,25 +31,39 @@ let k: i8 = 1 + 10 * sin(g * 2) + 3 * 2;
 let a: i8 = 0, b: i8 = 2;
 
 
-const i: i8 = 0;
+const i: i8[] = 0;
 
-define external test();
+define external test(p0: string, p1: ...i8);
+
+public module Test {
+    public class TestClass {
+        // Something
+    }
+}
+
+struct genericsTest<T, G, B> {
+    val: T;
+    ref: Test::TestClass;
+}
+
+struct Vector<T> {
+    x: T;
+    y: T;
+    z: T;
+}
 
 module test::modulename {
 
     define external test();
 
-    define blyat(i: none) {
+    define for_test(i: none) {
         for (let i: i8 = 0; i < 10; i++) {}
         for (let i: i8 = 0; i < 10; i++) {
 
         }
 
-
         throw Error("oops");
     }
-
-
 
     define main(args: string[]) {
         system::println("Hello, World!");
@@ -51,18 +71,13 @@ module test::modulename {
 
     define external println(message: string, args: ...string);
 
-
-    define external println(message: string, args: ...string);
-
     define func(test: string, test2: ...string) {
 
-        let nil: i8 = null;
+        let k: i8 = 0;
 
         do {
-
-        } while (knee);
-
-        const k: unknown = 0;
+            // Nothing.
+        } while (k++ < 10);
 
         do {
             system::println("Hello, World!");
@@ -87,14 +102,9 @@ module test::modulename {
 
         let k: i8 = 0;
 
-        while (true) {}
-
-        for (;;) {}
-
         do {
-            sock::s();
-
-        } while (true);;;
+            socket::listen();
+        } while (true);
 
      }
 }
