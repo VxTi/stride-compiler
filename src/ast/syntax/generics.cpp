@@ -3,9 +3,18 @@
 //
 
 #include "../ast.h"
+#include "variable_types.h"
 
 using namespace stride::ast;
 
+/**
+ * Checks if a token is a valid generic token.
+ * @return 1 if the token is valid, 0 otherwise.
+ */
+int is_valid_generic_type(token_type_t token, bool allow_literals)
+{
+    return allow_literals ? types::is_valid_variable_type(token) : token == TOKEN_IDENTIFIER;
+}
 
 /**
  * Parses a generic definition after a class name.
@@ -15,41 +24,53 @@ using namespace stride::ast;
  * <code>class MyClass&#60;T, U, ...&#62; { ... }</code>
  * This parsing function starts after the '<' token.
  */
-int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node &root)
+int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node &root, bool accept_literals)
 {
     // Check if the next token is a generic definition
     if ( !peekeq(token_set, index, TOKEN_LARROW))
     {
         return 0;
     }
-    requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier after '<' in generic definition.");
+
+    if (!is_valid_generic_type(token_set.tokens[ index + 1 ].type, accept_literals))
+    {
+        blame_token(token_set.tokens[ index ], "Generic value must be a valid literal or identifier.");
+        return 0;
+    }
+
     auto *generics_node = new Node(NODE_TYPE_GENERICS);
 
-    for ( int i = 1; index + i < token_set.token_count; )
-    {
-        requires_token(TOKEN_IDENTIFIER, token_set, index + i, "Expected identifier in generic definition.");
-        auto *generic_identifier_node = new Node(NODE_TYPE_IDENTIFIER);
-        generic_identifier_node->value = token_set.tokens[ index + i ].value;
-        generics_node->add_branch(generic_identifier_node);
+    // Append the first generic identifier
+    generics_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 1].value));
 
-        if ( peekeq(token_set, index + i + 1, TOKEN_COMMA))
+    if ( peekeq(token_set, index + 2, TOKEN_RARROW))
+    {
+        root.add_branch(generics_node);
+        return 3;
+    }
+
+    int skipped = 2;
+    for (; index + skipped < token_set.token_count;)
+    {
+        requires_token(TOKEN_COMMA, token_set, index + skipped, "Expected comma after generic identifier.");
+        if (!is_valid_generic_type(token_set.tokens[ index + skipped + 1 ].type, accept_literals))
         {
-            requires_token(TOKEN_IDENTIFIER, token_set, index + i + 2,
-                           "Expected identifier after ',' in generic definition.");
-            i += 2;
+            blame_token(token_set.tokens[ index + skipped ], "Generic value must be a valid literal or identifier.");
         }
-        else if ( peekeq(token_set, index + i + 1, TOKEN_RARROW))
+
+        // Append the next generic identifier
+        generics_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + skipped + 1].value));
+
+        skipped += 2;
+        // Check if we've reached the end of the generic definition
+        if (peekeq(token_set, index + skipped, TOKEN_RARROW))
         {
-            root.add_branch(generics_node);
-            return i + 2;
-        }
-        else
-        {
-            delete generics_node;
-            blame_token(token_set.tokens[ index + i + 1 ],
-                        "Expected ',' or '>' after identifier in generic definition.");
+            skipped++;
+            break;
         }
     }
-    blame_token(token_set.tokens[ index ], "Expected '>' after generic definition.");
-    return 0;
+    root.add_branch(generics_node);
+    printf("Generic length: %d\n", skipped);
+
+    return skipped;
 }

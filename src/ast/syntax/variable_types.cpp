@@ -39,6 +39,7 @@ int stride::ast::types::is_valid_literal_value(token_type_t type)
 {
     switch ( type )
     {
+        case TOKEN_KEYWORD_THIS:
         case TOKEN_KEYWORD_NULL:
         case TOKEN_NUMBER_INTEGER:
         case TOKEN_NUMBER_FLOAT:

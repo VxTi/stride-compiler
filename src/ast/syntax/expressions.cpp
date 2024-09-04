@@ -183,9 +183,9 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
         else
         {
             bool is_literal = types::is_valid_literal_value(token_set.tokens[ j ].type);
-            bool has_key = expressions.contains(token_set.tokens[ j ].type);
+            bool contains_token = expressions.contains(token_set.tokens[ j ].type);
             // Check whether the token is an operator or a value.
-            if ( !has_key && !is_literal )
+            if ( !contains_token && !is_literal )
             {
                 blame_token(token_set.tokens[ j], "Expected operator or value in expression.");
                 return 0;
@@ -196,7 +196,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
             {
                 literal_queue.push(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ j ].value));
             }
-            else if ( has_key )
+            else if ( contains_token )
             {
                 // String expression types only accept appending,
                 // or conditional expressions.

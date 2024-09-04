@@ -75,7 +75,7 @@ ast_token_set_t *
 stride::ast::capture_block(ast_token_set_t &token_set, token_type_t start_token, token_type_t end_token,
                            int starting_index)
 {
-    requires_token(start_token, token_set, starting_index, "Expected opening token after expression");
+    requires_token(start_token, token_set, starting_index, "Expected opening token after statement. This could be due to missing tokens.");
     int index, skipped_tokens, branch_depth;
     int block_start_index = starting_index;
 

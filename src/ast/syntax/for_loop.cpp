@@ -72,10 +72,12 @@ int stride::ast::parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node
     }
 
     // If there's no declarations in the for loop,
-    // we'll add a
+    // we'll add a truthy conditional.
     if ( for_loop_node->branch_count == 0 )
     {
-
+        auto *truthy_node = new Node(NODE_TYPE_EXPRESSION);
+        truthy_node->add_branch(new Node(NODE_TYPE_VALUE, 0, (void *) "true"));
+        for_loop_node->add_branch(truthy_node);
     }
 
     // The content node of the for loop.

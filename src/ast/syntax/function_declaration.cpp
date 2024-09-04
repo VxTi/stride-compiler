@@ -111,10 +111,9 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
     // add the 'parameters' node
     if ( function_parameters_body->token_count > 0 )
     {
-        auto *parameters_node = new Node(NODE_TYPE_FUNCTION_PARAMETERS, 0);
-        int variadic_declarations = 0;
+        auto *function_parameters_node = new Node(NODE_TYPE_FUNCTION_PARAMETERS, 0);
 
-        for ( int i = 0; i < function_parameters_body->token_count; )
+        for ( int i = 0, variadic_declarations = 0; i < function_parameters_body->token_count; )
         {
             int var_flags = 0;
             if ( peekeq(*function_parameters_body, i, TOKEN_KEYWORD_CONST))
@@ -128,7 +127,7 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                            function_parameters_body->tokens[ index ].value);
 
             requires_token(TOKEN_COLON, *function_parameters_body, i + 1,
-                           "Expected colon after parameter name in function definition.\nThis is required to denote the type of the parameter.",
+                           "Expected colon after parameter name in function definition.\nThis is required to denote the parameter_type_token of the parameter.",
                            function_parameters_body->tokens[ index ].value);
 
             auto function_parameter = new Node(NODE_TYPE_VARIABLE_DECLARATION);
@@ -148,11 +147,11 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 var_flags |= FLAG_VARIABLE_ARRAY;
             }
 
-            // Validate type after expression
-            token_t *type = peak(*function_parameters_body, i, 2);
-            if ( type == nullptr || !types::is_valid_variable_type(type->type))
+            // Validate parameter_type_token after expression
+            token_t *parameter_type_token = peak(*function_parameters_body, i, 2);
+            if ( parameter_type_token == nullptr || !types::is_valid_variable_type(parameter_type_token->type))
             {
-                error("Variadic expression requires valid type, but didn't receive one.");
+                error("Variadic expression requires valid parameter_type_token, but didn't receive one.");
                 return 0;
             }
 
@@ -170,7 +169,15 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 i += 2;
             }
 
-            function_parameter->add_branch(new Node(NODE_TYPE_VARIABLE_TYPE, var_flags, type->value));
+            auto *parameter_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, var_flags);
+            // If the variable type is a reference to a class within a module, use identifier as type.
+            if ( is_identifier_sequence(*function_parameters_body, i + 2))
+            {
+                i += parse_identifier(*function_parameters_body, i + 2, *parameter_type_node) - 1;
+            } else {
+                parameter_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, function_parameters_body->tokens[ i + 2 ].value));
+            }
+            function_parameter->add_branch(parameter_type_node);
 
             if ( i + 3 < function_parameters_body->token_count &&
                  !peekeq(*function_parameters_body, i + 3, TOKEN_COMMA))
@@ -180,9 +187,9 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 return 0;
             }
             i += 4;
-            parameters_node->add_branch(function_parameter);
+            function_parameters_node->add_branch(function_parameter);
         }
-        function_declaration->add_branch(parameters_node);
+        function_declaration->add_branch(function_parameters_node);
     }
 
     // If the function is not external, it must have a body.

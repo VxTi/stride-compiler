@@ -16,7 +16,7 @@
  */
 #define NODE_TYPE_OPERATION            (0x01)
 #define NODE_TYPE_CONDITIONAL          (0x02)
-#define NODE_TYPE_REPETITION           (0x03)
+#define NODE_TYPE_INHERITS             (0x03)
 
 #define NODE_TYPE_VARIABLE_DECLARATION (0x04)
 #define NODE_TYPE_VARIABLE_ASSIGNMENT  (0x05)
@@ -654,9 +654,11 @@ namespace stride::ast
      * @param token_set The token set to parse the generic type from.
      * @param index The index of the token set to start parsing from.
      * @param root The root Node to append the generic type to.
+     * @param accept_literals Whether to accept literals or not. This can be allowed when
+     * a child extends a class that requires filled in generics.
      * @return How many tokens were skipped.
      */
-    int parse_generic(ast_token_set_t &token_set, cursor_t index, Node &root);
+    int parse_generic(ast_token_set_t &token_set, cursor_t index, Node &root, bool accept_literals = false);
 }
 
 #endif //STRIDE_LANGUAGE_AST_H

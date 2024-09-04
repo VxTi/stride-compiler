@@ -2,41 +2,16 @@ import "external library";
 
 let k: type::something[] = function::call(null, 2, function::call());
 
-let illegal: string = "test" + + "balls";
-
-switch (k) {
-
-    case 0:
-        system::println("Hello, World!");
-        break;
-    case 1:
-
-            break;
-    default:
-        break;
-
-}
-
 public class Test {}
 
 public class Test<T> {
-    define async public fn(p: i8) {};
+    define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
+        b::listen();
+    };
 }
 
-let l: outer::inner::clazz = kek;
-
-
-let k: i8 = 1 + 10 * sin(g * 2) + 3 * 2;
-
-let a: i8 = 0, b: i8 = 2;
-
-
-const i: i8[] = 0;
-
-define external test(p0: string, p1: ...i8);
-
-public module Test {
-    public class TestClass {
+module Test {
+    class TestClass {
         // Something
     }
 }
@@ -51,6 +26,23 @@ struct Vector<T> {
     y: T;
     z: T;
 }
+
+class First<K, L> {
+    const p: K;
+    const l: L;
+}
+
+// Inherits p and l fields
+class Second<G, B> : First<i8, i32>, Test<P> {
+
+    const p2: unknown;
+
+}
+
+class Third : Second {
+    let p2: unknown = p + p2;
+}
+
 
 module test::modulename {
 

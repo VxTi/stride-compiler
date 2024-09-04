@@ -17,6 +17,7 @@ int stride::ast::parse_structure(ast_token_set_t &token_set, cursor_t index, Nod
     auto *structure_name_node = new Node(NODE_TYPE_IDENTIFIER);
     structure_name_node->value = token_set.tokens[ index ].value;
     structure_node->add_branch(structure_name_node);
+
     int generic_length = parse_generic(token_set, index + 1, *structure_node);
     index += generic_length;
 
@@ -52,18 +53,19 @@ int stride::ast::parse_structure(ast_token_set_t &token_set, cursor_t index, Nod
         }
         i += 2;
 
+        auto *struct_variable_type_node = new Node(NODE_TYPE_VARIABLE_TYPE);
+
         // Check if there's an identifier sequence as type (module > class?)
         if ( identifier_length > 0 )
         {
-            i += parse_identifier(*structure_content_tokens, i, *struct_variable_node);
+            i += parse_identifier(*structure_content_tokens, i, *struct_variable_type_node);
         }
         else
         {
-            auto *struct_variable_type_node = new Node(NODE_TYPE_VARIABLE_TYPE);
             struct_variable_type_node->value = structure_content_tokens->tokens[ i ].value;
-            struct_variable_node->add_branch(struct_variable_type_node);
             i++;
         }
+        struct_variable_node->add_branch(struct_variable_type_node);
 
         requires_token(TOKEN_SEMICOLON, *structure_content_tokens, i,
                        "Expected semicolon after struct variable declaration.");

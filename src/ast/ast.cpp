@@ -92,7 +92,7 @@ void Node::print(Node &reference, int depth)
     /** ** ** TO BE REMOVED IN THE FUTURE ** ** **/
     // This is a temporary function to print the AST to the console, for debugging purposes.
 
-    printf("%*s", depth * 2, "");
+    printf("\e[38;5;%dm%*s", 8 + depth % 7, depth * 2, "");
     if ( depth > 0 )
     {
         printf("─ ");
@@ -115,7 +115,7 @@ void Node::print(Node &reference, int depth)
             printf("ENUMERATION MEMBER");
             break;
         case NODE_TYPE_VARIABLE_TYPE:
-            printf("VARIABLE TYPE (%s)", (char *) reference.value);
+            printf("VARIABLE TYPE");
             if ( reference.flags & FLAG_VARIABLE_ARRAY)
             {
                 printf(" (array)");
@@ -165,11 +165,14 @@ void Node::print(Node &reference, int depth)
         case NODE_TYPE_FOR_LOOP:
             printf("FOR LOOP");
             break;
+        case NODE_TYPE_INHERITS:
+            printf("INHERITS");
+            break;
         case NODE_TYPE_STRUCTURE:
-            printf("STRUCTURE");
+            printf("STRUCTURE DEFINITION");
             break;
         case NODE_TYPE_MODULE:
-            printf("MODULE");
+            printf("MODULE DEFINITION");
             break;
         case NODE_TYPE_ARRAY:
             printf("ARRAY");
@@ -178,7 +181,7 @@ void Node::print(Node &reference, int depth)
             printf("TRY CATCH");
             break;
         case NODE_TYPE_CLASS:
-            printf("CLASS");
+            printf("CLASS DEFINITION");
             break;
         case NODE_TYPE_VARIABLE_DECLARATION:
             printf("VARIABLE DECLARATION");
