@@ -1,10 +1,20 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
+
 #include "analysis/lexer.h"
 #include "ast/ast.h"
-#include "ast/syntax/validation/syntax_validation.h"
+#include "ast/validation/syntax_validation.h"
 
 using namespace stride;
+
+std::vector<const char *> options = {
+        "std",
+        "verbose",
+        "insecure",
+        ""
+};
+
 
 int main(const int argc, const char **argv)
 {
@@ -15,6 +25,11 @@ int main(const int argc, const char **argv)
         std::cerr << "Run the program as followed:" << std::endl;
         std::cerr << "./cstride <options?> <relative input file path>" << std::endl;
         exit(1);
+    }
+
+    // Get compiler options from argv
+    for ( int i = 0; i < argc; i++)
+    {
     }
 
     std::ifstream file_in(argv[ 1 ]);
@@ -34,7 +49,7 @@ int main(const int argc, const char **argv)
 
     lexer::tokenize(content.c_str(), content.size(), token_set);
     auto root = ast::parse(token_set);
-    ast::validation::validate(*root);
+    stride::validation::validate(*root);
 
     return 0;
 }

@@ -30,19 +30,17 @@ int parse_class_inheritance(ast_token_set_t &token_set, cursor_t index, Node &ro
     skipped += parse_generic(token_set, index + skipped, *first_inherits_node, true); // Optional generics
     inherits_node->add_branch(first_inherits_node);
 
-    root.add_branch(inherits_node);
 
-    if ( !peekeq(token_set, index + skipped, TOKEN_COMMA))
+    if ( !peekeq(token_set, index + skipped, TOKEN_KEYWORD_AND))
     {
-        printf("Class %s does not inherit more than one, next token: %s\n", token_set.tokens[ index ].value,
-               token_set.tokens[ index + skipped ].value);
+        root.add_branch(inherits_node);
         return skipped + 1;
     }
 
     // More inheritance classes
     for ( ; index + skipped < token_set.token_count; )
     {
-        requires_token(TOKEN_COMMA, token_set, index + skipped, "Expected comma after generic identifier.");
+        requires_token(TOKEN_KEYWORD_AND, token_set, index + skipped, "Expected comma after generic identifier.");
         requires_token(TOKEN_IDENTIFIER, token_set, index + skipped + 1,
                        "Class inheritance requires parent class name.");
 
@@ -50,15 +48,16 @@ int parse_class_inheritance(ast_token_set_t &token_set, cursor_t index, Node &ro
         inherits_class_node->add_branch(
                 new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + skipped + 1 ].value));
 
-        inherits_node->add_branch(inherits_class_node);
         skipped += 2;
         skipped += parse_generic(token_set, index + skipped, *inherits_class_node, true); // Optional generics
+        inherits_node->add_branch(inherits_class_node);
         if ( peekeq(token_set, index + skipped, TOKEN_LBRACE))
         {
             skipped++;
             break;
         }
     }
+    root.add_branch(inherits_node);
     return skipped;
 }
 
@@ -86,7 +85,7 @@ int stride::ast::parse_class(ast_token_set_t &token_set, cursor_t index, Node &r
     int generics_length = parse_generic(token_set, index + 2, *node);
 
     // Check if class extends other, base : parent1, parent2, ... { ... }
-    if ( peekeq(token_set, index + 2 + generics_length, TOKEN_COLON))
+    if ( peekeq(token_set, index + 2 + generics_length, TOKEN_KEYWORD_HAS))
     {
         generics_length += parse_class_inheritance(token_set, index + generics_length + 3, *node);
     }

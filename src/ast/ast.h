@@ -195,6 +195,8 @@ namespace stride::ast
          */
         static void print(Node &reference, int depth = 0);
 
+        static void print_static(int node_type);
+
         /**
          * Ensures that the Node has the minimum amount of branches.
          * This function will allocate more memory for the branches if the
@@ -240,12 +242,23 @@ namespace stride::ast
          */
         unsigned int node_type;
 
+        /**
+         * The parent of the Node.
+         * This is the parent Node of this Node, and is used to traverse the AST.
+         */
         Node *parent;
 
+        /**
+         * The index at which this node resides in the parent's branches.
+         * This is used to store the index of the parent Node in the parent's branches.
+         */
         int parent_index = -1;
 
-        int self_index = -1;
-
+        /**
+         * Adds a branch to the Node.
+         * This function will add a branch to the Node, and ensure that the Node has enough memory allocated for the branches.
+         * @param node The Node to add as a branch.
+         */
         void add_branch(Node *node);
 
         /**
@@ -422,11 +435,14 @@ namespace stride::ast
      * This method is used in the `parse_variable_declaration` method, and can be used
      * to parse multiple expressions after one another. This method can also be used to parse the parameter
      * definitions in functions, with `allow_assignment` set to false.
-     * This function will generate the following AST Nodes:
-     *
-     * <li>IDENTIFIER (val = variable name)</li>
-     * <li>VARIABLE_TYPE (val = variable type) or IDENTIFIER_SEQUENCE -..-> IDENTIFIER (val = variable type segment)</li>
-     * <li>VALUE (val = value) or EXPRESSION -..-> VALUE (val = value)</li>
+     * This function will generate the following AST Nodes: <br />
+     * <pre>
+     * &nbsp          &nbsp;VARIABLE DECLARATION <br />
+     * &nbsp         /        &nbsp;|          &nbsp;\\<br />
+     * IDENTIFIER &nbsp  &nbsp; VARIABLE TYPE &nbsp;&nbsp;&nbsp; VALUE or EXPRESSION<br />
+     * &nbsp                                             &nbsp;|<br />
+     * &nbsp                                            &nbsp;...<br />
+     * </pre>
      *
      * If the variable assignment has an expression that requires evaluation,
      * it is not certain which tokens will be generated. This will be evaluated upon AST
@@ -438,7 +454,7 @@ namespace stride::ast
      * @param allow_assignment Whether the segment allows variable assignment.
      * @param root The root Node to append the segment to.
      */
-    void parse_variable_declaration_segment(ast_token_set_t &token_set, cursor_t index, int token_count, bool allow_assignment, Node &root);
+    void parse_variable_declaration_segment(ast_token_set_t &token_set, cursor_t index, int token_count, bool allow_assignment, Node &root, int flags = 0);
 
     /**
      * Validates a variable declaration.
@@ -453,13 +469,17 @@ namespace stride::ast
      * Parses an expression, which can be after variable declaration / assignment,
      * or providing function parameters.
      * An expression can be in the following format:
-     * `(5 + (3 * 4))` or `module::function()`
+     * `(5 + (3 * 4))`, `module::function()`, `variable + ...` etc.
      *
-     * This function will generate the following AST Nodes:
+     * This parser function will generate the following AST Nodes:
+     * <pre>
+     * &nbsp;                       &nbsp;EXPRESSION<br />
+     * &nbsp;                     /      &nbsp;|       &nbsp;\\<br />
+     * VALUE, EXPRESSION,       &nbsp; OPERATOR      VALUE, EXPRESSION,<br />
+     * FUNCTION CALL                           &nbsp;FUNCTION CALL<br />
+     * or VARIABLE REFERENCE                   &nbsp;or VARIABLE REFERENCE<br />
      *
-     * <li>OPERATION (val = operation type)</li>
-     * <li>VALUE (val = value) or EXPRESSION -..-> VALUE (val = value)</li>
-     * <li>FUNCTION_CALL -..-> IDENTIFIER(val = function name), FUNCTION_PARAMETERS -..-> EXPRESSION (val = function parameters) or VALUE (val = param value)</li>
+     * </pre>
      *
      * The nodes this function generates are not certain, as the expression can be any kind of operation.
      *
@@ -594,6 +614,19 @@ namespace stride::ast
      */
     int distance_next_token_outside_block(ast_token_set_t &token_set, int starting_index, token_type_t token);
 
+    /**
+     * Parses a class.
+     * This function will parse a class in the following format: <br />
+     * <code>
+     * class MyClass : ParentClass, SecondaryClass, Generics&lt;A, B ...&gt;, ... { <br />
+     * &nbsp;&nbsp;&nbsp;... <br />
+     * } <br />
+     * </code>
+     * @param token_set The token set to parse the class from.
+     * @param index The index of the token set to start parsing from.
+     * @param root The root Node to append the class to.
+     * @return How many tokens were skipped.
+     */
     int parse_class(ast_token_set_t &token_set, cursor_t index, Node &root);
 
     /**

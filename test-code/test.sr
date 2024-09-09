@@ -1,8 +1,19 @@
 import "external library";
 
-let k: type::something[] = function::call(null, 2, function::call());
+define test() {};
 
-public class Test {}
+define test() {
+ // do nothing
+};
+
+test();;
+
+let k: type::something = test(null, 2, mod::test());
+
+let c: char = 'c',
+    d: char = '\'';
+
+let g: char = c;
 
 public class Test<T> {
     define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
@@ -32,15 +43,15 @@ class First<K, L> {
     const l: L;
 }
 
+class Third has Second and Test {
+    const p: unknown = super;
+}
+
 // Inherits p and l fields
-class Second<G, B> : First<i8, i32>, Test<P> {
+class Second<G, B> has First<i8, i32> and Test<P> {
 
     const p2: unknown;
 
-}
-
-class Third : Second {
-    let p2: unknown = p + p2;
 }
 
 
@@ -78,7 +89,8 @@ module test::modulename {
         try {
             system::println("Hello, World!");
         } catch (e: Error) {
-            system::println("Hello, World!");
+            system::println("Hello, World!");;
+
             throw Error("fuck");
         }
 

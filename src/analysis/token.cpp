@@ -40,6 +40,16 @@ token_def_t gen_token_kw(const char *expression, token_type_t token)
     return token_def;
 }
 
+std::map<token_type_t, unsigned int> primitive_byte_sizes = {
+        {TOKEN_PRIMITIVE_BOOL, 1},
+        {TOKEN_PRIMITIVE_INT8, 1},
+        {TOKEN_PRIMITIVE_INT16, 2},
+        {TOKEN_PRIMITIVE_INT32, 4},
+        {TOKEN_PRIMITIVE_INT64, 8},
+        {TOKEN_PRIMITIVE_FLOAT32, 4},
+        {TOKEN_PRIMITIVE_FLOAT64, 8},
+};
+
 /**
  * Token definitions for the lexer.
  */
@@ -48,6 +58,8 @@ std::vector<token_def_t> token_definitions = {
         gen_token("/\\*.*\\*/", TOKEN_COMMENT_MULTILINE),
         gen_token_kw("public", TOKEN_KEYWORD_PUBLIC),
         gen_token_kw("module", TOKEN_KEYWORD_MODULE),
+        gen_token_kw("and", TOKEN_KEYWORD_AND),
+        gen_token_kw("has", TOKEN_KEYWORD_HAS),
         gen_token_kw("as", TOKEN_KEYWORD_AS),
         gen_token_kw("let", TOKEN_KEYWORD_LET),
         gen_token_kw("return", TOKEN_KEYWORD_RETURN),
@@ -93,6 +105,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token(R"([\+\-]?([0-9]+\.[eE][-+]?[0-9]+|[0-9]*\.?[0-9]+[eE][\+\-]?[0-9]+|[0-9]*\.[0-9]+|[0-9]+))",
                   TOKEN_NUMBER_FLOAT),
         gen_token(R"("[^"]*")", TOKEN_STRING_LITERAL),
+        gen_token(R"('(\\[^']|\\'|[^'])')", TOKEN_CHAR_LITERAL),
         gen_token("\\.{3}", TOKEN_THREE_DOTS),
         gen_token("\\[", TOKEN_LSQUARE_BRACKET),
         gen_token("]", TOKEN_RSQUARE_BRACKET),

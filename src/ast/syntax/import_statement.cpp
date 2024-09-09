@@ -25,12 +25,12 @@ int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t ind
 
     if ( root.node_type != NODE_TYPE_BLOCK || !(root.flags & FLAG_SCOPE_GLOBAL))
     {
-        error("\nImport statements must be at the top of the file.\n");
+        blame_token(token_set.tokens[ index ], "Import statements must be at the top of the file.");
         return 0;
     }
 
     auto *importNode = new Node(NODE_TYPE_IMPORT, 0);
-    importNode->add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ index ].value));
+    importNode->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
 
     requires_token(TOKEN_SEMICOLON, token_set, index + 1, "Expected semicolon after import statement");
 

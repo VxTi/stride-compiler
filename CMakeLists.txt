@@ -1,7 +1,12 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.29.6)
 project(stride_language)
 
+# Include standard library path
+include_directories(/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1")
+
+
 
 add_executable(stride_language src/main.cpp
         src/analysis/token.h
@@ -29,11 +34,9 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/do_while.cpp
         src/ast/syntax/if_else.cpp
         src/ast/syntax/throw.cpp
-        src/ast/syntax/validation/syntax_validation.cpp
-        src/ast/syntax/validation/syntax_validation.h
-        src/ast/syntax/validation/variables/variable_scope_access_order.cpp
-        src/ast/syntax/validation/variables/variable_redeclaration.cpp
-        src/ast/syntax/validation/if_statement_validation.cpp
+        src/ast/validation/syntax_validation.cpp
+        src/ast/validation/syntax_validation.h
+        src/ast/validation/if_statement_validation.cpp
         src/assembly.h
         src/ast/syntax/classes.cpp
         src/ast/syntax/switch_case.cpp
@@ -41,4 +44,7 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/generics.cpp
         src/ast/syntax/structures.cpp
         src/ast/syntax/returning.cpp
+        src/ast/validation/function_exists_before_call.cpp
+        src/ast/validation/symbol_scope_existence.cpp
+        src/ast/node_abstractions.h
 )

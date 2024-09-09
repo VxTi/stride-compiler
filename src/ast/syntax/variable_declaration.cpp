@@ -8,7 +8,7 @@
 using namespace stride::ast;
 
 void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set, cursor_t index, int token_count,
-                                                     bool allow_assignment, Node &root)
+                                                     bool allow_assignment, Node &root, int flags)
 {
     requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected variable name");
     requires_token(TOKEN_COLON, token_set, index + 1, "Expected colon after variable name, but received none.");
@@ -22,7 +22,7 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
         return;
     }
 
-    auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, 0);
+    auto *variable_declaration_node = new Node(NODE_TYPE_VARIABLE_DECLARATION, flags);
 
     variable_declaration_node->add_branch(
             new Node(NODE_TYPE_IDENTIFIER, 0,
@@ -33,19 +33,16 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
 
     // If it's an identifier, we'll have to check whether it's a sequence, e.g. whether the identifier
     // is defined in a module, with the 'module::submodule::identifier' syntax.
+    auto *variable_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, 0);
     if ( peekeq(token_set, index + 2, TOKEN_IDENTIFIER))
     {
-        auto *variable_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, 0);
         identifier_len = parse_identifier(token_set, index + 2, *variable_type_node);
-        variable_declaration_node->add_branch(variable_type_node);
     }
     else // Regular variable type (primitives)
     {
-        variable_declaration_node->add_branch(
-                new Node(NODE_TYPE_VARIABLE_TYPE, 0,
-                         token_set.tokens[ index + 2 ].value)
-        );
+        variable_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 2 ].value));
     }
+    variable_declaration_node->add_branch(variable_type_node);
     // Check if the variable is an array.
     if ( peekeq(token_set, index + identifier_len + 2, TOKEN_LSQUARE_BRACKET) &&
          peekeq(token_set, index + identifier_len + 3, TOKEN_RSQUARE_BRACKET))
@@ -112,7 +109,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
      */
     if ( sub_expression_length < 0 || sub_expression_length >= statement_length )
     {
-        parse_variable_declaration_segment(token_set, index + 1, statement_length, true, root);
+        parse_variable_declaration_segment(token_set, index + 1, statement_length, true, root, var_flags);
         return statement_length + 2;
     }
     /*
@@ -124,7 +121,7 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
           i < index + statement_length + 1;
           sub_expression_length = distance_next_token_outside_block(token_set, i, TOKEN_COMMA))
     {
-        parse_variable_declaration_segment(token_set, i, sub_expression_length, true, root);
+        parse_variable_declaration_segment(token_set, i, sub_expression_length, true, root, var_flags);
 
         // If there's no next expression, break the loop and prevent infinity
         if ( sub_expression_length < 0 || i + sub_expression_length > statement_length )

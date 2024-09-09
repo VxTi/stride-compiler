@@ -70,7 +70,6 @@ int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node 
         }
     }
     root.add_branch(generics_node);
-    printf("Generic length: %d\n", skipped);
 
     return skipped;
 }

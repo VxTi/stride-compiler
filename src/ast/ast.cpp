@@ -72,16 +72,115 @@ void Node::ensureMinimumBranches()
 }
 
 /**
- * Adds a branch to the Node.
- * @param node The Node to add.
+ * Adds the provided node to this node.
+ * @param node The Node to add to this node (the root)
  */
 void Node::add_branch(Node *node)
 {
     this->ensureMinimumBranches();
     node->parent_index = (int) this->branch_count;
-    this->self_index = (int) node->branch_count + 1;
     this->branches[ this->branch_count++ ] = *node;
     node->parent = this;
+}
+
+void Node::print_static(int node_type)
+{
+    switch ( node_type )
+    {
+        case NODE_TYPE_IMPORT:
+            printf("IMPORT");
+            break;
+        case NODE_TYPE_FUNCTION_PARAMETERS:
+            printf("FUNCTION PARAMETERS");
+            break;
+        case NODE_TYPE_IDENTIFIER_REFERENCE:
+            printf("IDENTIFIER REFERENCE");
+            break;
+        case NODE_TYPE_IDENTIFIER:
+            printf("IDENTIFIER");
+            break;
+        case NODE_TYPE_ENUMERATION_MEMBER:
+            printf("ENUMERATION MEMBER");
+            break;
+        case NODE_TYPE_VARIABLE_TYPE:
+            printf("VARIABLE TYPE");
+            break;
+        case NODE_TYPE_BLOCK:
+            printf("BODY");
+            break;
+        case NODE_TYPE_VALUE:
+            printf("VALUE");
+            break;
+        case NODE_TYPE_GENERICS:
+            printf("GENERICS");
+            break;
+        case NODE_TYPE_FUNCTION_DEFINITION:
+            printf("FUNCTION DECLARATION");
+            break;
+        case NODE_TYPE_SWITCH:
+            printf("SWITCH");
+            break;
+        case NODE_TYPE_CASE:
+            printf("CASE");
+            break;
+        case NODE_TYPE_DEFAULT:
+            printf("DEFAULT");
+            break;
+        case NODE_TYPE_IF:
+            printf("IF STATEMENT");
+            break;
+        case NODE_TYPE_FOR_LOOP:
+            printf("FOR LOOP");
+            break;
+        case NODE_TYPE_INHERITS:
+            printf("INHERITS");
+            break;
+        case NODE_TYPE_STRUCTURE:
+            printf("STRUCTURE DEFINITION");
+            break;
+        case NODE_TYPE_MODULE:
+            printf("MODULE DEFINITION");
+            break;
+        case NODE_TYPE_ARRAY:
+            printf("ARRAY");
+            break;
+        case NODE_TYPE_TRY_CATCH:
+            printf("TRY CATCH");
+            break;
+        case NODE_TYPE_CLASS:
+            printf("CLASS DEFINITION");
+            break;
+        case NODE_TYPE_VARIABLE_DECLARATION:
+            printf("VARIABLE DECLARATION");
+            break;
+        case NODE_TYPE_FUNCTION_CALL:
+            printf("FUNCTION CALL");
+            break;
+        case NODE_TYPE_RETURN:
+            printf("RETURN");
+            break;
+        case NODE_TYPE_ENUMERATION:
+            printf("ENUMERABLE DEF");
+            break;
+        case NODE_TYPE_CONDITIONAL:
+            printf("CONDITIONAL");
+            break;
+        case NODE_TYPE_WHILE_LOOP:
+            printf("WHILE LOOP");
+            break;
+        case NODE_TYPE_THROW:
+            printf("THROW");
+            break;
+        case NODE_TYPE_DO_WHILE:
+            printf("DO WHILE LOOP");
+            break;
+        case NODE_TYPE_EXPRESSION:
+            printf("EXPRESSION");
+            break;
+        default:
+            printf("%d", node_type);
+    }
+    printf("\n");
 }
 
 /**
@@ -92,7 +191,7 @@ void Node::print(Node &reference, int depth)
     /** ** ** TO BE REMOVED IN THE FUTURE ** ** **/
     // This is a temporary function to print the AST to the console, for debugging purposes.
 
-    printf("\e[38;5;%dm%*s", 8 + depth % 7, depth * 2, "");
+    printf("\e[38;5;%dm%*s", 9 + depth % 6, depth * 2, "");
     if ( depth > 0 )
     {
         printf("─ ");

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <regex.h>
+#include <map>
 
 typedef enum
 {
@@ -82,6 +83,8 @@ typedef enum
     TOKEN_PRIMITIVE_UNKNOWN,
 
     /* Keywords */
+    TOKEN_KEYWORD_HAS,
+    TOKEN_KEYWORD_AND,
     TOKEN_KEYWORD_AS,
     TOKEN_KEYWORD_ASYNC,
     TOKEN_KEYWORD_DEFINE,
@@ -115,6 +118,7 @@ typedef enum
 
     TOKEN_IDENTIFIER,
     TOKEN_STRING_LITERAL,
+    TOKEN_CHAR_LITERAL,
     TOKEN_NUMBER_INTEGER,
     TOKEN_NUMBER_FLOAT,
     TOKEN_BOOLEAN_LITERAL,
@@ -130,8 +134,6 @@ typedef struct
     token_type_t token;
     regex_t regex;
     bool keyword;
-    int column;
-    int line;
 } token_def_t;
 
 /**
@@ -152,5 +154,11 @@ typedef struct
  * Vector that contains all the token definitions.
  */
 extern std::vector<token_def_t> token_definitions;
+
+/**
+ * Map that contains the byte sizes of the primitive types.
+ * This is used for the code generation.
+ */
+extern std::map<token_type_t, unsigned int> primitive_byte_sizes;
 
 #endif //STRIDE_LANGUAGE_TOKEN_H

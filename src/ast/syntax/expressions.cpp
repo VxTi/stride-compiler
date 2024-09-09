@@ -2,7 +2,6 @@
 // Created by Luca Warmenhoven on 24/08/2024.
 //
 
-#include <queue>
 #include <map>
 #include "../ast.h"
 #include "variable_types.h"
@@ -132,6 +131,24 @@ const std::map<token_type_t, struct expression_segment_t> expressions = {
         { TOKEN_EQUALS,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // = (assignment)
 };
 
+void shunting_yard(ast_token_set_t &token_set, int cursor, int token_count, Node &parent_node)
+{
+    std::vector<token_t> operator_queue;
+    std::vector<token_t> literal_queue;
+
+    int i, j;
+
+    for ( i = 0; i < token_count; i++ )
+    {
+        j = cursor + i;
+        if ( types::is_valid_literal_value(token_set.tokens[j].type))
+        {
+            literal_queue.push_back(token_set.tokens[j]);
+        }
+    }
+}
+
+
 /**
  * Parses an expression, which can be after variable declaration / assignment,
  * or providing function parameters.
@@ -163,16 +180,12 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
         }
         blame_token(token_set.tokens[ cursor ], "Expected value or expression");
     }
-    
-    bool is_string = token_set.tokens[ cursor ].type == TOKEN_STRING_LITERAL;
 
     auto *expression_node = new Node(NODE_TYPE_EXPRESSION);
 
-    std::queue<Node *> operator_queue;
-    std::queue<Node *> literal_queue;
+    shunting_yard(token_set, cursor, token_count, *expression_node);
 
-    int i, j;
-    
+    /*
     for ( i = is_string ? 1 : 0; i < token_count; i++ )
     {
         j = cursor + i;
@@ -194,7 +207,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
             // If it's a literal, add it to the literal queue.
             if ( is_literal )
             {
-                literal_queue.push(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ j ].value));
+                literal_queue.push_back(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ j ].value));
             }
             else if ( contains_token )
             {
@@ -219,7 +232,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
                 }
             }
         }
-    }
+    }*/
 
     parent_node.add_branch(expression_node);
 

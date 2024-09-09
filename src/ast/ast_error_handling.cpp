@@ -25,10 +25,12 @@ void stride::ast::error(const char *errorMessage, ...)
 
 std::string capture_line(token_t token, int index)
 {
+    printf("Capturing line for token %s, line %d column %d, index %d\n", token.value,
+           token.line, token.column, index);
     std::string line;
 
     const char *file_content = stride::ast::current_file_content.c_str();
-    for ( int i = index; i >= 0; i-- )
+    for ( int i = index; i > 0; i-- )
     {
         if ( file_content[ i ] == '\n' || i == 0 )
         {

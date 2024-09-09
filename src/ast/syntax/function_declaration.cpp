@@ -155,6 +155,16 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 return 0;
             }
 
+            auto *parameter_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, var_flags);
+            // If the variable type is a reference to a class within a module, use identifier as type.
+            if ( is_identifier_sequence(*function_parameters_body, i + 2))
+            {
+                i += parse_identifier(*function_parameters_body, i + 2, *parameter_type_node) - 1;
+            } else {
+                parameter_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, function_parameters_body->tokens[ i + 2 ].value));
+            }
+            function_parameter->add_branch(parameter_type_node);
+
             // If the parameter has '[]' after it, make it an array (if it does not have '...')
             if ( peekeq(*function_parameters_body, i + 3, TOKEN_LSQUARE_BRACKET)
                  && peekeq(*function_parameters_body, i + 4, TOKEN_RSQUARE_BRACKET))
@@ -168,16 +178,6 @@ int stride::ast::parse_function_declaration(ast_token_set_t &token_set, cursor_t
                 var_flags |= FLAG_VARIABLE_ARRAY;
                 i += 2;
             }
-
-            auto *parameter_type_node = new Node(NODE_TYPE_VARIABLE_TYPE, var_flags);
-            // If the variable type is a reference to a class within a module, use identifier as type.
-            if ( is_identifier_sequence(*function_parameters_body, i + 2))
-            {
-                i += parse_identifier(*function_parameters_body, i + 2, *parameter_type_node) - 1;
-            } else {
-                parameter_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, function_parameters_body->tokens[ i + 2 ].value));
-            }
-            function_parameter->add_branch(parameter_type_node);
 
             if ( i + 3 < function_parameters_body->token_count &&
                  !peekeq(*function_parameters_body, i + 3, TOKEN_COMMA))

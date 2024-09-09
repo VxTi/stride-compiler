@@ -59,7 +59,7 @@ struct Structure<A, B> {
 }
 
 // publicly shared class
-public class cname {
+public class ClassName {
     define main() {
     
        // Automatically gets transformed to 3 by syntax analysis
@@ -71,6 +71,15 @@ public class cname {
     
        return 0;
     }
+}
+
+public class Secondary {
+    // Define something here
+}
+
+// Inheritance
+public class InheritedClass has Secondary and ClassName {
+    // Do something with the inheritance.
 }
 
 ```
