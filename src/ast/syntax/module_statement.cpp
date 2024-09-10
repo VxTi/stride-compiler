@@ -2,24 +2,24 @@
 // Created by Luca Warmenhoven on 24/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
 /**
- * Parses a shared statement.
- * This function will parse a shared statement in the following format:
+ * Parses a isPublic statement.
+ * This function will parse a isPublic statement in the following format:
  * ```
- * shared module::name {
+ * isPublic module::name {
  *     // code
  * }
  * ```
- * The function has to be called AFTER the shared keyword, e.g. the input stream tokens
+ * The function has to be called AFTER the isPublic keyword, e.g. the input stream tokens
  * must look like:
- * shared < 'identifier {'
- * @param token_set The token set to parse the shared statement from.
- * @param index The index of the token set to start parsing from.
- * @param root The root Node to append the shared statement to.
+ * isPublic < 'identifier {'
+ * @param token_set The required_token set to parse the isPublic statement from.
+ * @param index The index of the required_token set to start parsing from.
+ * @param root The root Node to append the isPublic statement to.
  */
 int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
@@ -39,7 +39,7 @@ int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t ind
     skipped += parse_identifier(token_set, index, *node);
 
     // Capture the closure after the namespace
-    ast_token_set_t *shared_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped);
+    ast_token_set_t *shared_block_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped);
 
     if (shared_block_tokens->token_count == 0)
     {

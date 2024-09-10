@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 03/09/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 

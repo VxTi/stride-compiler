@@ -3,7 +3,7 @@
 //
 
 #include <regex.h>
-#include "lexer.h"
+#include "tokenizer.h"
 
 /**
  * Checks whether the provided character is a word boundary character,
@@ -45,21 +45,20 @@ void get_cursor_position(const char *source, size_t index, int *line, int *colum
 
 /**
  * Tokenize the source code.
- * This function will tokenize the source code and store the tokens in the destination token set.
- * Tokenization is based on the grammar defined in token.h. This uses regular expressions
+ * This function will tokenize the source code and store the tokens in the destination required_token set.
+ * Tokenization is based on the grammar defined in required_token.h. This uses regular expressions
  * to match for phrases in source code, and generate tokens accordingly.
  * @param source The source code.
  * @param source_size The size of the source code.
- * @param dst The destination token set.
+ * @param dst The destination required_token set.
  */
-void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_set_t &dst)
+TokenSet *stride::tokenize(std::string source)
 {
     int matched, i, j, line, col;
 
-    dst.token_count = 0;
-    dst.tokens = (token_t *) malloc(sizeof(token_t) * source_size);
+    auto *tokens = new std::vector<token_t>();
 
-    for ( i = 0; i < source_size; )
+    for ( i = 0; i < source.size(); )
     {
         // Skip whitespaces
         if ( source[ i ] == ' ' || source[ i ] == '\n' || source[ i ] == '\t' )
@@ -82,18 +81,17 @@ void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_s
                 {
                     continue;
                 }
-                // Append the token to the buffer
+                // Append the required_token to the buffer
                 token_t token;
                 token.type = token_definitions[ j ].token;
                 token.value = (char *) malloc(match.rm_eo - match.rm_so + 1);
-                get_cursor_position(source, i, &line, &col);
+                get_cursor_position(source.c_str(), i, &line, &col);
                 token.line = line;
                 token.column = col;
                 token.index = i;
 
-                memcpy((void *) token.value, source + i + match.rm_so, match.rm_eo - match.rm_so);
+                memcpy((void *) token.value, source.c_str() + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value )[ match.rm_eo - match.rm_so ] = '\0';
-                dst.tokens[ dst.token_count++ ] = token;
                 i += match.rm_eo - match.rm_so;
                 matched = 1;
                 break;
@@ -101,14 +99,9 @@ void stride::lexer::tokenize(const char *source, size_t source_size, ast_token_s
         }
         if ( !matched )
         {
-            token_t illegal = {
-                .value = (char *) malloc(sizeof(char)),
-                .index = i,
-                };
-            illegal.value[ 0 ] = source[ i ];
-            get_cursor_position(source, i, &illegal.line, &illegal.column);
-            blame_token(illegal, "Illegal character found", i);
-            free(illegal.value);
+            error("Illegal character found in file.");
         }
+
     }
+    return new TokenSet(*tokens);
 }

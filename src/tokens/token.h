@@ -125,9 +125,9 @@ typedef enum
 } token_type_t;
 
 /**
- * Definition of a token.
+ * Definition of a required_token.
  * This includes the regular expression that has to match,
- * and the reference token enumerable.
+ * and the reference required_token enumerable.
  */
 typedef struct
 {
@@ -137,9 +137,9 @@ typedef struct
 } token_def_t;
 
 /**
- * Struct that represents a matched token.
- * This includes the properties of the token, the value of the token,
- * the length of the value, the line number and the column number.
+ * Struct that represents a matched required_token.
+ * This includes the properties of the required_token, the current of the required_token,
+ * the length of the current, the line number and the column number.
  */
 typedef struct
 {
@@ -151,7 +151,7 @@ typedef struct
 } token_t;
 
 /**
- * Vector that contains all the token definitions.
+ * Vector that contains all the required_token definitions.
  */
 extern std::vector<token_def_t> token_definitions;
 

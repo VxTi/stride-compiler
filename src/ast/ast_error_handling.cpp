@@ -4,7 +4,7 @@
 
 
 #include <iostream>
-#include "ast.h"
+#include "abstractions/AST.h"
 #include "ast_error_handling.h"
 
 /**
@@ -25,7 +25,7 @@ void stride::ast::error(const char *errorMessage, ...)
 
 std::string capture_line(token_t token, int index)
 {
-    printf("Capturing line for token %s, line %d column %d, index %d\n", token.value,
+    printf("Capturing line for required_token %s, line %d column %d, index %d\n", token.value,
            token.line, token.column, index);
     std::string line;
 
@@ -85,7 +85,7 @@ void stride::ast::blame_token(token_t token, const char *error_message, ...)
 }
 
 /**
- * Exits the program if the next token is not of the provided properties.
+ * Exits the program if the next required_token is not of the provided properties.
  * @param type The properties to check for.
  * @param offset The offset to check.p
  * @param errorMessage The error message to display.
@@ -100,10 +100,10 @@ stride::ast::requires_token(token_type_t type, ast_token_set_t &token_set, curso
         va_list args;
         va_start(args, error_message);
 
-        // Prevent empty token sets from causing a crash
+        // Prevent empty required_token sets from causing a crash
         if ( token_set.token_count == 0 )
         {
-            fprintf(stderr, "\n\nError whilst seeking token - No tokens found.");
+            fprintf(stderr, "\n\nError whilst seeking required_token - No tokens found.");
             exit(1);
         }
 

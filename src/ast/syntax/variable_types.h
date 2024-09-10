@@ -5,36 +5,36 @@
 #ifndef STRIDE_LANGUAGE_VARIABLE_TYPES_H
 #define STRIDE_LANGUAGE_VARIABLE_TYPES_H
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 namespace stride::ast::types {
     /**
-     * Checks if the token type is an integer.
-     * @param type The token type to check.
-     * @return True if the token type is an integer, false otherwise.
+     * Checks if the required_token type is an integer.
+     * @param type The required_token type to check.
+     * @return True if the required_token type is an integer, false otherwise.
      */
     int is_integer(token_type_t type);
 
     /**
-     * Checks whether the token is a valid literal.
+     * Checks whether the required_token is a valid literal.
      * Literals are integers, floats, strings, null and booleans.
-     * @param type The token type to check.
-     * @return True if the token is a valid literal, false otherwise.
+     * @param type The required_token type to check.
+     * @return True if the required_token is a valid literal, false otherwise.
      */
     int is_valid_literal_value(token_type_t type);
 
     /**
-     * Checks if the token type is a valid variable type.
-     * @param type The token type to check.
-     * @return True if the token type is a valid variable type, false otherwise.
+     * Checks if the required_token type is a valid variable type.
+     * @param type The required_token type to check.
+     * @return True if the required_token type is a valid variable type, false otherwise.
      */
     int is_valid_variable_type(token_type_t type);
 
     /**
-     * Checks whether the provided token is a functional keyword.
+     * Checks whether the provided required_token is a functional keyword.
      * A functional keyword is a keyword that has meaning,
      * such as 'class', 'enum', 'struct', etc.
-     * @param type The token to check.
+     * @param type The required_token to check.
      * @return An integer representing the truthyness of the result. 1 for true, 0 otherwise.
      */
     int is_functional_keyword(token_type_t type);

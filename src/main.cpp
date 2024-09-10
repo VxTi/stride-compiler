@@ -1,20 +1,8 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
-
-#include "analysis/lexer.h"
-#include "ast/ast.h"
-#include "ast/validation/syntax_validation.h"
+#include "ast/abstractions/AST.h"
+#include "ast/abstractions/StrideFile.h"
 
 using namespace stride;
-
-std::vector<const char *> options = {
-        "std",
-        "verbose",
-        "insecure",
-        ""
-};
-
 
 int main(const int argc, const char **argv)
 {
@@ -27,29 +15,8 @@ int main(const int argc, const char **argv)
         exit(1);
     }
 
-    // Get compiler options from argv
-    for ( int i = 0; i < argc; i++)
-    {
-    }
-
-    std::ifstream file_in(argv[ 1 ]);
-    std::string content(( std::istreambuf_iterator<char>(file_in)),
-                        ( std::istreambuf_iterator<char>()));
-
-    std::string output_file_path = argv[ 1 ];
-    output_file_path = output_file_path
-            .substr(0, output_file_path.find_last_of('.'))
-            .append(".asm");
-
-    std::cout << "Compiling file to " << output_file_path << std::endl;
-
-    ast::ast_token_set_t token_set;
-    ast::current_file_name = argv[ 1 ];
-    ast::current_file_content = content;
-
-    lexer::tokenize(content.c_str(), content.size(), token_set);
-    auto root = ast::parse(token_set);
-    stride::validation::validate(*root);
+    auto *file = new stride::StrideFile((std::string &) argv[ 1 ]);
+    file->compile();
 
     return 0;
 }

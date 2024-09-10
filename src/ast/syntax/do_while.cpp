@@ -2,13 +2,13 @@
 // Created by Luca Warmenhoven on 27/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
 int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_t index, stride::ast::Node &root)
 {
-    ast_token_set_t *do_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index);
+    ast_token_set_t *do_block_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index);
     if ( do_block_tokens == nullptr )
     {
         error("Do statement requires block statement after declaration.\nThis might have gone wrong due to a missing closing brace, at line %d column %d.",
@@ -21,8 +21,8 @@ int stride::ast::parse_do_while(stride::ast::ast_token_set_t &token_set, cursor_
     requires_token(TOKEN_LPAREN, token_set, index + do_block_tokens->token_count + 3,
                    "Expected opening parenthesis after 'while' keyword.");
 
-    ast_token_set_t *while_condition_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN,
-                                                            index + do_block_tokens->token_count + 3);
+    ast_token_set_t *while_condition_tokens = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN,
+                                                           index + do_block_tokens->token_count + 3);
 
     if ( while_condition_tokens == nullptr || while_condition_tokens->token_count == 0 )
     {

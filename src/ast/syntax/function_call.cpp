@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 26/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
@@ -13,7 +13,7 @@ int stride::ast::parse_function_call(ast_token_set_t &token_set, cursor_t index,
 
     int offset = parse_identifier(token_set, index, *function_call_node);
     requires_token(TOKEN_LPAREN, token_set, index + offset, "Expected opening parenthesis after function call.");
-    ast_token_set_t *function_call_arguments = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index + offset);
+    ast_token_set_t *function_call_arguments = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index + offset);
 
     // Ensure it has parenthesis.
     if ( function_call_arguments == nullptr )

@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 24/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
@@ -15,8 +15,8 @@ using namespace stride::ast;
  * The function has to be called AFTER the import keyword, e.g. the input stream tokens
  * must look like:
  * import < 'string'
- * @param token_set The token set to parse the import declaration from.
- * @param index The index of the token set to start parsing from.
+ * @param token_set The required_token set to parse the import declaration from.
+ * @param index The index of the required_token set to start parsing from.
  * @param root The root Node to append the import declaration to.
  */
 int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t index, Node &root)
@@ -30,7 +30,7 @@ int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t ind
     }
 
     auto *importNode = new Node(NODE_TYPE_IMPORT, 0);
-    importNode->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
+    importNode->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].current));
 
     requires_token(TOKEN_SEMICOLON, token_set, index + 1, "Expected semicolon after import statement");
 

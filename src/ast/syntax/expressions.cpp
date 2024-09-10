@@ -3,7 +3,7 @@
 //
 
 #include <map>
-#include "../ast.h"
+#include "../abstractions/AST.h"
 #include "variable_types.h"
 
 using namespace stride::ast;
@@ -154,9 +154,9 @@ void shunting_yard(ast_token_set_t &token_set, int cursor, int token_count, Node
  * or providing function parameters.
  * An expression can be in the following format:
  * ` (5 + (3 * 4)) `
- * This function will decompose the expression into the required AST nodes.
- * @param token_set The token set to parse a segment from
- * @param cursor The cursor position in the token set
+ * This function will decompose the expression into the required AST abstractions.
+ * @param token_set The required_token set to parse a segment from
+ * @param cursor The cursor position in the required_token set
  * @param token_count The amount of tokens in the subset
  * @param parent_node The parent AST Node to put the result into.
  * @return How many tokens were skipped.
@@ -166,7 +166,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
     int skipped = 0;
 
     /*
-     * In case the expression is just a singular value,
+     * In case the expression is just a singular current,
      * we'll just return that as a Node and return the ast.
      * No need to check for any other cases.
      */
@@ -175,10 +175,10 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
         token_type_t type = token_set.tokens[ cursor ].type;
         if ( types::is_valid_literal_value(type))
         {
-            parent_node.add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].value));
+            parent_node.add_branch(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ cursor ].current));
             return 1;
         }
-        blame_token(token_set.tokens[ cursor ], "Expected value or expression");
+        blame_token(token_set.tokens[ cursor ], "Expected current or expression");
     }
 
     auto *expression_node = new Node(NODE_TYPE_EXPRESSION);
@@ -197,7 +197,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
         {
             bool is_literal = types::is_valid_literal_value(token_set.tokens[ j ].type);
             bool contains_token = expressions.contains(token_set.tokens[ j ].type);
-            // Check whether the token is an operator or a value.
+            // Check whether the required_token is an operator or a value.
             if ( !contains_token && !is_literal )
             {
                 blame_token(token_set.tokens[ j], "Expected operator or value in expression.");
@@ -207,7 +207,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
             // If it's a literal, add it to the literal queue.
             if ( is_literal )
             {
-                literal_queue.push_back(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ j ].value));
+                literal_queue.push_back(new Node(NODE_TYPE_VALUE, 0, token_set.tokens[ j ].current));
             }
             else if ( contains_token )
             {
@@ -219,7 +219,7 @@ int stride::ast::parse_expression(ast_token_set_t &token_set, int cursor, int to
                     if ( token_set.tokens[ j ].type == TOKEN_LPAREN)
                     {
                         requires_token(TOKEN_PLUS, token_set, j - 1, "Expected appending operator or conditional expression after string literal.");
-                        ast_token_set_t *sub_expression = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, j);
+                        ast_token_set_t *sub_expression = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, j);
                         if ( sub_expression == nullptr )
                         {
                             blame_token(token_set.tokens[ j ], "Expected closing parenthesis.");

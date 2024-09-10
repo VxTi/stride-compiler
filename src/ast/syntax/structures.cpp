@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 03/09/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 #include "variable_types.h"
 
 using namespace stride::ast;
@@ -15,14 +15,14 @@ int stride::ast::parse_structure(ast_token_set_t &token_set, cursor_t index, Nod
     requires_token(TOKEN_IDENTIFIER, token_set, index, "Expected structure name after structure definition.");
 
     auto *structure_name_node = new Node(NODE_TYPE_IDENTIFIER);
-    structure_name_node->value = token_set.tokens[ index ].value;
+    structure_name_node->value = token_set.tokens[ index ].current;
     structure_node->add_branch(structure_name_node);
 
     int generic_length = parse_generic(token_set, index + 1, *structure_node);
     index += generic_length;
 
     auto *structure_content_node = new Node(NODE_TYPE_BLOCK);
-    ast_token_set_t *structure_content_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
+    ast_token_set_t *structure_content_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
 
     if ( structure_content_tokens == nullptr )
     {
@@ -40,7 +40,7 @@ int stride::ast::parse_structure(ast_token_set_t &token_set, cursor_t index, Nod
 
         // Struct variable name node
         auto *struct_variable_name_node = new Node(NODE_TYPE_IDENTIFIER);
-        struct_variable_name_node->value = structure_content_tokens->tokens[ i ].value;
+        struct_variable_name_node->value = structure_content_tokens->tokens[ i ].current;
         struct_variable_node->add_branch(struct_variable_name_node);
 
         identifier_length = is_identifier_sequence(*structure_content_tokens, i + 2);
@@ -62,7 +62,7 @@ int stride::ast::parse_structure(ast_token_set_t &token_set, cursor_t index, Nod
         }
         else
         {
-            struct_variable_type_node->value = structure_content_tokens->tokens[ i ].value;
+            struct_variable_type_node->value = structure_content_tokens->tokens[ i ].current;
             i++;
         }
         struct_variable_node->add_branch(struct_variable_type_node);

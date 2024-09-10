@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 29/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 #include "variable_types.h"
 
 using namespace stride::ast;
@@ -21,7 +21,7 @@ int is_valid_switch_type(token_type_t type)
 }
 
 /**
- * Parses the content of a switch case and adds the required nodes to the root node.
+ * Parses the content of a switch case and adds the required abstractions to the root node.
  */
 void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
 {
@@ -32,7 +32,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
         // Ensure either 'case' or 'default' keyword is present.
         if ( !peekeq(token_set, i, TOKEN_KEYWORD_CASE) && !peekeq(token_set, i, TOKEN_KEYWORD_DEFAULT))
         {
-            blame_token(token_set.tokens[ i ], "Unexpected token in switch statement.");
+            blame_token(token_set.tokens[ i ], "Unexpected required_token in switch statement.");
         }
 
         // Now create the appropriate switch_case_content_node for the case.
@@ -61,7 +61,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
         }
         else
         {
-            blame_token(token_set.tokens[ i ], "Unexpected token in switch statement.");
+            blame_token(token_set.tokens[ i ], "Unexpected required_token in switch statement.");
         }
 
         // Parse case content
@@ -103,19 +103,19 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
 }
 
 /**
- * Parses a switch case and adds the required nodes to the root node.
+ * Parses a switch case and adds the required abstractions to the root node.
  */
 int stride::ast::parse_switch_case(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
-    ast_token_set_t *switch_expression_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
+    ast_token_set_t *switch_expression_tokens = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
     if ( switch_expression_tokens == nullptr || switch_expression_tokens->token_count == 0 )
     {
         blame_token(token_set.tokens[ index ], "Switch statement requires expression in parentheses.");
         return 0;
     }
 
-    ast_token_set_t *switch_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
-                                                         index + switch_expression_tokens->token_count + 2);
+    ast_token_set_t *switch_block_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
+                                                        index + switch_expression_tokens->token_count + 2);
 
     if ( switch_block_tokens == nullptr )
     {

@@ -2,9 +2,15 @@
 // Created by Luca Warmenhoven on 26/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
+#include "../abstractions/ASTNodeAbstractions.h"
 
 using namespace stride::ast;
+
+void stride::ast::NWhileLoop::parse(TokenSet &tokens, Node &parent)
+{
+    return 0;
+}
 
 /**
  * Parses a while loop statement.
@@ -13,8 +19,8 @@ using namespace stride::ast;
  * while (condition) {
  *    // body
  * }
- * @param token_set The token set to parse a segment from
- * @param index The cursor position in the token set
+ * @param token_set The required_token set to parse a segment from
+ * @param index The cursor position in the required_token set
  * @param root The root AST Node to put the result into.
  * @return How many tokens were skipped.
  */
@@ -23,7 +29,7 @@ int stride::ast::parse_while_loop(ast_token_set_t &token_set, cursor_t index, No
     requires_token(TOKEN_LPAREN, token_set, index, "While statement requires opening parenthesis after declaration.");
 
     // Capture the block of the while expression
-    ast_token_set_t *while_expression_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
+    ast_token_set_t *while_expression_tokens = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
 
     if ( while_expression_tokens == nullptr )
     {
@@ -33,8 +39,8 @@ int stride::ast::parse_while_loop(ast_token_set_t &token_set, cursor_t index, No
     }
 
     // Capture the block of the while loop
-    ast_token_set_t *while_body_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
-                                                       index + while_expression_tokens->token_count + 2);
+    ast_token_set_t *while_body_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
+                                                      index + while_expression_tokens->token_count + 2);
 
     if ( while_body_tokens == nullptr )
     {
@@ -44,7 +50,11 @@ int stride::ast::parse_while_loop(ast_token_set_t &token_set, cursor_t index, No
         return 0;
     }
 
-    // All nodes for the while loop AST entry
+    auto *nst_while = new NWhileLoop();
+    auto *nst_while_body = new NBlock();
+    auto *nst_while_conditional = new NExpression();
+
+    // All abstractions for the while loop AST entry
     auto *while_node = new Node(NODE_TYPE_WHILE_LOOP);
     auto *while_body_node = new Node(NODE_TYPE_BLOCK);
     auto *while_body_conditional_node = new Node(NODE_TYPE_CONDITIONAL);

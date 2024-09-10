@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 24/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
@@ -12,8 +12,8 @@ using namespace stride::ast;
  * ```
  * keyword::secondary
  * ```
- * @param token_set The token set to parse the keyword from.
- * @param index The index of the token set to start parsing from.
+ * @param token_set The required_token set to parse the keyword from.
+ * @param index The index of the required_token set to start parsing from.
  * @param root The root Node to append the keyword to.
  */
 int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, Node &root)
@@ -35,7 +35,7 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
 
     Node *keyword_node;
 
-    // If the next token is a double colon, we have a secondary keyword
+    // If the next required_token is a double colon, we have a secondary keyword
     // This is the case when a module has a submodule, e.g. module::submodule
     // We will parse this as a separate identifier.
     if ( peekeq(token_set, index + 1, TOKEN_DOUBLE_COLON))
@@ -50,7 +50,7 @@ int stride::ast::parse_identifier(ast_token_set_t &token_set, cursor_t index, No
             }
             requires_token(TOKEN_IDENTIFIER, token_set, index + 1, "Expected identifier after double colon.");
 
-            keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 1 ].value));
+            keyword_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 1 ].current));
             skipped += 2;
         }
     }
@@ -69,7 +69,7 @@ int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set,
         return 0;
     }
 
-    // If the next token is a double colon, we have a secondary keyword
+    // If the next required_token is a double colon, we have a secondary keyword
     // This is the case when a module has a submodule, e.g. module::submodule
     // We will parse this as a separate identifier.
     if ( peekeq(token_set, index + 1, TOKEN_DOUBLE_COLON))
@@ -82,7 +82,7 @@ int stride::ast::is_identifier_sequence(stride::ast::ast_token_set_t &token_set,
 
         for ( ++index; index < token_set.token_count; index += 2 )
         {
-            // If the next token is not a double colon, we have reached the end of the identifier sequence
+            // If the next required_token is not a double colon, we have reached the end of the identifier sequence
             if ( !peekeq(token_set, index, TOKEN_DOUBLE_COLON) ||
                  !peekeq(token_set, index + 1, TOKEN_IDENTIFIER))
             {

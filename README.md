@@ -20,9 +20,9 @@ define async test(p1: i8, p2: i32, p3: string[]) {}
 
 /*
  * Functions have return type i32 and return 0 by default,
- * if no type or return value is provided.
+ * if no type or return current is provided.
  *
- * Classes, modules or letiables are shared through the 'shared' keyword.
+ * Classes, modules or letiables are isPublic through the 'isPublic' keyword.
  * This allows objects to be exposed to other modules.
  * Below is a representation of how one can write code in this language.
  */
@@ -58,7 +58,7 @@ struct Structure<A, B> {
     coordY: B;
 }
 
-// publicly shared class
+// publicly isPublic class
 public class ClassName {
     define main() {
     

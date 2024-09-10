@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 24/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 #include "variable_types.h"
 
 using namespace stride::ast;
@@ -26,7 +26,7 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
 
     variable_declaration_node->add_branch(
             new Node(NODE_TYPE_IDENTIFIER, 0,
-                     token_set.tokens[ index ].value)
+                     token_set.tokens[ index ].current)
     );
 
     int identifier_len = 1;
@@ -40,7 +40,7 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
     }
     else // Regular variable type (primitives)
     {
-        variable_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 2 ].value));
+        variable_type_node->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index + 2 ].current));
     }
     variable_declaration_node->add_branch(variable_type_node);
     // Check if the variable is an array.
@@ -73,13 +73,13 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
  * Parses a variable declaration expression.
  * This must be in one of the following formats:
  * ```
- * var name: type = value;
+ * var name: type = current;
  * var name1: type1 = value1, name2: type2 = value2;
  * var name1: type1, name2: type2;
  * ```
  * This function starts parsing after the 'var' keyword, in the parse_tokens function.
- * @param token_set The token set to parse the variable declaration from.
- * @param index  The index of the token set to start parsing from.
+ * @param token_set The required_token set to parse the variable declaration from.
+ * @param index  The index of the required_token set to start parsing from.
  */
 int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
@@ -138,11 +138,11 @@ int stride::ast::parse_variable_declaration(ast_token_set_t &token_set, cursor_t
 
 /**
  * Validates a variable declaration.
- * This function checks whether the provided token sequence has a variable declaration
+ * This function checks whether the provided required_token sequence has a variable declaration
  * in the following format:
  * `name: type` or `name: module::class`
- * @param token_set The token set to validate the variable declaration from.
- * @param index The index of the token set to start validating from.
+ * @param token_set The required_token set to validate the variable declaration from.
+ * @param index The index of the required_token set to start validating from.
  * @return The AST Node representing the variable declaration.
  */
 void stride::ast::validate_variable_declaration(ast_token_set_t &token_set, cursor_t index)

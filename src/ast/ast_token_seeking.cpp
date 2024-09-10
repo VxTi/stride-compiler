@@ -2,21 +2,21 @@
 // Created by Luca Warmenhoven on 21/08/2024.
 //
 
-#include "ast.h"
+#include "abstractions/AST.h"
 
 using namespace stride::ast;
 
 /**
- * Checks if there is a next token in the token stream.
- * @return True if there is a next token, false otherwise.
+ * Checks if there is a next required_token in the required_token stream.
+ * @return True if there is a next required_token, false otherwise.
  */
-bool stride::ast::has_next(ast_token_set_t &token_set, cursor_t index)
+bool stride::ast::has_next(TokenSet &token_set, cursor_t index)
 {
-    return index + 1 < token_set.token_count;
+    return index + 1 < token_set.tokens.size();
 }
 
 /**
- * Whether there is a token before the current one
+ * Whether there is a required_token before the current one
  * @return
  */
 bool stride::ast::has_previous(cursor_t index)
@@ -25,11 +25,11 @@ bool stride::ast::has_previous(cursor_t index)
 }
 
 /**
- * Returns the next token in the token stream, from
+ * Returns the next required_token in the required_token stream, from
  * the current index.
  * @return
  */
-token_t *stride::ast::next(ast_token_set_t &token_set, cursor_t index)
+token_t *stride::ast::next(TokenSet &token_set, cursor_t index)
 {
     if ( !has_next(token_set, index))
     {
@@ -40,11 +40,11 @@ token_t *stride::ast::next(ast_token_set_t &token_set, cursor_t index)
 }
 
 /**
- * Returns the previous token in the token stream, from the
+ * Returns the previous required_token in the required_token stream, from the
  * current index.
  * @return
  */
-token_t *stride::ast::previous(ast_token_set_t &token_set, cursor_t index)
+token_t *stride::ast::previous(TokenSet &token_set, cursor_t index)
 {
     if ( !has_previous(index))
     {
@@ -55,15 +55,15 @@ token_t *stride::ast::previous(ast_token_set_t &token_set, cursor_t index)
 }
 
 /**
- * Returns the token at the nth offset from the cursor position,
- * e.g. cursor = 0, peak(1) will return the token at position 1. (cursor + n)
+ * Returns the required_token at the nth offset from the cursor position,
+ * e.g. cursor = 0, peak(1) will return the required_token at position 1. (cursor + n)
  * @param offset
  * @return
  */
-token_t *stride::ast::peak(ast_token_set_t &token_set, cursor_t index, int offset)
+token_t *stride::ast::peak(TokenSet &token_set, cursor_t index, int offset)
 {
     int i = index + offset;
-    if ( i < 0 || i >= token_set.token_count )
+    if ( i < 0 || i >= token_set.tokens.size() )
     {
         return nullptr;
     }
@@ -71,7 +71,7 @@ token_t *stride::ast::peak(ast_token_set_t &token_set, cursor_t index, int offse
     return &token_set.tokens[ i ];
 }
 
-int stride::ast::peekeq(ast_token_set_t &token_set, cursor_t index, token_type_t type)
+int stride::ast::peekeq(TokenSet &token_set, cursor_t index, token_type_t type)
 {
     token_t *peaked = peak(token_set, index, 0);
 
@@ -84,12 +84,12 @@ int stride::ast::peekeq(ast_token_set_t &token_set, cursor_t index, token_type_t
 }
 
 /**
- * Whether the previous token is of the provided properties.
+ * Whether the previous required_token is of the provided properties.
  * If there are no tokens left, the function will return false.
  * @param type The properties to check for
  * @return
  */
-bool stride::ast::is_previous(ast_token_set_t &token_set, token_type_t type, cursor_t index)
+bool stride::ast::is_previous(TokenSet &token_set, token_type_t type, cursor_t index)
 {
     if ( !has_previous(index))
     {
@@ -100,12 +100,12 @@ bool stride::ast::is_previous(ast_token_set_t &token_set, token_type_t type, cur
 }
 
 /**
- * Whether the next token is of the provided properties.
+ * Whether the next required_token is of the provided properties.
  * If there are no tokens left, the function will return false.
  * @param type The properties to check for
  * @return
  */
-bool stride::ast::is_next(ast_token_set_t &token_set, token_type_t type, cursor_t index)
+bool stride::ast::is_next(TokenSet &token_set, token_type_t type, cursor_t index)
 {
     if ( !has_next(token_set, index))
     {

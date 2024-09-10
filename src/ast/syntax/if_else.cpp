@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 27/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
@@ -11,7 +11,7 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
     int skipped = 0;
 
     // Capture the if condition block
-    auto *if_condition_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
+    auto *if_condition_tokens = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
 
     if ( if_condition_tokens == nullptr )
     {
@@ -25,8 +25,8 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
     parse_expression(*if_condition_tokens, 0, if_condition_tokens->token_count, *if_node);
 
     // Capture the if body block
-    auto *if_body_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
-                                         index + if_condition_tokens->token_count + 2);
+    auto *if_body_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
+                                        index + if_condition_tokens->token_count + 2);
 
     if ( if_body_tokens == nullptr )
     {
@@ -57,7 +57,7 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
         else if ( peekeq(token_set, index + skipped + 1,
                          TOKEN_LBRACE)) // If there's an 'else' statement, parse the block contents
         {
-            auto *else_body_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped + 1);
+            auto *else_body_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped + 1);
 
             if ( else_body_tokens == nullptr )
             {

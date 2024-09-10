@@ -2,21 +2,21 @@
 // Created by Luca Warmenhoven on 26/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 
 using namespace stride::ast;
 
 // TODO: Add inner expression.
 
 /**
- * Parses a for loop and adds the required nodes to the root node.
+ * Parses a for loop and adds the required abstractions to the root node.
  */
 int stride::ast::parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node &root)
 {
 
     requires_token(TOKEN_LPAREN, token_set, index,
                    "For loop requires an opening parenthesis after for_loop_expression_tokens.");
-    ast_token_set_t *for_loop_expression_tokens = capture_block(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
+    ast_token_set_t *for_loop_expression_tokens = captureBlock(token_set, TOKEN_LPAREN, TOKEN_RPAREN, index);
 
     if ( for_loop_expression_tokens == nullptr || for_loop_expression_tokens->token_count < 2 )
     {
@@ -26,8 +26,8 @@ int stride::ast::parse_for_loop(ast_token_set_t &token_set, cursor_t index, Node
         return 0;
     }
 
-    ast_token_set_t *content = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
-                                             index + for_loop_expression_tokens->token_count + 2);
+    ast_token_set_t *content = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE,
+                                            index + for_loop_expression_tokens->token_count + 2);
 
     if ( content == nullptr )
     {

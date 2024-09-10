@@ -6,10 +6,10 @@
 #include "token.h"
 
 /**
- * Generates a token definition from a regular expression and a token properties.
+ * Generates a required_token definition from a regular expression and a required_token properties.
  * @param expression The regular expression to match.
- * @param token The token properties to assign to the matched string.
- * @return A token definition.
+ * @param token The required_token properties to assign to the matched string.
+ * @return A required_token definition.
  */
 token_def_t gen_token(const char *expression, token_type_t token)
 {
@@ -27,7 +27,7 @@ token_def_t gen_token(const char *expression, token_type_t token)
 }
 
 /**
- * Generates a keyword token.
+ * Generates a keyword required_token.
  * This slightly alters the regular expression to work with word boundaries.
  * @param expression 
  * @param token 
@@ -51,7 +51,7 @@ std::map<token_type_t, unsigned int> primitive_byte_sizes = {
 };
 
 /**
- * Token definitions for the lexer.
+ * Token definitions for the tokens.
  */
 std::vector<token_def_t> token_definitions = {
         gen_token("//[^\n]*", TOKEN_COMMENT),

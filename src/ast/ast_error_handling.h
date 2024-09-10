@@ -5,15 +5,14 @@
 #ifndef STRIDE_LANGUAGE_AST_ERROR_HANDLING_H
 #define STRIDE_LANGUAGE_AST_ERROR_HANDLING_H
 
-
-#include <queue>
+#include <vector>
 
 #define ERROR_LINE_BUFFER_SIZE 256
 
 namespace stride::error
 {
 
-    extern std::queue<const char *> error_queue;
+    extern std::vector<const char *> error_queue;
 
     void begin(const char *file_path);
 

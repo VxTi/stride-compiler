@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 25/08/2024.
 //
 
-#include "../ast.h"
+#include "../abstractions/AST.h"
 #include "variable_types.h"
 
 #define ENUM_IDENTIFIER_REGEXP ("([A-Z][A-Z0-9_]*)")
@@ -72,7 +72,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 {
     requires_token(TOKEN_IDENTIFIER, token_set, index, "An identifier is required after an enum statement.");
     requires_token(TOKEN_LBRACE, token_set, index + 1, "An opening bracket is required after enum identifier.");
-    ast_token_set_t *enumerable_block_tokens = capture_block(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
+    ast_token_set_t *enumerable_block_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + 1);
     if ( enumerable_block_tokens == nullptr )
     {
         error("Failed to acquire enumerable_block_tokens after enum definition, likely due to a missing closing bracket.");
@@ -84,9 +84,9 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
     Node *enum_block = new Node(NODE_TYPE_ENUMERATION);
 
-    enum_block->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].value));
+    enum_block->add_branch(new Node(NODE_TYPE_IDENTIFIER, 0, token_set.tokens[ index ].current));
 
-    // If the enum is shared, add the SHARED flag.
+    // If the enum is isPublic, add the SHARED flag.
     if ( peekeq(*enumerable_block_tokens, index - 2, TOKEN_KEYWORD_PUBLIC))
     {
         enum_block->flags |= FLAG_OBJECT_PUBLIC;
@@ -118,23 +118,23 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
 
         enum_value = enum_id;
 
-        // Check if a custom value is assigned
+        // Check if a custom current is assigned
         if ( peekeq(*enumerable_block_tokens, i + 1, TOKEN_EQUALS))
         {
 
-            // Check whether the value after enum entry assignment is an integer
+            // Check whether the current after enum entry assignment is an integer
             // This is required.
             if ( peak(*enumerable_block_tokens, i, 2) == nullptr
                  || !types::is_integer(enumerable_block_tokens->tokens[ i + 2 ].type))
             {
                 error("Value of enumerable must be an integer, received: %s, at line %d column %d (type %d)",
-                      (char *) enumerable_block_tokens->tokens[ i + 2 ].value,
+                      (char *) enumerable_block_tokens->tokens[ i + 2 ].current,
                       enumerable_block_tokens->tokens[ i + 2 ].line,
                       enumerable_block_tokens->tokens[ i + 2 ].column,
                       enumerable_block_tokens->tokens[ i + 2 ].type
                 );
             }
-            enum_value = atoi(enumerable_block_tokens->tokens[ i + 2 ].value);
+            enum_value = atoi(enumerable_block_tokens->tokens[ i + 2 ].current);
             offset = 4;
         }
 
@@ -178,7 +178,7 @@ void compile_reg()
         char buffer[128];
         regerror(regex_error, &enum_identifier_regexp, buffer, 128);
         fprintf(stderr,
-                "\nAn error occurred whilst attempting to compile regular expression for token identifier validation:\n%s\n\n",
+                "\nAn error occurred whilst attempting to compile regular expression for required_token identifier validation:\n%s\n\n",
                 buffer);
         exit(1);
     }
