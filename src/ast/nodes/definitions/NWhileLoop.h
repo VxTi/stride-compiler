@@ -1,7 +1,10 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
+#include "NExpression.h"
+#include "NBlock.h"
+
+using namespace stride::ast;
 
 /**
      * Represents a while loop.
@@ -32,7 +35,7 @@ public:
         this->condition = condition;
     }
 
-    enum NType getType() override
+    enum ENodeType getType() override
     { return WHILE_LOOP; }
 
     static void parse(TokenSet &tokenSet, Node &parent);

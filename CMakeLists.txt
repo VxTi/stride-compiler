@@ -31,7 +31,6 @@ add_executable(stride_language src/main.cpp
         src/ast/nodes/definitions/NEnumerableDeclaration.h
         src/ast/nodes/definitions/NStructureDeclaration.h
         src/ast/nodes/definitions/NConditionalStatement.h
-        src/ast/nodes/definitions/NSwitchCase.h
         src/ast/nodes/definitions/NSwitchStatement.h
         src/ast/nodes/definitions/NClassDeclaration.h
         src/ast/nodes/definitions/NImportStatement.h

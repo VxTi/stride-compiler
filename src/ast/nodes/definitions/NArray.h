@@ -3,6 +3,8 @@
 #include "../../../tokens/token.h"
 #include "NExpression.h"
 
+using namespace stride::ast;
+
 /**
     * Represents an array.
     * Arrays are used to store multiple values.
@@ -21,7 +23,7 @@ public:
         elements.push_back(element);
     }
 
-    enum NType getType() override
+    enum ENodeType getType() override
     { return ARRAY; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
