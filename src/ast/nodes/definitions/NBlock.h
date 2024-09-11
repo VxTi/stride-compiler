@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NBLOCK_H
+#define STRIDE_LANGUAGE_NBLOCK_H
+
 #include "../../ASTNodes.h"
 
 /**
@@ -9,3 +12,5 @@ class NBlock : public stride::ast::Node
     enum stride::ast::ENodeType getType() override
     { return stride::ast::BLOCK; }
 };
+
+#endif

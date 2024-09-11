@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NWHILELOOP_H
+#define STRIDE_LANGUAGE_NWHILELOOP_H
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
@@ -38,3 +41,5 @@ public:
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };
+
+#endif

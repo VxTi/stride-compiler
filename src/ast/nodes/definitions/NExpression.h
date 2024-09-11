@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NEXPRESSION_H
+#define STRIDE_LANGUAGE_NEXPRESSION_H
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
@@ -24,3 +27,5 @@ public:
     enum stride::ast::ENodeType getType() override
     { return stride::ast::EXPRESSION; }
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NMODULEDECLARATION_H
+#define STRIDE_LANGUAGE_NMODULEDECLARATION_H
+
 #include "../../ASTNodes.h"
 
 #include "../../../tokens/TokenSet.h"
@@ -18,3 +21,5 @@ public:
     static void parse(TokenSet &tokenSet, Node &parent);
 
 };
+
+#endif

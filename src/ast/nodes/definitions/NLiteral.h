@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NLITERAL_H
+#define STRIDE_LANGUAGE_NLITERAL_H
+
 #include "../../ASTNodes.h"
 
 #include "../../../tokens/TokenSet.h"
@@ -26,3 +29,5 @@ public:
     { return stride::ast::LITERAL; }
 
 };
+
+#endif

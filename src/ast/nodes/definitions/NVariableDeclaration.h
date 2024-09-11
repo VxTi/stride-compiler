@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NVARIABLEDECLARATION_H
+#define STRIDE_LANGUAGE_NVARIABLEDECLARATION_H
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
@@ -107,3 +110,5 @@ public:
     parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration, bool allowVariadic);
 
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NCONDITIONALSTATEMENT_H
+#define STRIDE_LANGUAGE_NCONDITIONALSTATEMENT_H
+
 #include "../../ASTNodes.h"
 
 #include "../../../tokens/TokenSet.h"
@@ -58,3 +61,5 @@ public:
     enum stride::ast::ENodeType getType() override
     { return stride::ast::CONDITIONAL_STATEMENT; }
 };
+
+#endif

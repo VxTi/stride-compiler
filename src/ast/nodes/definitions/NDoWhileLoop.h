@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NDOWHILELOOP_H
+#define STRIDE_LANGUAGE_NDOWHILELOOP_H
+
 #include "../../ASTNodes.h"
 
 #include "../../../tokens/TokenSet.h"
@@ -31,3 +34,5 @@ public:
     static void parse(TokenSet &tokenSet, Node &parent);
 
 };
+
+#endif

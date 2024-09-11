@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NBINARYOPERATION_H
+#define STRIDE_LANGUAGE_NBINARYOPERATION_H
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
@@ -57,8 +60,10 @@ public:
             operation(operation)
     {}
 
-    enum ENodeType getType() override
-    { return BINARY_OPERATOR; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::BINARY_OPERATOR; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };
+
+#endif

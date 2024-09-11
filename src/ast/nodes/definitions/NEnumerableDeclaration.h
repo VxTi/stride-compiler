@@ -1,3 +1,6 @@
+#ifndef STRIDE_LANGUAGE_NENUMERABLEDECLARATION_H
+#define STRIDE_LANGUAGE_NENUMERABLEDECLARATION_H
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
@@ -31,3 +34,5 @@ public:
     enum stride::ast::ENodeType getType() override
     { return stride::ast::ENUMERABLE_DECLARATION; }
 };
+
+#endif
