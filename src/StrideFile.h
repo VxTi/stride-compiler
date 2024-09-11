@@ -22,7 +22,7 @@ namespace stride
 
     public:
 
-        explicit StrideFile(std::string &path);
+        explicit StrideFile(const char *path);
 
         ~StrideFile();
 

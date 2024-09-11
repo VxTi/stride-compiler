@@ -46,6 +46,16 @@ namespace stride::ast
      */
     bool validateVariableType(TokenSet &tokenSet);
 
+    /**
+     * Validates whether the next token in the token set is a valid literal value.
+     * These values can be used in variable declarations, function parameters, etc.
+     * Literal values are values that are directly assigned to a variable,
+     * such as numbers, strings, booleans, etc.
+     * @param tokenSet The token set to validate the value from.
+     * @return Whether the value is valid.
+     */
+    bool validateLiteralValue(TokenSet &tokenSet);
+
 }
 
 

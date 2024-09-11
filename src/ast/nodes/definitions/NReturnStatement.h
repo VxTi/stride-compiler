@@ -14,12 +14,12 @@
      */
 class NReturnStatement : public stride::ast::Node
 {
-public:
+private:
     NExpression *expression;
 
-    explicit NReturnStatement(NExpression *expression) :
-            expression(expression)
-    {}
+public:
+
+    explicit NReturnStatement() : expression(nullptr){}
 
     enum stride::ast::ENodeType getType() override
     { return stride::ast::RETURN_STATEMENT; }

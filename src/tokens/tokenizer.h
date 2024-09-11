@@ -10,6 +10,6 @@
 #include "../tokens/TokenSet.h"
 
 namespace stride {
-    TokenSet * tokenize(stride::StrideFile &source);
+    TokenSet * tokenize(stride::StrideFile *source);
 }
 #endif //STRIDE_LANGUAGE_TOKENIZER_H

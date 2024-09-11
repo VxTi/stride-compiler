@@ -37,24 +37,23 @@ NClassDeclaration::~NClassDeclaration()
 void NClassDeclaration::parse(TokenSet &tokens, Node &parent)
 {
     // First inheritance class
-    auto *nst_class = new NClassDeclaration();
-    nst_class->class_name = tokens.consumeRequired(TOKEN_IDENTIFIER,
-                                                   "Class inheritance requires parent class name.").value;
+    auto *nstClassDecl = new NClassDeclaration();
+    nstClassDecl->className = tokens.consumeRequired(TOKEN_IDENTIFIER,
+                                                     "Class inheritance requires parent class name.").value;
 
-    printf("Class name: %s\n", nst_class->class_name.c_str());
+    printf("Class name: %s\n", nstClassDecl->className.c_str());
 
-    stride::ast::parseGenerics(tokens, *nst_class->generics);
+    stride::ast::parseGenerics(tokens, *nstClassDecl->generics);
 
     if ( tokens.consume(TOKEN_KEYWORD_HAS))
     {
         do
         {
-            nst_class->addParent(stride::ast::parseIdentifier(tokens));
+            nstClassDecl->addParent(stride::ast::parseIdentifier(tokens));
         } while ( tokens.consume(TOKEN_KEYWORD_AND));
     }
 
-    auto *subset = stride::ast::captureBlock(tokens, TOKEN_LBRACE, TOKEN_RBRACE);
-    auto *nst_class_block = new NBlock();
-    stride::ast::parser::parse(*subset, *nst_class_block);
-    nst_class->body = nst_class_block;
+    nstClassDecl->body = NBlock::capture(tokens);
+
+    parent.addChild(nstClassDecl);
 }

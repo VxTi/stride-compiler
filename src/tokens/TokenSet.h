@@ -17,8 +17,8 @@ class TokenSet
 {
 private:
     // Fields for the token stream.
-    std::vector<token_t> &tokens;
-    stride::StrideFile &source;
+    std::vector<token_t> *tokens;
+    stride::StrideFile *source;
     int index;
     int startOffset = 0;
     int length;
@@ -121,13 +121,7 @@ public:
      * Creates a new token stream.
      * @param tokens The tokens to store in the stream.
      */
-    explicit TokenSet(std::vector<token_t> &tokens, stride::StrideFile &source) :
-            tokens(tokens),
-            source(source),
-            index(0),
-            startOffset(0),
-            length(tokens.size())
-    {}
+    explicit TokenSet(std::vector<token_t> *tokens, stride::StrideFile *source);
 
     /**
      * Creates a new token stream from a subset of tokens.

@@ -18,6 +18,7 @@ void stride::error::error(StrideFile &file, int index, const char *message, ...)
     va_list args;
     va_start(args, message);
     printf("\n%*s╭─[ \e[1;38m%s\e[0m ] \e[31mError at line %d column %d.\e[0m\n",
+           0, "",
            file.path().c_str(), 0, 0);
     vprintf(message, args);
     va_end(args);

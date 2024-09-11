@@ -131,7 +131,7 @@ namespace stride::ast
          * to a root node. This root node will then be returned.
          * @param tokenSet The token set to parse
          */
-        Node *parse(TokenSet &tokenSetet);
+        Node *parse(TokenSet &tokenSet);
 
         /**
          * Parses a token set and appends the generated nodes
@@ -139,7 +139,7 @@ namespace stride::ast
          * @param tokenSet The token set to parse
          * @param root The root node to append the generated nodes to.
          */
-        void parse(TokenSet &tokenSetet, Node &root);
+        void parse(TokenSet &tokenSet, Node &root);
     }
 }
 

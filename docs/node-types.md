@@ -9,7 +9,7 @@ Here we'll have a formal description of all the abstractions for the Abstract Sy
 ```stride
 
 // For loop with initializer
-for (<initializer>; <condition>; <increment>) { ... }
+for (<initializer>; <conditionalValue>; <increment>) { ... }
 
 // For loop with iterable
 for (<initializer> in <iterable>) { ... }

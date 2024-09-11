@@ -27,12 +27,8 @@ private:
     NVariableDeclaration *exception;
 
 public:
-    NTryCatchStatement(NBlock *try_block, NBlock *catch_block) :
-            tryBlock(try_block),
-            catchBlock(catch_block),
-            exception(nullptr)
+    NTryCatchStatement() : tryBlock(nullptr), catchBlock(nullptr), exception(nullptr)
     {}
-
     /**
      * Set the exception variable.
      * @param exception The exception variable.

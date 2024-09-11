@@ -5,7 +5,7 @@
 #include "NodeProperties.h"
 #include "../error/ast_error_handling.h"
 
-stride::ast::NIdentifier *stride::ast::parseIdentifier(TokenSet &tokenSet)
+NIdentifier *stride::ast::parseIdentifier(TokenSet &tokenSet)
 {
     if ( !tokenSet.canConsume(TOKEN_IDENTIFIER))
     {

@@ -10,12 +10,12 @@
 
 /**
      * Represents a do-while loop.
-     * Do-while loops are used to repeat a block of code while a condition is true.
-     * The condition is checked after the loop body is executed.
+     * Do-while loops are used to repeat a block of code while a conditionalValue is true.
+     * The conditionalValue is checked after the loop body is executed.
      * This means that the loop body is always executed at least once.
      * The syntax for a do-while loop is as follows:
      * <code>
-     * do {  ... } while (condition);
+     * do {  ... } while (conditionalValue);
      *   </code>
      */
 class NDoWhileLoop : public NWhileLoop

@@ -32,8 +32,8 @@ public:
     {}
 
     /**
-     * Set the condition of the if statement.
-     * @param condition The condition to set.
+     * Set the conditionalValue of the if statement.
+     * @param condition The conditionalValue to set.
      */
     void setCondition(NExpression *condition)
     {

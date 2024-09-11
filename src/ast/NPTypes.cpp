@@ -4,6 +4,21 @@
 
 #include "NodeProperties.h"
 
+bool stride::ast::validateLiteralValue(TokenSet &tokenSet)
+{
+    token_type_t type = tokenSet.current().type;
+    switch ( type )
+    {
+        case TOKEN_BOOLEAN_LITERAL:
+        case TOKEN_STRING_LITERAL:
+        case TOKEN_CHAR_LITERAL:
+        case TOKEN_NUMBER_INTEGER:
+        case TOKEN_NUMBER_FLOAT:
+            return true;
+        default:
+            return false;
+    }
+}
 
 bool stride::ast::validateVariableType(TokenSet &tokenSet)
 {

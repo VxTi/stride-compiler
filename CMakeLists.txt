@@ -58,4 +58,12 @@ add_executable(stride_language src/main.cpp
         src/ast/nodes/NEnumerableDeclaration.cpp
         src/ast/nodes/NImportStatement.cpp
         src/ast/nodes/NModuleDeclaration.cpp
+        src/ast/nodes/NForLoop.cpp
+        src/ast/nodes/NTryCatchStatement.cpp
+        src/ast/nodes/NWhileLoop.cpp
+        src/ast/nodes/NDoWhileLoop.cpp
+        src/ast/nodes/NThrowStatement.cpp
+        src/ast/nodes/NBlock.cpp
+        src/ast/nodes/NReturnStatement.cpp
+        src/ast/nodes/NSwitchStatement.cpp
 )

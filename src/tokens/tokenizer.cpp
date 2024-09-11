@@ -54,14 +54,14 @@ void get_cursor_position(const char *source, size_t index, int *line, int *colum
  * @param source_size The size of the source code.
  * @param dst The destination required_token set.
  */
-TokenSet *stride::tokenize(stride::StrideFile &source)
+TokenSet *stride::tokenize(stride::StrideFile *source)
 {
-    int matched, i, j, line, col;
+    int matched, i, j;
 
     auto *tokens = new std::vector<token_t>();
-    const char *src = source.getContent().c_str();
+    const char *src = source->getContent().c_str();
 
-    for ( i = 0; i < source.getContent().size(); )
+    for ( i = 0; i < source->getContent().size(); )
     {
         // Skip whitespaces
         if ( src[ i ] == ' ' || src[ i ] == '\n' || src[ i ] == '\t' )
@@ -88,23 +88,22 @@ TokenSet *stride::tokenize(stride::StrideFile &source)
                 token_t token;
                 token.type = token_definitions[ j ].token;
                 token.value = (char *) malloc(match.rm_eo - match.rm_so + 1);
-                get_cursor_position(src, i, &line, &col);
-                token.line = line;
-                token.column = col;
                 token.index = i;
 
                 memcpy((void *) token.value, src + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value )[ match.rm_eo - match.rm_so ] = '\0';
                 i += match.rm_eo - match.rm_so;
                 matched = 1;
+
+                tokens->push_back(token);
                 break;
             }
         }
         if ( !matched )
         {
-            stride::error::error(source, i, "Illegal character found in file.");
+            stride::error::error(*source, i, "Illegal character found in file.");
         }
-
     }
-    return new TokenSet(*tokens, source);
+
+    return new TokenSet(tokens, source);
 }

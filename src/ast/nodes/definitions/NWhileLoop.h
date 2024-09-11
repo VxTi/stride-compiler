@@ -9,7 +9,7 @@
 
 /**
      * Represents a while loop.
-     * While loops are used to repeat a block of code while a condition is true.
+     * While loops are used to repeat a block of code while a conditionalValue is true.
      */
 class NWhileLoop : public stride::ast::Node
 {
@@ -20,7 +20,7 @@ public:
 
     /**
      * Create a new while loop.
-     * @param condition The condition of the while loop.
+     * @param condition The conditionalValue of the while loop.
      * @param body The body of the while loop.
      */
     NWhileLoop(NExpression *condition, NBlock *body) :

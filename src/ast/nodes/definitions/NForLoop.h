@@ -13,30 +13,25 @@
  * For loops are used to repeat a block of code a fixed number of times.
  * The syntax for a for loop is as follows: <br />
  * <code>
- * for (initializer; condition; increment) { ... }
+ * for (initializer; conditionalValue; increment) { ... }
  * </code>
  */
 class NForLoop : public NWhileLoop
 {
-public:
+private:
     std::vector<NVariableDeclaration *> initializers;
     std::vector<NVariableDeclaration *> increments;
 
+public:
     /**
-     * For loop constructor with initializer, condition and increment.
+     * For loop constructor with initializer, conditionalValue and increment.
      * This is the classical form of a for-loop
-     * @param initializer The initializer node, e.g. with a variable declaration.
-     * @param condition The condition that has to hold true for the next iteration to commence
-     * @param increment The incremental expression that
-     * @param body
      */
-    NForLoop(NExpression *condition, NExpression *increment, NBlock *body) :
-            NWhileLoop(condition, body)
-    {}
+    NForLoop() : NWhileLoop() {}
 
     /**
-     * Updates the condition of this for-loop.
-     * @param condition The condition that has to hold true for the next iteration to happen.
+     * Updates the conditionalValue of this for-loop.
+     * @param condition The conditionalValue that has to hold true for the next iteration to happen.
      */
     void setCondition(NExpression *condition)
     {

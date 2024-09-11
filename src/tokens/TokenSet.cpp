@@ -5,14 +5,34 @@
 #include "TokenSet.h"
 #include "../error/ast_error_handling.h"
 
+TokenSet::TokenSet(std::vector<token_t> *tokens, stride::StrideFile *source)
+{
+    this->source = source;
+    this->tokens = tokens;
+    this->index = 0;
+    this->startOffset = 0;
+    if (this->tokens == nullptr)
+    {
+        this->error("Token stream is null.");
+        exit(1);
+    }
+    this->length = tokens->size();
+
+    if ( this->length == 0 )
+    {
+        this->error("Token stream is empty.");
+    }
+
+}
+
 bool TokenSet::canConsume(token_type_t token, int fromIndex)
 {
-    if ( fromIndex >= this->length || this->startOffset + fromIndex >= this->tokens.size())
+    if ( !hasNext())
     {
         return false;
     }
 
-    return this->tokens[ this->startOffset + fromIndex ].type == token;
+    return (*this->tokens)[ this->startOffset + fromIndex ].type == token;
 }
 
 bool TokenSet::canConsume(token_type_t type)
@@ -46,19 +66,19 @@ token_t TokenSet::consumeRequired(token_type_t type, const char *message)
 
 token_t TokenSet::current()
 {
-    return this->tokens[ this->startOffset + this->index ];
+    return (*this->tokens)[ this->startOffset + this->index ];
 }
 
 bool TokenSet::peekEq(token_type_t type, int offset)
 {
     int absoluteIndex = this->startOffset + this->index + offset;
     // If the relative index or absolute index exceeds the boundaries, stop.
-    if ( this->index + offset >= this->length || absoluteIndex >= this->tokens.size())
+    if ( this->index + offset >= this->length || absoluteIndex >= this->tokens->size())
     {
         return false;
     }
 
-    return this->tokens[ absoluteIndex ].type == type;
+    return (*this->tokens)[ absoluteIndex ].type == type;
 }
 
 bool TokenSet::hasNext()
@@ -68,13 +88,13 @@ bool TokenSet::hasNext()
 
 bool TokenSet::hasNext(int fromIndex)
 {
-    return this->startOffset + fromIndex + 1 < this->tokens.size() &&
-           fromIndex + 1 < this->length;
+    return this->startOffset + fromIndex + 1 < this->tokens->size() &&
+           fromIndex + 1 < this->length && this->tokens != nullptr;
 }
 
 token_t TokenSet::next(int *fromIndex)
 {
-    return this->tokens[ *fromIndex++ ];
+    return (*this->tokens)[ *fromIndex++ ];
 }
 
 token_t TokenSet::next()
@@ -106,10 +126,10 @@ TokenSet *TokenSet::subset(int start, int subLength)
 
 stride::StrideFile &TokenSet::getSource() const
 {
-    return this->source;
+    return *this->source;
 }
 
 void TokenSet::error(const char *message)
 {
-    stride::error::error(this->source, this->index, message);
+    stride::error::error(*this->source, this->index, message);
 }

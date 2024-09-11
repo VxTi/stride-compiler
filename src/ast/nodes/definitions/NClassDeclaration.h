@@ -12,22 +12,25 @@
      * Class declaration.
      * Classes are defined using the following format: <br />
      * <code>
-     * class &lt;class_name&gt; {
+     * class &lt;className&gt; {
      *  ... <br />
      * } <br />
      * or <br />
-     * class &lt;class_name&gt;&lt;&lt;GENERICS&gt;&gt; : &lt;parent_class&gt;, ... {
+     * class &lt;className&gt;&lt;&lt;GENERICS&gt;&gt; : &lt;parent_class&gt;, ... {
      * </code>
      */
 class NClassDeclaration : public stride::ast::Node
 {
-public:
-    std::string class_name;
+private:
+    std::string className;
     std::vector<NIdentifier *> *parents;
     std::vector<NIdentifier *> *generics;
     NBlock *body;
 
-    NClassDeclaration();
+public:
+
+    NClassDeclaration() : className(""), parents(new std::vector<NIdentifier *>()), generics(new std::vector<NIdentifier *>()), body(nullptr)
+    {}
 
     ~NClassDeclaration();
 

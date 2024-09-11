@@ -10,28 +10,28 @@
 
 using namespace stride;
 
-StrideFile::StrideFile(std::string &path)
+StrideFile::StrideFile(const char *path)
 {
-    this->filePath = &path;
+    this->filePath = new std::string(path);
     std::ifstream file_in(*this->filePath);
     this->content = new std::string(( std::istreambuf_iterator<char>(file_in)),
-                                ( std::istreambuf_iterator<char>()));
+                                    ( std::istreambuf_iterator<char>()));
 }
 
 void StrideFile::compile()
 {
     std::string output_file_path = this->filePath->substr(0, this->filePath->find_last_of('.')).append(".asm");
 
-    std::cout << "Compiling file to " << output_file_path << std::endl;
+    std::cout << "Compiling file \"" << this->filePath->c_str() << "\" to " << output_file_path << std::endl;
 
     auto tokens = stride::tokenize(this);
     auto root = stride::ast::parser::parse(*tokens);
     auto irCode = root->codegen();
 
     // Write to output file
-    std::ofstream file_out(output_file_path);
+    /*std::ofstream file_out(output_file_path);
     file_out << (char *) irCode->value;
-    file_out.close();
+    file_out.close();*/
 }
 
 void StrideFile::interpret()

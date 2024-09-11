@@ -6,6 +6,7 @@
 #include "../../../tokens/token.h"
 #include "NLiteral.h"
 #include "NBlock.h"
+#include "NExpression.h"
 
 /**
     * Switch case.
@@ -17,18 +18,15 @@
 class NSwitchCase : public stride::ast::Node
 {
 public:
-    NLiteral &condition;
-    NBlock &body;
+    NLiteral *conditionalValue;
+    NBlock *body;
 
     /**
      * Create a new switch case.
-     * @param condition The condition of the case.
+     * @param condition The conditionalValue of the case.
      * @param body The body of the case.
      */
-    NSwitchCase(NLiteral &condition, NBlock &body) :
-            condition(condition),
-            body(body)
-    {}
+    NSwitchCase() : conditionalValue(nullptr), body(nullptr){}
 
     enum stride::ast::ENodeType getType() override
     {
@@ -49,36 +47,33 @@ public:
  */
 class NSwitchStatement : public stride::ast::Node
 {
-public:
-    std::vector<NSwitchCase *> cases;
-    NSwitchCase *default_case;
+private:
 
-    /**
-     * Create a new switch statement.
-     * @param cases The cases of the switch statement.
-     * @param default_case The default case.
-     */
-    NSwitchStatement(std::vector<NSwitchCase *> cases, NSwitchCase *default_case) :
-            cases(std::move(cases)),
-            default_case(default_case)
+    NExpression *expression;
+    std::vector<NSwitchCase *> cases;
+    NSwitchCase *defaultCase;
+
+public:
+
+    NSwitchStatement() : cases(), defaultCase(nullptr), expression(nullptr)
     {}
 
     /**
      * Add a case to the switch statement.
-     * @param switch_case The case to add.
+     * @param switchCase The case to add.
      */
-    void addCase(NSwitchCase *switch_case)
+    void addCase(NSwitchCase *switchCase)
     {
-        cases.push_back(switch_case);
+        cases.push_back(switchCase);
     }
 
     /**
      * Set the default case.
-     * @param switch_case The default case.
+     * @param switchCase The default case.
      */
-    void setDefaultCase(NSwitchCase *switch_case)
+    void setDefaultCase(NSwitchCase *switchCase)
     {
-        default_case = switch_case;
+        defaultCase = switchCase;
     }
 
     enum stride::ast::ENodeType getType() override

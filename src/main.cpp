@@ -1,5 +1,4 @@
 #include <iostream>
-#include "ast/abstractions/AST.h"
 #include "StrideFile.h"
 
 using namespace stride;
@@ -15,7 +14,7 @@ int main(const int argc, const char **argv)
         exit(1);
     }
 
-    auto *file = new stride::StrideFile((std::string &) argv[ 1 ]);
+    auto *file = new stride::StrideFile(argv[ 1 ]);
     file->compile();
 
     return 0;

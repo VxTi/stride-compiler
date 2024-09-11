@@ -15,7 +15,7 @@ void NStructureDeclaration::parse(TokenSet &tokenSet, stride::ast::Node &parent)
     nstStructureDecl->setName(
             tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected structure name after structure definition").value);
 
-    auto *structureSubSet = captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
+    auto *structureSubSet = stride::ast::captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
 
     if ( structureSubSet == nullptr )
     {
