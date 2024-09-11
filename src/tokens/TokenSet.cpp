@@ -69,7 +69,7 @@ bool TokenSet::hasNext()
 bool TokenSet::hasNext(int fromIndex)
 {
     return this->startOffset + fromIndex + 1 < this->tokens.size() &&
-           this->startOffset + fromIndex + 1 < this->length;
+           fromIndex + 1 < this->length;
 }
 
 token_t TokenSet::next(int *fromIndex)
@@ -83,7 +83,7 @@ token_t TokenSet::next()
     {
         this->error("Unexpected end of file.");
     }
-    return this->tokens[ index++ ];
+    return this->next(&this->index);
 }
 
 unsigned long int TokenSet::size() const
@@ -99,7 +99,7 @@ int TokenSet::getIndex() const
 TokenSet *TokenSet::subset(int start, int subLength)
 {
     auto *subset = new TokenSet(this->tokens, this->source);
-    subset->startOffset = start;
+    subset->startOffset = this->startOffset + start;
     subset->length = subLength;
     return subset;
 }

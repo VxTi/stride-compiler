@@ -6,7 +6,15 @@
 
 using namespace stride::ast;
 
-void stride::ast::NExpression::parse(TokenSet &tokenSet, stride::ast::Node &parent)
+NExpression *NExpression::parse(TokenSet &tokenSet)
 {
+    auto nstExpression = new NExpression();
 
+
+    return nstExpression;
+}
+
+void stride::ast::NExpression::parse(TokenSet &tokenSet, Node &parent)
+{
+    parent.addChild(NExpression::parse(tokenSet));
 }

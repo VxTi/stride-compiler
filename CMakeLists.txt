@@ -13,25 +13,32 @@ add_executable(stride_language src/main.cpp
         src/tokens/token.cpp
         src/error/ast_error_handling.cpp
         src/ast/Lookahead.cpp
-        #[[src/ast/syntax/expressions.cpp
-        src/ast/syntax/module_statement.cpp
-        src/ast/syntax/import_statement.cpp
-        src/ast/syntax/variable_declaration.cpp
-        src/ast/syntax/identifiers.cpp
-        src/ast/syntax/enumerables.cpp
-        src/ast/syntax/variable_types.h
-        src/ast/syntax/for_loop.cpp
-        src/ast/syntax/function_call.cpp
-        src/ast/syntax/while_loop.cpp
-        src/ast/syntax/try_catch.cpp
-        src/ast/syntax/variable_types.cpp
-        src/ast/syntax/do_while.cpp
-        src/ast/syntax/if_else.cpp
-        src/ast/syntax/throw.cpp
-        src/ast/syntax/switch_case.cpp
-        src/ast/syntax/generics.cpp
-        src/ast/syntax/structures.cpp
-        src/ast/syntax/returning.cpp]]
+        src/ast/nodes/definitions/NLiteral.h
+        src/ast/nodes/definitions/NIdentifier.h
+        src/ast/nodes/definitions/NBlock.h
+        src/ast/nodes/definitions/NExpression.h
+        src/ast/nodes/definitions/NArray.h
+        src/ast/nodes/definitions/NReturnStatement.h
+        src/ast/nodes/definitions/NThrowStatement.h
+        src/ast/nodes/definitions/NBinaryOperation.h
+        src/ast/nodes/definitions/NUnaryOperator.h
+        src/ast/nodes/definitions/NModuleDeclaration.h
+        src/ast/nodes/definitions/NVariableDeclaration.h
+        src/ast/nodes/definitions/NTryCatchStatement.h
+        src/ast/nodes/definitions/NFunctionDeclaration.h
+        src/ast/nodes/definitions/NFunctionCall.h
+        src/ast/nodes/definitions/NOperatorOverload.h
+        src/ast/nodes/definitions/NEnumerableDeclaration.h
+        src/ast/nodes/definitions/NStructureDeclaration.h
+        src/ast/nodes/definitions/NConditionalStatement.h
+        src/ast/nodes/definitions/NSwitchCase.h
+        src/ast/nodes/definitions/NSwitchStatement.h
+        src/ast/nodes/definitions/NClassDeclaration.h
+        src/ast/nodes/definitions/NImportStatement.h
+        src/ast/nodes/definitions/NWhileLoop.h
+        src/ast/nodes/definitions/NDoWhileLoop.h
+        src/ast/nodes/definitions/NForLoop.h
+
         src/ast/nodes/NFunctionDeclaration.cpp
         src/ast/nodes/NClassDeclaration.cpp
         src/ast/ASTNodes.h
@@ -48,4 +55,8 @@ add_executable(stride_language src/main.cpp
         src/ast/NPTypes.cpp
         src/ast/nodes/NVariableDeclaration.cpp
         src/ast/nodes/NExpression.cpp
+        src/ast/nodes/NStructureDeclaration.cpp
+        src/ast/nodes/NEnumerableDeclaration.cpp
+        src/ast/nodes/NImportStatement.cpp
+        src/ast/nodes/NModuleDeclaration.cpp
 )

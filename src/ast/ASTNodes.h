@@ -6,7 +6,6 @@
 #define STRIDE_LANGUAGE_ASTNODES_H
 
 #include <vector>
-#include "AST.h"
 #include "../tokens/TokenSet.h"
 #include "../tokens/token.h"
 
@@ -189,35 +188,12 @@ namespace stride::ast
 
         NExpression() = default;
 
+        static NExpression *parse(TokenSet &tokenSet);
+
         static void parse(TokenSet &tokenSet, Node &parent);
 
         enum NType getType() override
         { return EXPRESSION; }
-    };
-
-    /**
-     * Represents an array.
-     * Arrays are used to store multiple values.
-     * For example, in the expression "[1, 2, 3]", the array contains the values "1", "2" and "3".
-     */
-    class NArray : public NExpression
-    {
-    public:
-        std::vector<NExpression *> elements;
-
-        NArray() : NExpression()
-        {}
-
-        void addElement(NExpression *element)
-        {
-            elements.push_back(element);
-        }
-
-        enum NType getType() override
-        { return ARRAY; }
-
-        static void parse(TokenSet &tokenSet, Node &parent);
-
     };
 
     /**
@@ -372,20 +348,23 @@ namespace stride::ast
      * Variable declaration.
      * Variables are defined using the following format: <br />
      * <code>
-     * let &lt;variable_name&gt;: &lt;variable_type&gt;; <br />
+     * let &lt;varName&gt;: &lt;varType&gt;; <br />
      * ... or <br />
-     * const &lt;variable_name&gt;: &lt;variable_type&gt; = &lt;expression&gt;;
+     * const &lt;varName&gt;: &lt;varType&gt; = &lt;expression&gt;;
      * </code>
      */
     class NVariableDeclaration : public Node
     {
-    public:
-        NIdentifier *variable_name;
-        NIdentifier *variable_type;
+    private:
+        NIdentifier *varName;
+        NIdentifier *varType;
+        NExpression *value;
         bool isConst;
         bool isArray;
 
-        NVariableDeclaration() : isConst(false), isArray(false)
+    public:
+
+        NVariableDeclaration() : isConst(false), isArray(false), varName(nullptr), varType(nullptr), value(nullptr)
         {}
 
         /**
@@ -394,12 +373,25 @@ namespace stride::ast
          */
         void setVariableName(NIdentifier *variable_name)
         {
-            this->variable_name = variable_name;
+            this->varName = variable_name;
         }
 
+        /**
+         * Updates the name of the variable.
+         * @param variable_name
+         */
         void setVariableName(std::string variable_name)
         {
-            this->variable_name = new NIdentifier(variable_name);
+            this->varName = new NIdentifier(variable_name);
+        }
+
+        /**
+         * Updates the value of the variable.
+         * @param expression The expression to set.
+         */
+        void setValue(NExpression *expression)
+        {
+            this->value = expression;
         }
 
         /**
@@ -410,7 +402,7 @@ namespace stride::ast
          */
         void setVariableType(NIdentifier *variable_type)
         {
-            this->variable_type = variable_type;
+            this->varType = variable_type;
         }
 
         /**
@@ -438,6 +430,21 @@ namespace stride::ast
 
         static void parse(TokenSet &tokenSet, Node &parent);
 
+        /**
+         * Parses a singular variable declaration.
+         * In Stride, multiple variables can be declared in a row with comma separation.
+         * This function is to parse a single part of it. This function also allows assignment
+         * and variadic parsing, if necessary. This will likely only be used in lambda and function declarations.
+         * @param tokenSet The token set to parse the variable declaration with
+         * @param allowAssignment Whether the variable declaration allows assignment.
+         * @param implicitDeclaration Whether the variable is implicitly declared,
+         * e.g. as a function parameter, or structure. Implicit declaration does not allow 'const' or 'let' as starting symbols
+         * of the sequence. This will throw an error if found.
+         * @param allowVariadic Whether or not the assignment allows variadic declaration.
+         * @return An pointer to a variable declaration node.
+         */
+        static NVariableDeclaration *parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration, bool allowVariadic);
+
     };
 
     /**
@@ -453,20 +460,45 @@ namespace stride::ast
      */
     class NTryCatchStatement : public Node
     {
-    public:
-        NBlock *try_block;
-        NBlock *catch_block;
+    private:
+        NBlock *tryBlock;
+        NBlock *catchBlock;
         NVariableDeclaration *exception;
 
+    public:
         NTryCatchStatement(NBlock *try_block, NBlock *catch_block) :
-                try_block(try_block),
-                catch_block(catch_block),
+                tryBlock(try_block),
+                catchBlock(catch_block),
                 exception(nullptr)
         {}
 
+        /**
+         * Set the exception variable.
+         * @param exception The exception variable.
+         */
         void setException(NVariableDeclaration *exception)
         {
             this->exception = exception;
+        }
+
+        /**
+         * Set the try block.
+         * This is the block that will be executed first,
+         * and will be the block that could throw an exception.
+         * @param try_block The try block.
+         */
+        void setTryBlock(NBlock *try_block)
+        {
+            this->tryBlock = try_block;
+        }
+
+        /**
+         * Set the catch block.
+         * @param catch_block The catch block.
+         */
+        void setCatchBlock(NBlock *catch_block)
+        {
+            this->catchBlock = catch_block;
         }
 
         enum NType getType() override
@@ -613,10 +645,22 @@ namespace stride::ast
         NEnumerableDeclaration() : values()
         {};
 
-        void addValue(std::string key, long int value)
+        void addValue(const char *key, long int value)
+        {
+            values [ key ] = value;
+        }
+
+        void addValue(std::string &key, long int value)
         {
             values[ key ] = value;
         }
+
+        /**
+         * Parses an enumerable
+         * @param tokenSet
+         * @param parent
+         */
+        static void parse(TokenSet &tokenSet, Node &parent);
 
         enum NType getType() override
         { return ENUMERABLE_DECLARATION; }
@@ -632,27 +676,14 @@ namespace stride::ast
      */
     class NStructureDeclaration : public Node
     {
-    public:
+    private:
+
         std::string structure_name;
-        std::vector<NVariableDeclaration *> fields;
+        std::vector<NVariableDeclaration *> *fields;
 
-        /**
-         * Create a new structure declaration.
-         * @param structure_name The name of the structure.
-         */
-        explicit NStructureDeclaration(std::string structure_name) :
-                structure_name(std::move(structure_name)),
-                fields()
-        {}
+    public:
 
-        /**
-         * Create a new structure declaration.
-         * @param structure_name The name of the structure.
-         * @param fields The fields of the structure.
-         */
-        NStructureDeclaration(std::string structure_name, std::vector<NVariableDeclaration *> fields) :
-                structure_name(std::move(structure_name)),
-                fields(std::move(fields))
+        explicit NStructureDeclaration() : structure_name(""), fields(new std::vector<NVariableDeclaration *>())
         {}
 
         /**
@@ -661,13 +692,21 @@ namespace stride::ast
          */
         void addField(NVariableDeclaration *field)
         {
-            fields.push_back(field);
+            fields->push_back(field);
         }
 
+        void setName(const char *name) {
+            structure_name = name;
+        }
+
+
         enum NType getType() override
-        { return STRUCTURE_DECLARATION; }
+        {
+            return STRUCTURE_DECLARATION;
+        }
 
         static void parse(TokenSet &tokenSet, Node &parent);
+
     };
 
     /**
@@ -683,25 +722,42 @@ namespace stride::ast
      */
     class NConditionalStatement : public Node
     {
-    public:
+    private:
         NExpression *condition;
-        NBlock *if_true;
-        NBlock *otherwise = nullptr;
+        NBlock *truthyBlock;
+        NBlock *otherwise;
+
+
+    public:
+        explicit NConditionalStatement() : condition(nullptr), truthyBlock(nullptr), otherwise(nullptr)
+        {}
 
         /**
-         * Create a new conditional statement.
-         * @param condition The condition of the statement.
-         * @param if_true The body of the statement.
-         * @param otherwise The body of the else statement.
+         * Set the condition of the if statement.
+         * @param condition The condition to set.
          */
-        NConditionalStatement(NExpression *condition, NBlock *if_true, NBlock *otherwise) :
-                condition(condition),
-                if_true(if_true),
-                otherwise(otherwise)
-        {}
+        void setCondition(NExpression *condition)
+        {
+            NConditionalStatement::condition = condition;
+        }
 
-        NConditionalStatement() : NConditionalStatement(nullptr, nullptr, nullptr)
-        {}
+        /**
+         * Set the truthy block of the if statement.
+         * @param truthyBlock The truthy block to set.
+         */
+        void setTruthyBlock(NBlock *truthyBlock)
+        {
+            NConditionalStatement::truthyBlock = truthyBlock;
+        }
+
+        /**
+         * Set the otherwise block of the if statement.
+         * @param otherwise The otherwise block to set.
+         */
+        void setOtherwise(NBlock *otherwise)
+        {
+            NConditionalStatement::otherwise = otherwise;
+        }
 
         enum NType getType() override
         { return CONDITIONAL_STATEMENT; }
@@ -852,41 +908,6 @@ namespace stride::ast
 
         enum NType getType() override
         { return IMPORT_STATEMENT; }
-
-        static void parse(TokenSet &tokenSet, Node &parent);
-    };
-
-    /**
-     * Represents a while loop.
-     * While loops are used to repeat a block of code while a condition is true.
-     */
-    class NWhileLoop : public Node
-    {
-    public:
-        NExpression *condition;
-        NBlock *body;
-
-
-        /**
-         * Create a new while loop.
-         * @param condition The condition of the while loop.
-         * @param body The body of the while loop.
-         */
-        NWhileLoop(NExpression *condition, NBlock *body) :
-                condition(condition),
-                body(body)
-        {}
-
-        explicit NWhileLoop() : NWhileLoop(nullptr, nullptr)
-        {};
-
-        void setCondition(NExpression *condition)
-        {
-            this->condition = condition;
-        }
-
-        enum NType getType() override
-        { return WHILE_LOOP; }
 
         static void parse(TokenSet &tokenSet, Node &parent);
     };

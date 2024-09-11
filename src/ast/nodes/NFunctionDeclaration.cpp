@@ -25,7 +25,7 @@ using namespace stride::ast;
  * @param root The root Node to append the function declaration to.
  */
 
-void stride::ast::NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
+void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 {
 
     if ( !tokenSet.hasNext())
@@ -96,7 +96,7 @@ void stride::ast::NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
             if ( fnParameterSet->consume(TOKEN_KEYWORD_CONST))
             {
-                nstFnParameter->isConst = true;
+                nstFnParameter->setConst(true);
             }
 
             nstFnParameter->setVariableName((char *) fnParameterSet->consumeRequired(TOKEN_IDENTIFIER,
@@ -112,23 +112,19 @@ void stride::ast::NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
             // If the variable type is a reference to a class within a module, use identifier as type.
             // Otherwise, we'll use the token value as the type.
-            if ( tokenSet.canConsume(TOKEN_IDENTIFIER))
-            {
-                nstFnParameter->setVariableType(parseIdentifier(tokenSet));
-            }
-            else
-            {
-                nstFnParameter->setVariableType(new NIdentifier(tokenSet.next().value));
-            }
+            nstFnParameter->setVariableType(
+                    fnParameterSet->canConsume(TOKEN_IDENTIFIER) ? parseIdentifier(tokenSet) : new NIdentifier(
+                            tokenSet.next().value)
+            );
 
             // Check if function parameter is of array type.
             if ( tokenSet.consume(TOKEN_LSQUARE_BRACKET) && tokenSet.consume(TOKEN_LSQUARE_BRACKET))
             {
-                nstFnParameter->isArray = true;
+                nstFnParameter->setIsArray(true);
             }
             else if ( tokenSet.consume(TOKEN_THREE_DOTS))
             {
-                nstFnParameter->isArray = true;
+                nstFnParameter->setIsArray(true);
                 hasVariadic = true;
             }
 
@@ -140,13 +136,12 @@ void stride::ast::NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
         {
             fnParameterSet->error("Function parameter requires comma or closing parenthesis after declaration.");
         }
-
     }
 
     if ( !nstFunctionDecl->external )
     {
         auto *fnBodySet = captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
-        if (fnBodySet == nullptr)
+        if ( fnBodySet == nullptr )
         {
             tokenSet.error("Function declaration requires a function body, but received none.");
             return;
@@ -154,8 +149,11 @@ void stride::ast::NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
         auto *nstBlock = new NBlock();
         stride::ast::parser::parse(*fnBodySet, *nstBlock);
-    } else {
-        tokenSet.consumeRequired(TOKEN_SEMICOLON, "External functions are not allowed to have a function body, and must end with a semicolon.");
+    }
+    else
+    {
+        tokenSet.consumeRequired(TOKEN_SEMICOLON,
+                                 "External functions are not allowed to have a function body, and must end with a semicolon.");
     }
 
     parent.addChild(nstFunctionDecl);
