@@ -4,13 +4,11 @@
 #include "NExpression.h"
 #include "NBlock.h"
 
-using namespace stride::ast;
-
 /**
      * Represents a while loop.
      * While loops are used to repeat a block of code while a condition is true.
      */
-class NWhileLoop : public Node
+class NWhileLoop : public stride::ast::Node
 {
 public:
     NExpression *condition;
@@ -35,8 +33,8 @@ public:
         this->condition = condition;
     }
 
-    enum ENodeType getType() override
-    { return WHILE_LOOP; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::WHILE_LOOP; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };

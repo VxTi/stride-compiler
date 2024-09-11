@@ -1,11 +1,7 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NExpression.h"
-
-using namespace stride::ast;
-
 
 /**
  * Represents a block.

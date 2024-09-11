@@ -1,10 +1,8 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
-
-using namespace stride::ast;
-
+#include "NExpression.h"
+#include "NIdentifier.h"
 
 /**
  * Variable declaration.
@@ -15,7 +13,7 @@ using namespace stride::ast;
  * const &lt;varName&gt;: &lt;varType&gt; = &lt;expression&gt;;
  * </code>
  */
-class NVariableDeclaration : public Node
+class NVariableDeclaration : public stride::ast::Node
 {
 private:
     NIdentifier *varName;
@@ -85,9 +83,9 @@ public:
         this->isConst = isConstant;
     }
 
-    enum ENodeType getType() override
+    enum stride::ast::ENodeType getType() override
     {
-        return VARIABLE_DECLARATION;
+        return stride::ast::VARIABLE_DECLARATION;
     }
 
     static void parse(TokenSet &tokenSet, Node &parent);

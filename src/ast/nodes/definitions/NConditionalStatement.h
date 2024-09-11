@@ -2,8 +2,8 @@
 
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
-
-using namespace stride::ast;
+#include "NBlock.h"
+#include "NExpression.h"
 
 /**
      * If statement.
@@ -16,7 +16,7 @@ using namespace stride::ast;
      * } else { ... } <br />
      * </code>
      */
-class NConditionalStatement : public Node
+class NConditionalStatement : public stride::ast::Node
 {
 private:
     NExpression *condition;
@@ -55,6 +55,6 @@ public:
         NConditionalStatement::otherwise = otherwise;
     }
 
-    enum ENodeType getType() override
-    { return CONDITIONAL_STATEMENT; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::CONDITIONAL_STATEMENT; }
 };

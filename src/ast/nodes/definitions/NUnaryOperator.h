@@ -4,8 +4,6 @@
 #include "../../../tokens/token.h"
 #include "NExpression.h"
 
-using namespace stride::ast;
-
 enum EUnaryOperator
 {
     NEGATE,         // Logical NOT (!)
@@ -32,8 +30,8 @@ public:
             expression(expression)
     {}
 
-    enum ENodeType getType() override
-    { return UNARY_OPERATOR; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::UNARY_OPERATOR; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };

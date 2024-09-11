@@ -7,9 +7,6 @@
 #include "NBlock.h"
 #include "NVariableDeclaration.h"
 
-using namespace stride::ast;
-
-
 /**
  * Function declaration.
  * Functions are defined using the following format: <br />
@@ -19,7 +16,7 @@ using namespace stride::ast;
  * }
  * </code>
  */
-class NFunctionDeclaration : public Node
+class NFunctionDeclaration : public stride::ast::Node
 {
 public:
     NIdentifier *functionName;
@@ -49,8 +46,8 @@ public:
         this->functionName = new NIdentifier(function_name);
     }
 
-    enum ENodeType getType() override
-    { return FUNCTION_DECLARATION; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::FUNCTION_DECLARATION; }
 
     static void parse(TokenSet &tokenSetet, Node &parent);
 };

@@ -1,16 +1,13 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
-
-using namespace stride::ast;
-
+#include "NLiteral.h"
 
 /**
  * Represents an expression.
  * Expressions are used to evaluate values.
  */
-class NExpression : public Node
+class NExpression : public stride::ast::Node
 {
 public:
     explicit NExpression(const std::string &value)
@@ -24,6 +21,6 @@ public:
 
     static void parse(TokenSet &tokenSet, Node &parent);
 
-    enum ENodeType getType() override
-    { return EXPRESSION; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::EXPRESSION; }
 };

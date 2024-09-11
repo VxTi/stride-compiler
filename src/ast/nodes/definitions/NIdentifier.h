@@ -3,14 +3,12 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 
-using namespace stride::ast;
-
 /**
      * Represents an identifier.
      * Identifiers are used to represent names.
      * For example, in the expression "let x = 1", the identifier is "x".
      */
-class NIdentifier : public Node
+class NIdentifier : public stride::ast::Node
 {
 public:
     std::string name;
@@ -19,6 +17,6 @@ public:
             name(std::move(name))
     {}
 
-    enum ENodeType getType() override
-    { return IDENTIFIER; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::IDENTIFIER; }
 };

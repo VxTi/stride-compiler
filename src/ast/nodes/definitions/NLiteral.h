@@ -3,15 +3,13 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 
-using namespace stride::ast;
-
 
 /*
      * Represents a literal.
      * Literals are used to represent fixed values.
      * For example, in the expression "1 + 2", the literals are "1" and "2", respectively.
      */
-class NLiteral : public Node
+class NLiteral : public stride::ast::Node
 {
 public:
 
@@ -24,7 +22,7 @@ public:
     explicit NLiteral(void *val) : value(val)
     {}
 
-    enum ENodeType getType() override
-    { return LITERAL; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::LITERAL; }
 
 };

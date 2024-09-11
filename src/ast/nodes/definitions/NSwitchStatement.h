@@ -1,12 +1,8 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
-
 #include "NLiteral.h"
 #include "NBlock.h"
-
-using namespace stride::ast;
 
 /**
     * Switch case.
@@ -15,7 +11,7 @@ using namespace stride::ast;
     * case &lt;literal&gt; -&gt; { ... }
     * </code>
     */
-class NSwitchCase : public Node
+class NSwitchCase : public stride::ast::Node
 {
 public:
     NLiteral &condition;
@@ -31,8 +27,10 @@ public:
             body(body)
     {}
 
-    enum ENodeType getType() override
-    { return SWITCH_CASE; }
+    enum stride::ast::ENodeType getType() override
+    {
+        return stride::ast::SWITCH_CASE;
+    }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };
@@ -46,7 +44,7 @@ public:
  * }
  * </code>
  */
-class NSwitchStatement : public Node
+class NSwitchStatement : public stride::ast::Node
 {
 public:
     std::vector<NSwitchCase *> cases;
@@ -80,8 +78,10 @@ public:
         default_case = switch_case;
     }
 
-    enum ENodeType getType() override
-    { return SWITCH_STATEMENT; }
+    enum stride::ast::ENodeType getType() override
+    {
+        return stride::ast::SWITCH_STATEMENT;
+    }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

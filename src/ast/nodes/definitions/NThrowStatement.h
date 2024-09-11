@@ -4,14 +4,12 @@
 #include "../../../tokens/token.h"
 #include "NExpression.h"
 
-using namespace stride::ast;
-
 /**
      * Represents a throw statement.
      * Throw statements are used to throw an exception.
      * For example, in the expression "throw new Error()", the throw statement is "throw new Error()".
      */
-class NThrowStatement : public Node
+class NThrowStatement : public stride::ast::Node
 {
 public:
     NExpression *expression;
@@ -20,8 +18,8 @@ public:
             expression(expression)
     {}
 
-    enum ENodeType getType() override
-    { return THROW_STATEMENT; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::THROW_STATEMENT; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };

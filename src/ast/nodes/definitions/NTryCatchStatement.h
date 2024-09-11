@@ -5,8 +5,6 @@
 #include "NBlock.h"
 #include "NVariableDeclaration.h"
 
-using namespace stride::ast;
-
 /**
  * Try catch statement.
  * Try catch statements are used to catch exceptions.
@@ -18,7 +16,7 @@ using namespace stride::ast;
  *   &nbsp;&lt;statement&gt; ... <br />
  *  }
  */
-class NTryCatchStatement : public Node
+class NTryCatchStatement : public stride::ast::Node
 {
 private:
     NBlock *tryBlock;
@@ -61,8 +59,8 @@ public:
         this->catchBlock = catch_block;
     }
 
-    enum ENodeType getType() override
-    { return TRY_CATCH_CLAUSE; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::TRY_CATCH_CLAUSE; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

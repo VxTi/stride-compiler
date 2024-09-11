@@ -4,14 +4,12 @@
 #include "../../../tokens/token.h"
 #include "NExpression.h"
 
-using namespace stride::ast;
-
 /**
      * Represents a return statement.
      * Return statements are used to return a value from a function.
      * For example, in the expression "return 1", the return statement is "return 1".
      */
-class NReturnStatement : public Node
+class NReturnStatement : public stride::ast::Node
 {
 public:
     NExpression *expression;
@@ -20,8 +18,8 @@ public:
             expression(expression)
     {}
 
-    enum ENodeType getType() override
-    { return RETURN_STATEMENT; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::RETURN_STATEMENT; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };

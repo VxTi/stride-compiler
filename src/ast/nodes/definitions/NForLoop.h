@@ -1,14 +1,9 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NWhileLoop.h"
 #include "NVariableDeclaration.h"
 #include "NExpression.h"
-#include "NBlock.h"
-
-using namespace stride::ast;
-
 
 /**
  * Represents a for loop.
@@ -66,8 +61,8 @@ public:
         increments.push_back(incrementor);
     }
 
-    enum ENodeType getType() override
-    { return FOR_LOOP; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::FOR_LOOP; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

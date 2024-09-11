@@ -3,9 +3,7 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 
-using namespace stride::ast;
-
-class NModuleDeclaration : public Node
+class NModuleDeclaration : public stride::ast::Node
 {
 public:
     std::string module_name;
@@ -14,8 +12,8 @@ public:
             module_name(std::move(module_name))
     {}
 
-    enum ENodeType getType() override
-    { return MODULE_DECLARATION; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::MODULE_DECLARATION; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

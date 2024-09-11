@@ -5,7 +5,7 @@
 #include "NBinaryOperation.h"
 #include "NFunctionDeclaration.h"
 
-class NOperatorOverload : public Node
+class NOperatorOverload : public stride::ast::Node
 {
 public:
     enum EBinaryOperator operation;
@@ -35,8 +35,8 @@ public:
         this->overloaded_function = overloaded_function;
     }
 
-    enum ENodeType getType() override
-    { return OPERATOR_OVERLOAD; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::OPERATOR_OVERLOAD; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

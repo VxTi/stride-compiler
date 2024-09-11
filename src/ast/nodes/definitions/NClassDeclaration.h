@@ -1,9 +1,9 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
+#include "NIdentifier.h"
+#include "NBlock.h"
 
-using namespace stride::ast;
 
 /**
      * Class declaration.
@@ -16,7 +16,7 @@ using namespace stride::ast;
      * class &lt;class_name&gt;&lt;&lt;GENERICS&gt;&gt; : &lt;parent_class&gt;, ... {
      * </code>
      */
-class NClassDeclaration : public Node
+class NClassDeclaration : public stride::ast::Node
 {
 public:
     std::string class_name;
@@ -46,8 +46,10 @@ public:
         generics->push_back(generic);
     }
 
-    enum ENodeType getType() override
-    { return CLASS_DECLARATION; }
+    enum stride::ast::ENodeType getType() override
+    {
+        return stride::ast::CLASS_DECLARATION;
+    }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 };

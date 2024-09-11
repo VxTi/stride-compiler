@@ -3,9 +3,7 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 
-using namespace stride::ast;
-
-class NEnumerableDeclaration : public Node
+class NEnumerableDeclaration : public stride::ast::Node
 {
 public:
 
@@ -31,6 +29,6 @@ public:
      */
     static void parse(TokenSet &tokenSet, Node &parent);
 
-    enum ENodeType getType() override
-    { return ENUMERABLE_DECLARATION; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::ENUMERABLE_DECLARATION; }
 };

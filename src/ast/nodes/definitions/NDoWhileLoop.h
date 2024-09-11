@@ -5,8 +5,6 @@
 
 #include "NWhileLoop.h"
 
-using namespace stride::ast;
-
 /**
      * Represents a do-while loop.
      * Do-while loops are used to repeat a block of code while a condition is true.
@@ -27,8 +25,8 @@ public:
     explicit NDoWhileLoop() : NDoWhileLoop(nullptr, nullptr)
     {}
 
-    enum ENodeType getType() override
-    { return DO_WHILE_LOOP; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::DO_WHILE_LOOP; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

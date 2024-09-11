@@ -1,11 +1,7 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NExpression.h"
-#include "NLiteral.h"
-
-using namespace stride::ast;
 
 /**
  * Function call.
@@ -14,7 +10,7 @@ using namespace stride::ast;
  * &lt;functionName&gt;(&lt;argument&gt;, ...)
  * </code>
  */
-class NFunctionCall : public Node
+class NFunctionCall : public stride::ast::Node
 {
 public:
     std::string function_name;
@@ -46,8 +42,8 @@ public:
         this->addArgument(new NExpression((char *) argument->value));
     }
 
-    enum ENodeType getType() override
-    { return FUNCTION_CALL; }
+    enum stride::ast::ENodeType getType() override
+    { return stride::ast::FUNCTION_CALL; }
 
     static void parse(TokenSet &tokenSet, Node &parent);
 

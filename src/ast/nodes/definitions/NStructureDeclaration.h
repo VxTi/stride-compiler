@@ -4,7 +4,6 @@
 #include "../../../tokens/token.h"
 #include "NVariableDeclaration.h"
 
-using namespace stride::ast;
 /**
  * Structure declaration.
  * Structures are defined using the following format: <br />
@@ -13,7 +12,7 @@ using namespace stride::ast;
  *  &nbsp;&lt;field&gt; ...
  *  }
  */
-class NStructureDeclaration : public Node
+class NStructureDeclaration : public stride::ast::Node
 {
 private:
 
@@ -39,9 +38,9 @@ public:
     }
 
 
-    enum ENodeType getType() override
+    enum stride::ast::ENodeType getType() override
     {
-        return STRUCTURE_DECLARATION;
+        return stride::ast::STRUCTURE_DECLARATION;
     }
 
     static void parse(TokenSet &tokenSet, Node &parent);
