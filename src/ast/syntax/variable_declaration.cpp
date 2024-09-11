@@ -64,7 +64,8 @@ void stride::ast::parse_variable_declaration_segment(ast_token_set_t &token_set,
     else if ( !peekeq(token_set, index + identifier_len + 2, TOKEN_SEMICOLON) &&
               !peekeq(token_set, index + identifier_len + 2, TOKEN_COMMA))
     {
-        blame_token(token_set.tokens[ index + identifier_len + 2 ], "Variable declaration requires a valid postfix notation. This can be done using assignment, a comma separator for next declaration or a semicolon.");
+        blame_token(token_set.tokens[ index + identifier_len + 2 ],
+                    "Variable declaration requires a valid postfix notation. This can be done using assignment, a comma separator for next declaration or a semicolon.");
     }
     root.add_branch(variable_declaration_node);
 }

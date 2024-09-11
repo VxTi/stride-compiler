@@ -5,7 +5,8 @@
 #ifndef STRIDE_LANGUAGE_VARIABLE_TYPES_H
 #define STRIDE_LANGUAGE_VARIABLE_TYPES_H
 
-namespace stride::ast::types {
+namespace stride::ast::types
+{
     /**
      * Checks if the required_token type is an integer.
      * @param type The required_token type to check.

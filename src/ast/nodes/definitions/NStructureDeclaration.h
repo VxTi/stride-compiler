@@ -33,7 +33,8 @@ public:
         fields->push_back(field);
     }
 
-    void setName(const char *name) {
+    void setName(const char *name)
+    {
         structure_name = name;
     }
 

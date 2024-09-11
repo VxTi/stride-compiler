@@ -112,23 +112,23 @@ const std::map<token_type_t, struct expression_segment_t> expressions = {
                                               .flags = AST_OPERATION_MUL }},
         { TOKEN_DOUBLE_STAR_EQUALS,   { .associativity = ASSOCIATIVITY_LEFT, .precedence = 50,  // **=
                                               .flags = AST_OPERATION_MUL }},
-        { TOKEN_CARET_EQUALS,  { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45, //  ^=
+        { TOKEN_CARET_EQUALS,         { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45, //  ^=
                                               .flags = AST_OPERATION_MUL }},
 
 
-        { TOKEN_DOUBLE_PLUS,   { .associativity = ASSOCIATIVITY_LEFT |
+        { TOKEN_DOUBLE_PLUS,          { .associativity = ASSOCIATIVITY_LEFT |
                                                          ASSOCIATIVITY_RIGHT, .precedence = 55 }}, // ++
-        { TOKEN_DOUBLE_MINUS,  { .associativity = ASSOCIATIVITY_LEFT |
+        { TOKEN_DOUBLE_MINUS,         { .associativity = ASSOCIATIVITY_LEFT |
                                                          ASSOCIATIVITY_RIGHT, .precedence = 55 }}, // --
 
         /* Comparison operators */
-        { TOKEN_LARROW,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <
-        { TOKEN_RARROW,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >
-        { TOKEN_LEQUALS,       { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <=
-        { TOKEN_GEQUALS,       { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >=
-        { TOKEN_DOUBLE_EQUALS, { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // ==
-        { TOKEN_NOT_EQUALS,    { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // !=
-        { TOKEN_EQUALS,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // = (assignment)
+        { TOKEN_LARROW,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <
+        { TOKEN_RARROW,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >
+        { TOKEN_LEQUALS,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // <=
+        { TOKEN_GEQUALS,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // >=
+        { TOKEN_DOUBLE_EQUALS,        { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // ==
+        { TOKEN_NOT_EQUALS,           { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // !=
+        { TOKEN_EQUALS,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 10 }}, // = (assignment)
 };
 
 void shunting_yard(ast_token_set_t &token_set, int cursor, int token_count, Node &parent_node)
@@ -141,9 +141,9 @@ void shunting_yard(ast_token_set_t &token_set, int cursor, int token_count, Node
     for ( i = 0; i < token_count; i++ )
     {
         j = cursor + i;
-        if ( types::is_valid_literal_value(token_set.tokens[j].type))
+        if ( types::is_valid_literal_value(token_set.tokens[ j ].type))
         {
-            literal_queue.push_back(token_set.tokens[j]);
+            literal_queue.push_back(token_set.tokens[ j ]);
         }
     }
 }

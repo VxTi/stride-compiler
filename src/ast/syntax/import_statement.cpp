@@ -23,7 +23,7 @@ int stride::ast::parse_import_statement(ast_token_set_t &token_set, cursor_t ind
 {
     requires_token(TOKEN_STRING_LITERAL, token_set, index, "Expected string literal for import");
 
-    if ( root.node_type != NODE_TYPE_BLOCK || !(root.flags & FLAG_SCOPE_GLOBAL))
+    if ( root.node_type != NODE_TYPE_BLOCK || !( root.flags & FLAG_SCOPE_GLOBAL ))
     {
         blame_token(token_set.tokens[ index ], "Import statements must be at the top of the file.");
         return 0;

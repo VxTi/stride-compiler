@@ -2,20 +2,17 @@
 // Created by Luca Warmenhoven on 27/08/2024.
 //
 
-#include "../ASTNodes.h"
 #include "../Lookahead.h"
-#include "../../error/ast_error_handling.h"
 #include "../NodeProperties.h"
+#include "definitions/NClassDeclaration.h"
 
-using namespace stride::ast;
-
-stride::ast::NClassDeclaration::~NClassDeclaration()
+NClassDeclaration::~NClassDeclaration()
 {
-    for (auto &parent : *parents)
+    for ( auto &parent: *parents )
     {
         delete parent;
     }
-    for (auto &generic : *generics)
+    for ( auto &generic: *generics )
     {
         delete generic;
     }
@@ -37,25 +34,27 @@ stride::ast::NClassDeclaration::~NClassDeclaration()
  * @return The number of tokens skipped.
  * @see parse_class
  */
-void stride::ast::NClassDeclaration::parse(TokenSet &tokens, Node &parent)
+void NClassDeclaration::parse(TokenSet &tokens, Node &parent)
 {
     // First inheritance class
     auto *nst_class = new NClassDeclaration();
-    nst_class->class_name = tokens.consumeRequired(TOKEN_IDENTIFIER, "Class inheritance requires parent class name.").value;
+    nst_class->class_name = tokens.consumeRequired(TOKEN_IDENTIFIER,
+                                                   "Class inheritance requires parent class name.").value;
 
     printf("Class name: %s\n", nst_class->class_name.c_str());
 
-    parseGenerics(tokens, *nst_class->generics);
+    stride::ast::parseGenerics(tokens, *nst_class->generics);
 
-    if (tokens.consume(TOKEN_KEYWORD_HAS))
+    if ( tokens.consume(TOKEN_KEYWORD_HAS))
     {
-        do {
-            nst_class->addParent(parseIdentifier(tokens));
-        } while (tokens.consume(TOKEN_KEYWORD_AND));
+        do
+        {
+            nst_class->addParent(stride::ast::parseIdentifier(tokens));
+        } while ( tokens.consume(TOKEN_KEYWORD_AND));
     }
 
-    auto *subset = captureBlock(tokens, TOKEN_LBRACE, TOKEN_RBRACE);
+    auto *subset = stride::ast::captureBlock(tokens, TOKEN_LBRACE, TOKEN_RBRACE);
     auto *nst_class_block = new NBlock();
-    parser::parse(*subset, *nst_class_block);
+    stride::ast::parser::parse(*subset, *nst_class_block);
     nst_class->body = nst_class_block;
 }

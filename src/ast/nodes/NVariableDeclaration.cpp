@@ -2,13 +2,14 @@
 // Created by Luca Warmenhoven on 11/09/2024.
 //
 
-#include "../ASTNodes.h"
+#include "definitions/NVariableDeclaration.h"
 #include "../NodeProperties.h"
 
 using namespace stride::ast;
 
-NVariableDeclaration * NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration,
-                                                 bool allowVariadic)
+NVariableDeclaration *
+NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration,
+                                    bool allowVariadic)
 {
     auto nstVariableDecl = new NVariableDeclaration();
 
@@ -49,15 +50,15 @@ NVariableDeclaration * NVariableDeclaration::parseSingular(TokenSet &tokenSet, b
     nstVariableDecl->setIsArray(tokenSet.consume(TOKEN_LSQUARE_BRACKET) && tokenSet.consume(TOKEN_RSQUARE_BRACKET));
 
     // Variadic checks
-    if (tokenSet.consume(TOKEN_THREE_DOTS))
+    if ( tokenSet.consume(TOKEN_THREE_DOTS))
     {
-        if (!allowVariadic)
+        if ( !allowVariadic )
         {
             tokenSet.error("Variadic variable declarations are not allowed here.");
             return nullptr;
         }
 
-        if (nstVariableDecl->isArray)
+        if ( nstVariableDecl->isArray )
         {
             tokenSet.error("Variable is already declared as array.");
             return nullptr;
@@ -98,7 +99,7 @@ NVariableDeclaration * NVariableDeclaration::parseSingular(TokenSet &tokenSet, b
     return nstVariableDecl;
 }
 
-void stride::ast::NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
+void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
 {
     if ( !tokens.canConsume(TOKEN_KEYWORD_LET) && !tokens.canConsume(TOKEN_KEYWORD_CONST))
     {

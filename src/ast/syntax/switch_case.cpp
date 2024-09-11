@@ -84,7 +84,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
 
         case_node->add_branch(switch_case_content_node);
 
-        if (case_node->node_type == NODE_TYPE_DEFAULT)
+        if ( case_node->node_type == NODE_TYPE_DEFAULT )
         {
             default_node = case_node;
         }
@@ -96,7 +96,7 @@ void parse_switch_case_content(ast_token_set_t &token_set, Node &root)
         i += block_length + block_start_offset + 2;
     }
     // Default node is always at last.
-    if ( default_node != nullptr)
+    if ( default_node != nullptr )
     {
         root.add_branch(default_node);
     }

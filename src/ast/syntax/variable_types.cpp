@@ -20,7 +20,7 @@ int stride::ast::types::is_integer(token_type_t type)
 
 int stride::ast::types::is_functional_keyword(token_type_t type)
 {
-    switch (type )
+    switch ( type )
     {
         case TOKEN_KEYWORD_CLASS:
         case TOKEN_KEYWORD_MODULE:

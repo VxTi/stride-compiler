@@ -95,7 +95,7 @@ int stride::ast::parse_if_else(ast_token_set_t &token_set, cursor_t index, Node 
             }
             ast_token_set_t segment = {
                     .tokens = token_set.tokens + skipped + 1,
-                    .token_count = static_cast<unsigned int>((semicolon_index - skipped - 1))
+                    .token_count = static_cast<unsigned int>(( semicolon_index - skipped - 1 ))
             };
             parse_tokens(if_body_node, segment);
         }

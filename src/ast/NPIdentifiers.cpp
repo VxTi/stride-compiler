@@ -7,16 +7,16 @@
 
 stride::ast::NIdentifier *stride::ast::parseIdentifier(TokenSet &tokenSet)
 {
-    if (!tokenSet.canConsume(TOKEN_IDENTIFIER))
+    if ( !tokenSet.canConsume(TOKEN_IDENTIFIER))
     {
         stride::error::error(tokenSet.getSource(), tokenSet.getIndex(), "Expected identifier");
     }
     std::string identifierName = "";
     token_t next_token;
-    do {
+    do
+    {
         next_token = tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected identifier after double colon.");
         identifierName.append("__").append(next_token.value);
-    }
-    while (tokenSet.consume(TOKEN_DOUBLE_COLON));
+    } while ( tokenSet.consume(TOKEN_DOUBLE_COLON));
     return new NIdentifier(identifierName);
 }

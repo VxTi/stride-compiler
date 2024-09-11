@@ -3,8 +3,7 @@
 //
 
 #include "../ASTNodes.h"
-
-using namespace stride::ast;
+#include "definitions/NExpression.h"
 
 NExpression *NExpression::parse(TokenSet &tokenSet)
 {
@@ -14,7 +13,7 @@ NExpression *NExpression::parse(TokenSet &tokenSet)
     return nstExpression;
 }
 
-void stride::ast::NExpression::parse(TokenSet &tokenSet, Node &parent)
+void NExpression::parse(TokenSet &tokenSet, Node &parent)
 {
     parent.addChild(NExpression::parse(tokenSet));
 }

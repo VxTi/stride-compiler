@@ -1,5 +1,4 @@
 #include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 
@@ -14,7 +13,7 @@ public:
 
     void addValue(const char *key, long int value)
     {
-        values [ key ] = value;
+        values[ key ] = value;
     }
 
     void addValue(std::string &key, long int value)

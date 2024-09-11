@@ -32,7 +32,7 @@ int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node 
         return 0;
     }
 
-    if (!is_valid_generic_type(token_set.tokens[ index + 1 ].type, accept_literals))
+    if ( !is_valid_generic_type(token_set.tokens[ index + 1 ].type, accept_literals))
     {
         blame_token(token_set.tokens[ index ], "Generic current must be a valid literal or identifier.");
         return 0;
@@ -50,10 +50,10 @@ int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node 
     }
 
     int skipped = 2;
-    for (; index + skipped < token_set.token_count;)
+    for ( ; index + skipped < token_set.token_count; )
     {
         requires_token(TOKEN_COMMA, token_set, index + skipped, "Expected comma after generic identifier.");
-        if (!is_valid_generic_type(token_set.tokens[ index + skipped + 1 ].type, accept_literals))
+        if ( !is_valid_generic_type(token_set.tokens[ index + skipped + 1 ].type, accept_literals))
         {
             blame_token(token_set.tokens[ index + skipped ], "Generic current must be a valid literal or identifier.");
         }
@@ -63,7 +63,7 @@ int stride::ast::parse_generic(ast_token_set_t &token_set, cursor_t index, Node 
 
         skipped += 2;
         // Check if we've reached the end of the generic definition
-        if (peekeq(token_set, index + skipped, TOKEN_RARROW))
+        if ( peekeq(token_set, index + skipped, TOKEN_RARROW))
         {
             skipped++;
             break;

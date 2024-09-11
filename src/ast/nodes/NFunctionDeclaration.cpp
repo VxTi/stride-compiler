@@ -5,9 +5,7 @@
 #include "../ASTNodes.h"
 #include "../Lookahead.h"
 #include "../NodeProperties.h"
-
-using namespace stride::ast;
-
+#include "definitions/NFunctionDeclaration.h"
 
 /**
  * Parses a function declaration.
@@ -72,7 +70,7 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
             tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected function name after function declaration.").value);
 
     // Capture block for function parameter body, aka the part after the function name between the parenthesis
-    auto *fnParameterSet = captureBlock(tokenSet, TOKEN_LPAREN, TOKEN_RPAREN);
+    auto *fnParameterSet = stride::ast::captureBlock(tokenSet, TOKEN_LPAREN, TOKEN_RPAREN);
 
     if ( fnParameterSet == nullptr )
     {
@@ -113,7 +111,8 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
             // If the variable type is a reference to a class within a module, use identifier as type.
             // Otherwise, we'll use the token value as the type.
             nstFnParameter->setVariableType(
-                    fnParameterSet->canConsume(TOKEN_IDENTIFIER) ? parseIdentifier(tokenSet) : new NIdentifier(
+                    fnParameterSet->canConsume(TOKEN_IDENTIFIER) ? stride::ast::parseIdentifier(tokenSet)
+                                                                 : new NIdentifier(
                             tokenSet.next().value)
             );
 
@@ -140,7 +139,7 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
     if ( !nstFunctionDecl->external )
     {
-        auto *fnBodySet = captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
+        auto *fnBodySet = stride::ast::captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
         if ( fnBodySet == nullptr )
         {
             tokenSet.error("Function declaration requires a function body, but received none.");

@@ -8,8 +8,10 @@
 #include <string>
 #include "../tokens/TokenSet.h"
 #include "ASTNodes.h"
+#include "nodes/definitions/NIdentifier.h"
 
-namespace stride::ast {
+namespace stride::ast
+{
 
     /**
      * Parses a sequence that represents class/structure generics.
@@ -31,7 +33,7 @@ namespace stride::ast {
      * @param tokenSet
      * @param identifierDst
      */
-    NIdentifier* parseIdentifier(TokenSet &tokenSet);
+    NIdentifier *parseIdentifier(TokenSet &tokenSet);
 
 
     /**

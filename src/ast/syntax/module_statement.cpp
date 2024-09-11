@@ -41,7 +41,7 @@ int stride::ast::parse_module_statement(ast_token_set_t &token_set, cursor_t ind
     // Capture the closure after the namespace
     ast_token_set_t *shared_block_tokens = captureBlock(token_set, TOKEN_LBRACE, TOKEN_RBRACE, index + skipped);
 
-    if (shared_block_tokens->token_count == 0)
+    if ( shared_block_tokens->token_count == 0 )
     {
         blame_token(*next_token, "Expected block after module declaration");
     }

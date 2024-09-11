@@ -8,7 +8,7 @@
 bool stride::ast::validateVariableType(TokenSet &tokenSet)
 {
     token_type_t type = tokenSet.current().type;
-    switch (type)
+    switch ( type )
     {
         case TOKEN_IDENTIFIER:
         case TOKEN_PRIMITIVE_INT8:

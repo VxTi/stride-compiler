@@ -138,7 +138,7 @@ int stride::ast::parse_enumerable(ast_token_set_t &token_set, cursor_t index, No
             offset = 4;
         }
 
-        int * enum_value_allocated = (int *) malloc(sizeof(int));
+        int *enum_value_allocated = (int *) malloc(sizeof(int));
         *enum_value_allocated = '0' + enum_value;
 
         enum_member->add_branch(new Node(NODE_TYPE_VALUE, 0, enum_value_allocated));

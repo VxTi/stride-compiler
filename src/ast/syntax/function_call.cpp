@@ -31,7 +31,8 @@ int stride::ast::parse_function_call(ast_token_set_t &token_set, cursor_t index,
         {
             // Ensure the expression length is either the length of the expression or the length of the arguments.
             temp_expression_length = distance_next_token_outside_block(*function_call_arguments, i, TOKEN_COMMA);
-            expression_length = temp_expression_length <= 0 ? function_call_arguments->token_count - i: temp_expression_length;
+            expression_length =
+                    temp_expression_length <= 0 ? function_call_arguments->token_count - i : temp_expression_length;
 
             parse_expression(*function_call_arguments, i, expression_length, *function_call_params_node);
 

@@ -4,14 +4,13 @@
 
 #include "../ASTNodes.h"
 #include "../Lookahead.h"
-
-using namespace stride::ast;
+#include "definitions/NEnumerableDeclaration.h"
 
 void NEnumerableDeclaration::parse(TokenSet &tokenSet, Node &parent)
 {
     tokenSet.consumeRequired(TOKEN_KEYWORD_ENUM, "Enumerable declaration requires 'enum' keyword.");
 
-    auto enumSubSet = captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
+    auto enumSubSet = stride::ast::captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
 
     if ( enumSubSet == nullptr )
     {
@@ -43,7 +42,7 @@ void NEnumerableDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
     // Since all members must have been processed, there's not supposed
     // to be any tokens remaining in the subset.
-    if (enumSubSet->hasNext())
+    if ( enumSubSet->hasNext())
     {
         tokenSet.error("Illegal trailing token.");
         return;

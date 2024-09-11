@@ -103,6 +103,7 @@ public:
      * @param allowVariadic Whether or not the assignment allows variadic declaration.
      * @return An pointer to a variable declaration node.
      */
-    static NVariableDeclaration *parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration, bool allowVariadic);
+    static NVariableDeclaration *
+    parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration, bool allowVariadic);
 
 };

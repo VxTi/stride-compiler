@@ -7,7 +7,8 @@
 
 #include "../tokens/TokenSet.h"
 
-namespace stride::ast {
+namespace stride::ast
+{
 
     /**
      * Captures a block of tokens that is enclosed by the provided start and end tokens.

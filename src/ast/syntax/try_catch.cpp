@@ -20,7 +20,8 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
         return 0;
     }
 
-    requires_token(TOKEN_KEYWORD_CATCH, token_set, index + try_body_tokens->token_count + 2, "Catch statement requires after try block.");
+    requires_token(TOKEN_KEYWORD_CATCH, token_set, index + try_body_tokens->token_count + 2,
+                   "Catch statement requires after try block.");
 
     // Capture the block of the catch variable
     // This is the variable that will be caught in the catch block
@@ -39,8 +40,8 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
     if ( strcmp((char *) catch_variable_tokens->tokens[ 2 ].current, "Error") != 0 )
     {
         error("\nCatch expression requires 'Error' type after parameter name, at line %d column %d.\nThis is to ensure all exceptions are handled properly.\n",
-              catch_variable_tokens->tokens[2].line,
-              catch_variable_tokens->tokens[2].column);
+              catch_variable_tokens->tokens[ 2 ].line,
+              catch_variable_tokens->tokens[ 2 ].column);
     }
 
     // Capture the block of the catch expression
@@ -49,7 +50,8 @@ int stride::ast::parse_try_catch(stride::ast::ast_token_set_t &token_set, cursor
                                                       catch_variable_tokens->token_count + 5);
     if ( catch_body_tokens == nullptr )
     {
-        token_t fault_start = token_set.tokens[index + try_body_tokens->token_count + catch_variable_tokens->token_count + 5];
+        token_t fault_start = token_set.tokens[ index + try_body_tokens->token_count +
+                                                catch_variable_tokens->token_count + 5 ];
         error("Catch expression requires block statement after declaration.\nThis might have gone wrong due to a missing closing brace, at line %d column %d.",
               fault_start.line,
               fault_start.column);

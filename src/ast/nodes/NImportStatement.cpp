@@ -3,8 +3,7 @@
 //
 
 #include "../ASTNodes.h"
-
-using namespace stride::ast;
+#include "definitions/NImportStatement.h"
 
 void NImportStatement::parse(TokenSet &tokenSet, stride::ast::Node &parent)
 {
