@@ -16,13 +16,25 @@ namespace stride
 
     private:
 
-        std::string &path;
+        std::string *content;
+        std::string *filePath;
         std::map<std::string, std::variant<std::string, long int>> compilerFlags;
 
     public:
 
-        explicit StrideFile(std::string &path) : path(path)
-        {}
+        explicit StrideFile(std::string &path);
+
+        ~StrideFile();
+
+        /**
+         * Returns the path to the file.
+         */
+        std::string &path();
+
+        /**
+         * Returns the content of the file.
+         */
+        std::string &getContent();
 
         /**
          * Sets a compiler flag.
@@ -47,6 +59,11 @@ namespace stride
          */
         void compile();
 
+        /**
+         * Interprets the file.
+         * This will read the file, compile it and interpret the output.
+         * This is not yet implemented.
+         */
         void interpret();
 
     };

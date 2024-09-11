@@ -5,8 +5,6 @@
 #ifndef STRIDE_LANGUAGE_VARIABLE_TYPES_H
 #define STRIDE_LANGUAGE_VARIABLE_TYPES_H
 
-#include "../abstractions/AST.h"
-
 namespace stride::ast::types {
     /**
      * Checks if the required_token type is an integer.

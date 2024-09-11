@@ -3,7 +3,7 @@
 //
 
 #include "../abstractions/AST.h"
-#include "../abstractions/ASTNodeAbstractions.h"
+#include "../ASTNodes.h"
 
 using namespace stride::ast;
 

@@ -2,13 +2,13 @@
 // Created by Luca Warmenhoven on 09/09/2024.
 //
 
-#ifndef STRIDE_LANGUAGE_ASTNODEABSTRACTIONS_H
-#define STRIDE_LANGUAGE_ASTNODEABSTRACTIONS_H
+#ifndef STRIDE_LANGUAGE_ASTNODES_H
+#define STRIDE_LANGUAGE_ASTNODES_H
 
 #include <vector>
 #include "AST.h"
-#include "TokenSet.h"
-#include "../../tokens/token.h"
+#include "../tokens/TokenSet.h"
+#include "../tokens/token.h"
 
 namespace stride::ast
 {
@@ -84,7 +84,7 @@ namespace stride::ast
          * @param tokens The token stream to parse.
          * @param parent The parent node to append the children to.
          */
-        static void parse(TokenSet &tokens, Node &parent)
+        static void parse(TokenSet &tokenSet, Node &parent)
         {}
 
         /**
@@ -189,6 +189,8 @@ namespace stride::ast
 
         NExpression() = default;
 
+        static void parse(TokenSet &tokenSet, Node &parent);
+
         enum NType getType() override
         { return EXPRESSION; }
     };
@@ -214,7 +216,7 @@ namespace stride::ast
         enum NType getType() override
         { return ARRAY; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -235,7 +237,7 @@ namespace stride::ast
         enum NType getType() override
         { return RETURN_STATEMENT; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -255,7 +257,7 @@ namespace stride::ast
         enum NType getType() override
         { return THROW_STATEMENT; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -315,7 +317,7 @@ namespace stride::ast
         enum NType getType() override
         { return BINARY_OPERATOR; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     enum EUnaryOperator
@@ -347,7 +349,7 @@ namespace stride::ast
         enum NType getType() override
         { return UNARY_OPERATOR; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     class NModuleDeclaration : public Node
@@ -362,7 +364,7 @@ namespace stride::ast
         enum NType getType() override
         { return MODULE_DECLARATION; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -380,10 +382,10 @@ namespace stride::ast
     public:
         NIdentifier *variable_name;
         NIdentifier *variable_type;
-        bool immutable;
-        bool is_array;
+        bool isConst;
+        bool isArray;
 
-        NVariableDeclaration() : immutable(false), is_array(false)
+        NVariableDeclaration() : isConst(false), isArray(false)
         {}
 
         /**
@@ -412,27 +414,29 @@ namespace stride::ast
         }
 
         /**
-         * Updates whether this variable is an array or not.
-         * @param is_array Whether it's an array.
+         * Updates whether this variable is an isVariableArray or not.
+         * @param isVariableArray Whether it's an isVariableArray.
          */
-        void setIsArray(bool is_array)
+        void setIsArray(bool isVariableArray)
         {
-            this->is_array = is_array;
+            this->isArray = isVariableArray;
         }
 
         /**
          * Changes whether this variable is mutable or not (constant)
-         * @param immutable Whether the variable is mutable or not.
+         * @param isConst Whether the variable is mutable or not.
          */
-        void setImmutable(bool immutable)
+        void setConst(bool isConstant)
         {
-            this->immutable = immutable;
+            this->isConst = isConstant;
         }
 
         enum NType getType() override
-        { return VARIABLE_DECLARATION; }
+        {
+            return VARIABLE_DECLARATION;
+        }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -468,7 +472,7 @@ namespace stride::ast
         enum NType getType() override
         { return TRY_CATCH_CLAUSE; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -514,7 +518,7 @@ namespace stride::ast
         enum NType getType() override
         { return FUNCTION_DECLARATION; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSetet, Node &parent);
     };
 
     /**
@@ -559,7 +563,7 @@ namespace stride::ast
         enum NType getType() override
         { return FUNCTION_CALL; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -596,7 +600,7 @@ namespace stride::ast
         enum NType getType() override
         { return OPERATOR_OVERLOAD; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -606,11 +610,12 @@ namespace stride::ast
 
         std::map<std::string, long int> values;
 
-        NEnumerable() = default;
+        NEnumerableDeclaration() : values()
+        {};
 
         void addValue(std::string key, long int value)
         {
-            values[key] = value;
+            values[ key ] = value;
         }
 
         enum NType getType() override
@@ -636,7 +641,8 @@ namespace stride::ast
          * @param structure_name The name of the structure.
          */
         explicit NStructureDeclaration(std::string structure_name) :
-                structure_name(std::move(structure_name))
+                structure_name(std::move(structure_name)),
+                fields()
         {}
 
         /**
@@ -661,7 +667,7 @@ namespace stride::ast
         enum NType getType() override
         { return STRUCTURE_DECLARATION; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -727,7 +733,7 @@ namespace stride::ast
         enum NType getType() override
         { return SWITCH_CASE; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -776,7 +782,7 @@ namespace stride::ast
         enum NType getType() override
         { return SWITCH_STATEMENT; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -795,20 +801,13 @@ namespace stride::ast
     {
     public:
         std::string class_name;
-        std::vector<NIdentifier *> parents;
-        std::vector<NVariableDeclaration *> fields;
-        std::vector<NFunctionDeclaration *> methods;
-        std::vector<NIdentifier *> generics;
+        std::vector<NIdentifier *> *parents;
+        std::vector<NIdentifier *> *generics;
+        NBlock *body;
 
-        NClassDeclaration() = default;
+        NClassDeclaration();
 
-        /**
-         * Create a new class declaration
-         * @param class_name The name of the class.
-         */
-        explicit NClassDeclaration(std::string class_name) :
-                class_name(std::move(class_name))
-        {}
+        ~NClassDeclaration();
 
         /**
          * Add a parent class to the class declaration.
@@ -816,25 +815,7 @@ namespace stride::ast
          */
         void addParent(NIdentifier *parent)
         {
-            parents.push_back(parent);
-        }
-
-        /**
-         * Add a field to the class declaration
-         * @param field The field to add.
-         */
-        void addField(NVariableDeclaration *field)
-        {
-            fields.push_back(field);
-        }
-
-        /**
-         * Add a method to the class declaration.
-         * @param method The method to add.
-         */
-        void addMethod(NFunctionDeclaration *method)
-        {
-            methods.push_back(method);
+            parents->push_back(parent);
         }
 
         /**
@@ -843,13 +824,13 @@ namespace stride::ast
          */
         void addClassGeneric(NIdentifier *generic)
         {
-            generics.push_back(generic);
+            generics->push_back(generic);
         }
 
         enum NType getType() override
         { return CLASS_DECLARATION; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -872,7 +853,7 @@ namespace stride::ast
         enum NType getType() override
         { return IMPORT_STATEMENT; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -907,7 +888,7 @@ namespace stride::ast
         enum NType getType() override
         { return WHILE_LOOP; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
     };
 
     /**
@@ -933,7 +914,7 @@ namespace stride::ast
         enum NType getType() override
         { return DO_WHILE_LOOP; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
@@ -996,25 +977,28 @@ namespace stride::ast
         enum NType getType() override
         { return FOR_LOOP; }
 
-        static void parse(TokenSet &tokens, Node &parent);
+        static void parse(TokenSet &tokenSet, Node &parent);
 
     };
 
-    /**
-     * Parses a token set and appends the generated nodes
-     * to a root node. This root node will then be returned.
-     * @param tokenSet The token set to parse
-     */
-    Node *parse(TokenSet &tokenSet);
+    namespace parser
+    {
 
-    /**
-     * Parses a token set and appends the generated nodes
-     * to the provided root node.
-     * @param tokenSet The token set to parse
-     * @param root The root node to append the generated nodes to.
-     */
-    void parse(TokenSet &tokenSet, Node &root);
+        /**
+         * Parses a token set and appends the generated nodes
+         * to a root node. This root node will then be returned.
+         * @param tokenSet The token set to parse
+         */
+        Node *parse(TokenSet &tokenSetet);
 
+        /**
+         * Parses a token set and appends the generated nodes
+         * to the provided root node.
+         * @param tokenSet The token set to parse
+         * @param root The root node to append the generated nodes to.
+         */
+        void parse(TokenSet &tokenSetet, Node &root);
+    }
 }
 
-#endif //STRIDE_LANGUAGE_ASTNODEABSTRACTIONS_H
+#endif //STRIDE_LANGUAGE_ASTNODES_H

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "ast/abstractions/AST.h"
-#include "ast/abstractions/StrideFile.h"
+#include "StrideFile.h"
 
 using namespace stride;
 

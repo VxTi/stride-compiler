@@ -5,7 +5,7 @@
 #ifndef STRIDE_LANGUAGE_LOOKAHEAD_H
 #define STRIDE_LANGUAGE_LOOKAHEAD_H
 
-#include "TokenSet.h"
+#include "../tokens/TokenSet.h"
 
 namespace stride::ast {
 
@@ -32,7 +32,7 @@ namespace stride::ast {
      * @param token
      * @return
      */
-    int distanceNextTokenExclude(TokenSet &stream, token_type_t token);
+    int distanceNextTokenInScope(TokenSet &stream, token_type_t token);
 
 }
 

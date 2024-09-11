@@ -4,6 +4,8 @@
 
 #include <regex.h>
 #include "tokenizer.h"
+#include "TokenSet.h"
+#include "../error/ast_error_handling.h"
 
 /**
  * Checks whether the provided character is a word boundary character,
@@ -52,16 +54,17 @@ void get_cursor_position(const char *source, size_t index, int *line, int *colum
  * @param source_size The size of the source code.
  * @param dst The destination required_token set.
  */
-TokenSet *stride::tokenize(std::string source)
+TokenSet *stride::tokenize(stride::StrideFile &source)
 {
     int matched, i, j, line, col;
 
     auto *tokens = new std::vector<token_t>();
+    const char *src = source.getContent().c_str();
 
-    for ( i = 0; i < source.size(); )
+    for ( i = 0; i < source.getContent().size(); )
     {
         // Skip whitespaces
-        if ( source[ i ] == ' ' || source[ i ] == '\n' || source[ i ] == '\t' )
+        if ( src[ i ] == ' ' || src[ i ] == '\n' || src[ i ] == '\t' )
         {
             i++;
             continue;
@@ -72,11 +75,11 @@ TokenSet *stride::tokenize(std::string source)
             regmatch_t match;
 
             // Check if we have a match, and if the match is at the beginning of the string
-            if ( !regexec(&token_definitions[ j ].regex, source + i, 1, &match, 0) && !match.rm_so )
+            if ( !regexec(&token_definitions[ j ].regex, src + i, 1, &match, 0) && !match.rm_so )
             {
                 if ((
-                            !is_word_boundary(source[ i + match.rm_eo ]) ||
-                            (i + match.rm_so - 1 >= 0 && !is_word_boundary(source[ i + match.rm_so - 1 ]))
+                            !is_word_boundary(src[ i + match.rm_eo ]) ||
+                            (i + match.rm_so - 1 >= 0 && !is_word_boundary(src[ i + match.rm_so - 1 ]))
                     ) && token_definitions[ j ].keyword )
                 {
                     continue;
@@ -85,12 +88,12 @@ TokenSet *stride::tokenize(std::string source)
                 token_t token;
                 token.type = token_definitions[ j ].token;
                 token.value = (char *) malloc(match.rm_eo - match.rm_so + 1);
-                get_cursor_position(source.c_str(), i, &line, &col);
+                get_cursor_position(src, i, &line, &col);
                 token.line = line;
                 token.column = col;
                 token.index = i;
 
-                memcpy((void *) token.value, source.c_str() + i + match.rm_so, match.rm_eo - match.rm_so);
+                memcpy((void *) token.value, src + i + match.rm_so, match.rm_eo - match.rm_so);
                 ((char *) token.value )[ match.rm_eo - match.rm_so ] = '\0';
                 i += match.rm_eo - match.rm_so;
                 matched = 1;
@@ -99,9 +102,9 @@ TokenSet *stride::tokenize(std::string source)
         }
         if ( !matched )
         {
-            error("Illegal character found in file.");
+            stride::error::error(source, i, "Illegal character found in file.");
         }
 
     }
-    return new TokenSet(*tokens);
+    return new TokenSet(*tokens, source);
 }

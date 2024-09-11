@@ -6,7 +6,8 @@
 #define STRIDE_LANGUAGE_TOKENSET_H
 
 #include <vector>
-#include "../../tokens/token.h"
+#include "token.h"
+#import "../StrideFile.h"
 
 /**
  * Represents a token stream.
@@ -17,23 +18,36 @@ class TokenSet
 private:
     // Fields for the token stream.
     std::vector<token_t> &tokens;
+    stride::StrideFile &source;
     int index;
-    unsigned long int length;
+    int startOffset = 0;
+    int length;
 
 public:
+
+    [[nodiscard]] stride::StrideFile &getSource() const;
 
     /**
      * Gets the length of the token stream.
      * @return The length of the token stream.
      */
-    unsigned long int size();
+    [[nodiscard]] unsigned long int size() const;
 
     /**
      * Gets the index of the token stream.
      * @return The index of the token stream.
      */
-    int getIndex();
+    [[nodiscard]] int getIndex() const;
 
+    void error(const char *message);
+
+    /**
+     * Checks if there are more tokens in the stream,
+     * relative to the starting index.
+     * @param fromIndex The index to start from.
+     * @return True if there are more tokens, false otherwise.
+     */
+    bool hasNext(int fromIndex);
 
     /**
      * Checks if there are more tokens in the stream.
@@ -48,10 +62,17 @@ public:
     token_t next();
 
     /**
+     * Gets the next token in the stream, relative to the starting index.
+     * @param fromIndex The index to start from.
+     * @return The next token in the stream.
+     */
+    token_t next(int *fromIndex);
+
+    /**
      * Peeks at the next token in the stream.
      * @return The next token in the stream.
      */
-    bool peekEq(token_type_t token, unsigned int offset);
+    bool peekEq(token_type_t token, int offset);
 
     /**
      * Consumes a token from the stream.
@@ -59,6 +80,15 @@ public:
      * @return True if the token was consumed, false otherwise.
      */
     bool consume(token_type_t token);
+
+    /**
+     * Consumes a token from the stream relative to the starting index.
+     * After consuming the token, the index is updated.
+     * @param token The token to consume.
+     * @param fromIndex The index to start from.
+     * @return True if the token was consumed, false otherwise.
+     */
+    bool consume(token_type_t token, int *fromIndex);
 
     /**
      * Consumes a token from the stream.
@@ -75,6 +105,14 @@ public:
     bool canConsume(token_type_t token);
 
     /**
+     * Checks if the next token in the stream is of a certain type.
+     * @param token The token to check for.
+     * @param fromIndex The index to start from.
+     * @return True if the next token is of the specified type, false otherwise.
+     */
+    bool canConsume(token_type_t token, int fromIndex);
+
+    /**
      * Returns the next token in the stream without consuming it.
      */
     token_t current();
@@ -83,16 +121,12 @@ public:
      * Creates a new token stream.
      * @param tokens The tokens to store in the stream.
      */
-    explicit TokenSet(std::vector<token_t> &tokens) :
+    explicit TokenSet(std::vector<token_t> &tokens, stride::StrideFile &source) :
             tokens(tokens),
+            source(source),
             index(0),
+            startOffset(0),
             length(tokens.size())
-    {}
-
-    explicit TokenSet(std::vector<token_t> &tokens, int startOffset) :
-            tokens(tokens),
-            index(startOffset),
-            length(tokens.size() - startOffset)
     {}
 
     /**
@@ -101,7 +135,7 @@ public:
      * but instead references the original vector and
      * updates the range of tokens to consider.
      */
-    TokenSet *subset(int startOffset, int endOffset);
+    TokenSet *subset(int startOffset, int length);
 
 };
 

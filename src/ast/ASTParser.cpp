@@ -2,19 +2,19 @@
 // Created by Luca Warmenhoven on 11/09/2024.
 //
 
-#include "ASTNodeAbstractions.h"
+#include "ASTNodes.h"
 #include <cstdio>
 
 using namespace stride::ast;
 
-Node *parse(TokenSet &tokenSet)
+Node *parser::parse(TokenSet &tokenSet)
 {
     auto *root = new Node();
-    parse(tokenSet, *root);
+    parser::parse(tokenSet, *root);
     return root;
 }
 
-void parse(TokenSet &tokenSet, stride::ast::Node &root)
+void parser::parse(TokenSet &tokenSet, stride::ast::Node &root)
 {
     for ( token_t token = tokenSet.current(); tokenSet.hasNext(); )
     {

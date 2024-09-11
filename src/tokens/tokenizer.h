@@ -6,11 +6,10 @@
 #define STRIDE_LANGUAGE_TOKENIZER_H
 
 #include "token.h"
-#include "../ast/abstractions/AST.h"
-
-using namespace stride::ast;
+#include "../StrideFile.h"
+#include "../tokens/TokenSet.h"
 
 namespace stride {
-    TokenSet * tokenize(std::string source);
+    TokenSet * tokenize(stride::StrideFile &source);
 }
 #endif //STRIDE_LANGUAGE_TOKENIZER_H

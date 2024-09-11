@@ -11,13 +11,11 @@ add_executable(stride_language src/main.cpp
         src/tokens/tokenizer.cpp
         src/tokens/tokenizer.h
         src/tokens/token.cpp
-        src/ast/ast_token_seeking.cpp
-        src/ast/ast_error_handling.cpp
-        src/ast/syntax/expressions.cpp
-        src/ast/abstractions/Lookahead.cpp
+        src/error/ast_error_handling.cpp
+        src/ast/Lookahead.cpp
+        #[[src/ast/syntax/expressions.cpp
         src/ast/syntax/module_statement.cpp
         src/ast/syntax/import_statement.cpp
-        src/ast/abstractions/NFunctionDeclaration.cpp
         src/ast/syntax/variable_declaration.cpp
         src/ast/syntax/identifiers.cpp
         src/ast/syntax/enumerables.cpp
@@ -30,20 +28,24 @@ add_executable(stride_language src/main.cpp
         src/ast/syntax/do_while.cpp
         src/ast/syntax/if_else.cpp
         src/ast/syntax/throw.cpp
-        src/ast/abstractions/NClassDeclaration.cpp
         src/ast/syntax/switch_case.cpp
-        src/ast/ast_error_handling.h
         src/ast/syntax/generics.cpp
         src/ast/syntax/structures.cpp
-        src/ast/syntax/returning.cpp
-        src/ast/abstractions/ASTNodeAbstractions.h
-        src/ast/abstractions/TokenSet.cpp
-        src/ast/abstractions/TokenSet.h
-        src/ast/TokenPatterns.cpp
-        src/ast/TokenPatterns.h
-        src/ast/TokenPatterns.h
-        src/ast/abstractions/StrideFile.cpp
-        src/ast/abstractions/StrideFile.h
-        src/ast/abstractions/ASTParser.cpp
-        src/ast/abstractions/Lookahead.h
+        src/ast/syntax/returning.cpp]]
+        src/ast/nodes/NFunctionDeclaration.cpp
+        src/ast/nodes/NClassDeclaration.cpp
+        src/ast/ASTNodes.h
+        src/tokens/TokenSet.cpp
+        src/tokens/TokenSet.h
+        src/error/ast_error_handling.h
+        src/StrideFile.cpp
+        src/StrideFile.h
+        src/ast/ASTParser.cpp
+        src/ast/Lookahead.h
+        src/ast/NodeProperties.h
+        src/ast/NPGenerics.cpp
+        src/ast/NPIdentifiers.cpp
+        src/ast/NPTypes.cpp
+        src/ast/nodes/NVariableDeclaration.cpp
+        src/ast/nodes/NExpression.cpp
 )
