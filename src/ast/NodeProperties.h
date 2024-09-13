@@ -19,7 +19,7 @@ namespace stride::ast
      * @param tokenSet
      * @param genericsDst
      */
-    void parseGenerics(TokenSet &tokenSet, std::vector<NIdentifier *> &genericsDst);
+    void parseGenerics(TokenSet &tokenSet, std::vector<std::string *> &genericsDst);
 
     /**
      * Parses a sequence of identifiers and converts it to an internal name.

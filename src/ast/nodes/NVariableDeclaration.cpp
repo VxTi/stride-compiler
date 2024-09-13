@@ -7,6 +7,8 @@
 
 using namespace stride::ast;
 
+#include <utility>
+
 NVariableDeclaration *
 NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration,
                                     bool allowVariadic)
@@ -41,7 +43,9 @@ NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bo
     // Parse variable type, identifier(sequence) or primitive
     // and continue parsing the variable declaration.
     nstVariableDecl->setVariableType(
-            tokenSet.canConsume(TOKEN_IDENTIFIER) ? parseIdentifier(tokenSet) : new NIdentifier(tokenSet.next().value)
+            tokenSet.canConsume(TOKEN_IDENTIFIER) ?
+            std::variant<std::string *, token_type_t>(&stride::ast::parseIdentifier(tokenSet)->name) :
+            std::variant<std::string *, token_type_t>(tokenSet.next().type)
     );
 
     // Check if the variable is an array.
@@ -132,8 +136,14 @@ void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
         // Parse variable type, identifier(sequence) or primitive
         // and continue parsing the variable declaration.
         nstVariableDecl->setVariableType(
-                tokens.canConsume(TOKEN_IDENTIFIER) ? parseIdentifier(tokens) : new NIdentifier(tokens.next().value)
+                tokens.canConsume(TOKEN_IDENTIFIER) ?
+                std::variant<std::string *, token_type_t>(&stride::ast::parseIdentifier(tokens)->name) :
+                std::variant<std::string *, token_type_t>(tokens.next().type)
         );
+
+        printf("Variable name: %s\n", nstVariableDecl->varName->c_str());
+        printf("Variable type: %s\n", std::holds_alternative<std::string *>(nstVariableDecl->varType) ?
+                std::get<std::string *>(nstVariableDecl->varType)->c_str() : "Primitive");
 
         // Check if the variable is an array.
         // If this is the case, we'll have to check if the assignment is of an array type,
@@ -143,25 +153,8 @@ void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
         // Check if there's assignment or the declaration ends
         if ( tokens.consume(TOKEN_EQUALS))
         {
-            int expressionStart = tokens.getIndex();
-            int expressionLength = 0;
-
-            token_t next;
-
-            while (( next = tokens.next()).type != TOKEN_SEMICOLON && next.type != TOKEN_COMMA )
-            {
-                expressionLength++;
-            }
-
-            if ( expressionLength == 0 )
-            {
-                tokens.error("Expected expression after assignment operator.");
-                return;
-            }
-
-            auto nstExprSubSet = tokens.subset(expressionStart, expressionLength);
-            auto nstExpr = NExpression::parse(*nstExprSubSet);
-            nstVariableDecl->setValue(nstExpr);
+            printf("Assignment found\n");
+            nstVariableDecl->setValue(NExpression::parse(tokens, false));
         }
 
         parent.addChild(nstVariableDecl);

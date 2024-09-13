@@ -1,11 +1,16 @@
 #ifndef STRIDE_LANGUAGE_NVARIABLEDECLARATION_H
 #define STRIDE_LANGUAGE_NVARIABLEDECLARATION_H
 
+#include <utility>
+
 #include "../../ASTNodes.h"
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NExpression.h"
 #include "NIdentifier.h"
+
+#define VARIABLE_TYPE_PRIMITIVE 0
+#define VARIABLE_TYPE_
 
 /**
  * Variable declaration.
@@ -19,33 +24,33 @@
 class NVariableDeclaration : public stride::ast::Node
 {
 private:
-    NIdentifier *varName;
-    NIdentifier *varType;
+
+    /**
+     * A variant that can either be a string pointer or a token definition.
+     * This makes it so that the type can be either a primitive type or a custom type.
+     */
+    std::variant<std::string *, token_type_t> varType;
+    std::string *varName;
+
     NExpression *value;
+    bool isPrimitiveType;
     bool isConst;
     bool isArray;
 
 public:
 
-    NVariableDeclaration() : isConst(false), isArray(false), varName(nullptr), varType(nullptr), value(nullptr)
+    NVariableDeclaration() : isConst(false), isArray(false),
+                             isPrimitiveType(false), varName(nullptr),
+                             varType(nullptr), value(nullptr)
     {}
 
     /**
      * Updates the name of the variable.
-     * @param variable_name
+     * @param variableName
      */
-    void setVariableName(NIdentifier *variable_name)
+    void setVariableName(std::string variableName)
     {
-        this->varName = variable_name;
-    }
-
-    /**
-     * Updates the name of the variable.
-     * @param variable_name
-     */
-    void setVariableName(std::string variable_name)
-    {
-        this->varName = new NIdentifier(variable_name);
+        this->varName = new std::string(std::move(variableName));
     }
 
     /**
@@ -63,9 +68,10 @@ public:
      * and can be validated after class instantiation.
      * @param variable_type The type node of the variable.
      */
-    void setVariableType(NIdentifier *variable_type)
+    void setVariableType(std::variant<std::string *, token_type_t> type)
     {
-        this->varType = variable_type;
+        this->varType = type;
+        this->isPrimitiveType = std::holds_alternative<std::string *>(type);
     }
 
     /**

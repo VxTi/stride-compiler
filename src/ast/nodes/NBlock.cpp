@@ -7,21 +7,19 @@
 
 TokenSet *NBlock::captureRaw(TokenSet &set)
 {
-    auto subset = stride::ast::captureBlock(set, TOKEN_LBRACE, TOKEN_RBRACE);
-
-    if (subset == nullptr)
-    {
-        set.error("Block requires opening and closing brackets.");
-        return nullptr;
-    }
-
-    return subset;
+    return stride::ast::captureBlock(set, TOKEN_LBRACE, TOKEN_RBRACE);
 }
 
 NBlock *NBlock::capture(TokenSet &set)
 {
     auto block = new NBlock();
     auto subset = NBlock::captureRaw(set);
+    printf("Captured block with length %lu\n", subset->size());
+    if (subset->size() == 0)
+    {
+        delete block;
+        return nullptr;
+    }
     stride::ast::parser::parse(*subset, *block);
     return block;
 }

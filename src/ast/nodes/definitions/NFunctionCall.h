@@ -5,6 +5,7 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NExpression.h"
+#include "NIdentifier.h"
 
 /**
  * Function call.
@@ -13,18 +14,18 @@
  * &lt;functionName&gt;(&lt;argument&gt;, ...)
  * </code>
  */
-class NFunctionCall : public stride::ast::Node
+class NFunctionCall : public NExpression
 {
 public:
-    std::string function_name;
+
     std::vector<NExpression *> arguments;
+    std::basic_string<char> *functionName;
 
     /**
      * Create a new function call with the given function name.
      * @param function_name The name of the function.
      */
-    explicit NFunctionCall(std::string function_name) :
-            function_name(std::move(function_name))
+    explicit NFunctionCall() : functionName(nullptr), arguments()
     {}
 
     /**
@@ -36,20 +37,10 @@ public:
         arguments.push_back(argument);
     }
 
-    /**
-     * Add a literal argument to the function call.
-     * @param argument The argument to add.
-     */
-    void addArgument(NLiteral *argument)
-    {
-        this->addArgument(new NExpression((char *) argument->value));
-    }
-
     enum stride::ast::ENodeType getType() override
-    { return stride::ast::FUNCTION_CALL; }
-
-    static void parse(TokenSet &tokenSet, Node &parent);
-
+    {
+        return stride::ast::FUNCTION_CALL;
+    }
 };
 
 #endif

@@ -8,13 +8,9 @@
 #include <vector>
 #include "../StrideFile.h"
 
-#define ERROR_LINE_BUFFER_SIZE 256
-
 namespace stride::error
 {
-
-    void error(StrideFile &file, int index, const char *message, ...);
-
+    void error(StrideFile &file, int index, int tokenLength, const char *message, ...);
 }
 
 #endif //STRIDE_LANGUAGE_AST_ERROR_HANDLING_H

@@ -25,17 +25,15 @@ class NUnaryOperator : public NExpression
 {
 public:
     enum EUnaryOperator operation;
-    NExpression &expression;
+    std::unique_ptr<NExpression> expression;
 
-    NUnaryOperator(enum EUnaryOperator operation, NExpression &expression) :
+    NUnaryOperator(enum EUnaryOperator operation, std::unique_ptr<NExpression> expression) :
             operation(operation),
-            expression(expression)
+            expression(std::move(expression))
     {}
 
     enum stride::ast::ENodeType getType() override
     { return stride::ast::UNARY_OPERATOR; }
-
-    static void parse(TokenSet &tokenSet, Node &parent);
 };
 
 #endif

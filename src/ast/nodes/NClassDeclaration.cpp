@@ -38,6 +38,7 @@ void NClassDeclaration::parse(TokenSet &tokens, Node &parent)
 {
     // First inheritance class
     auto *nstClassDecl = new NClassDeclaration();
+    tokens.consumeRequired(TOKEN_KEYWORD_CLASS, "Class declaration requires 'class' keyword.");
     nstClassDecl->className = tokens.consumeRequired(TOKEN_IDENTIFIER,
                                                      "Class inheritance requires parent class name.").value;
 

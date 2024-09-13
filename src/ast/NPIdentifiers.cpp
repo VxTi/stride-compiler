@@ -9,9 +9,10 @@ NIdentifier *stride::ast::parseIdentifier(TokenSet &tokenSet)
 {
     if ( !tokenSet.canConsume(TOKEN_IDENTIFIER))
     {
-        stride::error::error(tokenSet.getSource(), tokenSet.getIndex(), "Expected identifier");
+        tokenSet.error("Expected identifier.");
     }
-    std::string identifierName = "";
+
+    std::string identifierName;
     token_t next_token;
     do
     {

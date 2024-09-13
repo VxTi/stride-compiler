@@ -5,6 +5,7 @@
 #include "../../../tokens/TokenSet.h"
 #include "../../../tokens/token.h"
 #include "NExpression.h"
+#include "../../Reducible.h"
 
 /**
  * Represents a block.
@@ -13,33 +14,37 @@
  */
 enum EBinaryOperator
 {
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DIVIDE,
-    MODULO,
-    EQUALS,
-    NOT_EQUALS,
-    LESS_THAN,
-    GREATER_THAN,
-    LESS_THAN_EQUALS,
-    GREATER_THAN_EQUALS,
-    AND,
-    OR,
-    XOR,
-    SHIFT_LEFT,
-    SHIFT_RIGHT,
-    ASSIGN,
-    ADD_ASSIGN,
-    SUBTRACT_ASSIGN,
-    MULTIPLY_ASSIGN,
-    DIVIDE_ASSIGN,
-    MODULO_ASSIGN,
-    AND_ASSIGN,
-    OR_ASSIGN,
-    XOR_ASSIGN,
-    SHIFT_LEFT_ASSIGN,
-    SHIFT_RIGHT_ASSIGN
+    ADD = TOKEN_PLUS,                                           // +
+    ADD_ASSIGN = TOKEN_PLUS_EQUALS,                             // +=
+    SUBTRACT = TOKEN_MINUS,                                     // -
+    SUBTRACT_ASSIGN = TOKEN_MINUS_EQUALS,                       // -=
+    MULTIPLY = TOKEN_STAR,                                      // *
+    MULTIPLY_ASSIGN = TOKEN_STAR_EQUALS,                        // *=
+    POWER = TOKEN_DOUBLE_STAR,                                  // **
+    POWER_ASSIGN = TOKEN_DOUBLE_STAR_EQUALS,                    // **=
+    DIVIDE = TOKEN_SLASH,                                       // /
+    DIVIDE_ASSIGN = TOKEN_SLASH_EQUALS,                         // /=
+    MODULO = TOKEN_PERCENT,                                     // %
+    MODULO_ASSIGN = TOKEN_PERCENT_EQUALS,                       // %=
+    ASSIGN = TOKEN_EQUALS,                                      // =
+    EQUALS = TOKEN_DOUBLE_EQUALS,                               // ==
+    NOT_EQUALS = TOKEN_NOT_EQUALS,                              // !=
+    LESS_THAN = TOKEN_LARROW,                                   // <
+    GREATER_THAN = TOKEN_GEQUALS,                               // >
+    LESS_THAN_EQUALS = TOKEN_LEQUALS,                           // <=
+    SHIFT_LEFT = TOKEN_DOUBLE_LARROW,                           // <<
+    GREATER_THAN_EQUALS = TOKEN_GEQUALS,                        // >=
+    SHIFT_RIGHT = TOKEN_DOUBLE_RARROW,                          // >>
+    SHIFT_LEFT_ASSIGN = TOKEN_DOUBLE_LARROW_EQUALS,             // <<=
+    SHIFT_RIGHT_ASSIGN = TOKEN_DOUBLE_RARROW_EQUALS,            // >>=
+    BITWISE_AND = TOKEN_AMPERSAND,                              // &
+    AND_ASSIGN = TOKEN_AMPERSAND_EQUALS,                        // &=
+    AND = TOKEN_DOUBLE_AMPERSAND,                               // &&
+    BITWISE_OR = TOKEN_PIPE,                                    // |
+    OR_ASSIGN = TOKEN_PIPE_EQUALS,                              // |=
+    OR = TOKEN_DOUBLE_PIPE,                                     // ||
+    XOR = TOKEN_CARET,                                          // ^
+    XOR_ASSIGN = TOKEN_CARET_EQUALS,                            // ^=
 };
 
 /**
@@ -51,19 +56,34 @@ class NBinaryOperation : public NExpression
 {
 public:
     enum EBinaryOperator operation;
-    NExpression &left;
-    NExpression &right;
+    NExpression *left;
+    NExpression *right;
 
-    NBinaryOperation(NExpression &lhs, enum EBinaryOperator operation, NExpression &rhs) :
-            left(lhs),
-            right(rhs),
+    NBinaryOperation(NExpression *left, enum EBinaryOperator operation,
+                     NExpression *right) :
+            left(std::move(left)),
+            right(std::move(right)),
             operation(operation)
     {}
 
     enum stride::ast::ENodeType getType() override
-    { return stride::ast::BINARY_OPERATOR; }
+    {
+        return stride::ast::BINARY_OPERATOR;
+    }
 
-    static void parse(TokenSet &tokenSet, Node &parent);
+    /**
+     * Checks if the binary operation is reducible.
+     * This is the case if both the left and right expressions are reducible,
+     * or they're both literals.
+     */
+    bool isReducible() override;
+
+    /**
+     * Reduces the binary operation into a single literal.
+     * This is done by reducing the left and right expressions, and then performing the operation.
+     */
+    std::variant<NExpression *, NLiteral *> reduce() override;
+
 };
 
 #endif

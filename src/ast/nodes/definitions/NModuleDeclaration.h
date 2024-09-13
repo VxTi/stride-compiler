@@ -1,18 +1,19 @@
 #ifndef STRIDE_LANGUAGE_NMODULEDECLARATION_H
 #define STRIDE_LANGUAGE_NMODULEDECLARATION_H
 
-#include "../../ASTNodes.h"
-
 #include "../../../tokens/TokenSet.h"
-#include "../../../tokens/token.h"
+#include "NBlock.h"
 
 class NModuleDeclaration : public stride::ast::Node
 {
+private:
+    std::string moduleName;
+    NBlock *body;
+
 public:
-    std::string module_name;
 
     explicit NModuleDeclaration(std::string module_name) :
-            module_name(std::move(module_name))
+            moduleName(std::move(module_name)), body(nullptr)
     {}
 
     enum stride::ast::ENodeType getType() override

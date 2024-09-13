@@ -79,14 +79,6 @@ namespace stride::ast
         { return nullptr; }
 
         /**
-         * Parses the token stream and appends the children to the parent node.
-         * @param tokens The token stream to parse.
-         * @param parent The parent node to append the children to.
-         */
-        static void parse(TokenSet &tokenSet, Node &parent)
-        {}
-
-        /**
          * Converts the node to a string.
          * @return The string representation of the node.
          */
@@ -99,7 +91,8 @@ namespace stride::ast
          */
         void addChild(Node *child)
         {
-            children.push_back(child);
+            if ( child != nullptr )
+                children.push_back(child);
         }
 
         /**

@@ -20,11 +20,30 @@ private:
     std::vector<token_t> *tokens;
     stride::StrideFile *source;
     int index;
-    int startOffset = 0;
+    int startOffset;
     int length;
 
 public:
 
+
+
+    /**
+     * Checks if the token stream has ended.
+     * @return True if the token stream has ended, false otherwise.
+     */
+    [[nodiscard]] bool end() const;
+
+    /**
+     * Checks if the token stream has ended.
+     * @param fromIndex The index to start from.
+     * @return True if the token stream has ended, false otherwise.
+     */
+    [[nodiscard]] bool end(int fromIndex) const;
+
+    /**
+     * Gets the source file of the token stream.
+     * @return The source file of the token stream.
+     */
     [[nodiscard]] stride::StrideFile &getSource() const;
 
     /**
@@ -101,6 +120,7 @@ public:
      * Checks if the next token in the stream is of a certain type.
      * @param token The token to check for.
      * @return True if the next token is of the specified type, false otherwise.
+     *
      */
     bool canConsume(token_type_t token);
 
@@ -131,6 +151,17 @@ public:
      */
     TokenSet *subset(int startOffset, int length);
 
+    /*struct error_io
+    {
+        template<typename T>
+        friend std::ostream &operator<<(std::ostream &os, T &message)
+        {
+            os << message;
+            return os;
+        }
+    };*/
+
+    token_t peek(int offset);
 };
 
 #endif //STRIDE_LANGUAGE_TOKENSET_H

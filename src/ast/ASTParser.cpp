@@ -28,14 +28,11 @@ stride::ast::Node *stride::ast::parser::parse(TokenSet &tokenSet)
 
 void stride::ast::parser::parse(TokenSet &tokenSet, stride::ast::Node &root)
 {
-    for ( token_t token = tokenSet.current(); tokenSet.hasNext(); )
+    for (; tokenSet.hasNext(); )
     {
-        if ( tokenSet.consume(static_cast<token_type_t>(0))) // skip comments (0)
-        {
-            continue;
-        }
+        tokenSet.consume(static_cast<token_type_t>(0)); // skip whitespace and comments
 
-        switch ( token.type )
+        switch ( tokenSet.current().type )
         {
             case TOKEN_KEYWORD_DEFINE:
                 NFunctionDeclaration::parse(tokenSet, root);
@@ -83,12 +80,16 @@ void stride::ast::parser::parse(TokenSet &tokenSet, stride::ast::Node &root)
             case TOKEN_KEYWORD_MODULE:
                 NModuleDeclaration::parse(tokenSet, root);
                 break;
-            case TOKEN_IDENTIFIER:
-                NIdentifier::parse(tokenSet, root);
+            case TOKEN_SEMICOLON:
+                tokenSet.next();
+                break;
+            case TOKEN_LBRACE:
+                root.addChild(NBlock::capture(tokenSet));
                 break;
             default:
-                fprintf(stderr, "Unexpected token %s\n", tokenSet.current().value);
-                exit(1);
+                // Attempt to parse expression.
+                NExpression::parse(tokenSet, root);
+                break;
         }
     }
 }

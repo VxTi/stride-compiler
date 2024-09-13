@@ -6,6 +6,7 @@
 #include "../Lookahead.h"
 #include "../NodeProperties.h"
 #include "definitions/NFunctionDeclaration.h"
+#include <utility>
 
 /**
  * Parses a function declaration.
@@ -25,8 +26,7 @@
 
 void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 {
-
-    if ( !tokenSet.hasNext())
+    if ( !tokenSet.consume(TOKEN_KEYWORD_DEFINE))
     {
         tokenSet.error("Expected function name or identifiers, but received none.");
     }
@@ -69,6 +69,8 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
     nstFunctionDecl->setFunctionName(
             tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected function name after function declaration.").value);
 
+    printf("Function name: %s\n", nstFunctionDecl->functionName->name.c_str());
+
     // Capture block for function parameter body, aka the part after the function name between the parenthesis
     auto *fnParameterSet = stride::ast::captureBlock(tokenSet, TOKEN_LPAREN, TOKEN_RPAREN);
 
@@ -82,6 +84,7 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
     // add the 'parameters' node
     if ( fnParameterSet->size() > 0 )
     {
+        printf("Function parameter count: %lu\n", fnParameterSet->size());
         bool hasVariadic = false;
         do
         {
@@ -97,13 +100,13 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
                 nstFnParameter->setConst(true);
             }
 
-            nstFnParameter->setVariableName((char *) fnParameterSet->consumeRequired(TOKEN_IDENTIFIER,
-                                                                                     "Expected parameter name after function declaration.").value);
+            nstFnParameter->setVariableName(fnParameterSet->consumeRequired(TOKEN_IDENTIFIER,
+                                                                            "Expected parameter name after function declaration.").value);
             fnParameterSet->consumeRequired(TOKEN_COLON,
                                             "Expected colon after parameter name in function definition.\nThis is required to denote the parameter_type_token of the parameter.");
 
             // Validate parameter type
-            if ( !stride::ast::validateVariableType(tokenSet))
+            if ( !stride::ast::validateVariableType(*fnParameterSet))
             {
                 fnParameterSet->error("Expected type after colon in function definition.");
             }
@@ -111,23 +114,23 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
             // If the variable type is a reference to a class within a module, use identifier as type.
             // Otherwise, we'll use the token value as the type.
             nstFnParameter->setVariableType(
-                    fnParameterSet->canConsume(TOKEN_IDENTIFIER) ? stride::ast::parseIdentifier(tokenSet)
-                                                                 : new NIdentifier(
-                            tokenSet.next().value)
+                    fnParameterSet->canConsume(TOKEN_IDENTIFIER) ?
+                    std::variant<std::string *, token_type_t>(&stride::ast::parseIdentifier(*fnParameterSet)->name) :
+                    std::variant<std::string *, token_type_t>(fnParameterSet->next().type)
             );
 
             // Check if function parameter is of array type.
-            if ( tokenSet.consume(TOKEN_LSQUARE_BRACKET) && tokenSet.consume(TOKEN_LSQUARE_BRACKET))
+            if ( fnParameterSet->consume(TOKEN_LSQUARE_BRACKET) && fnParameterSet->consume(TOKEN_LSQUARE_BRACKET))
             {
                 nstFnParameter->setIsArray(true);
             }
-            else if ( tokenSet.consume(TOKEN_THREE_DOTS))
+            else if ( fnParameterSet->consume(TOKEN_THREE_DOTS))
             {
                 nstFnParameter->setIsArray(true);
                 hasVariadic = true;
             }
 
-        } while ( fnParameterSet->consume(TOKEN_COMMA));
+        } while ( fnParameterSet->hasNext() && fnParameterSet->consume(TOKEN_COMMA));
 
         // The parameter parsing ends when no comma is found.
         // If there's still tokens remaining in the set, that means there's an illegal one out there.
@@ -139,15 +142,7 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
 
     if ( !nstFunctionDecl->external )
     {
-        auto *fnBodySet = stride::ast::captureBlock(tokenSet, TOKEN_LBRACE, TOKEN_RBRACE);
-        if ( fnBodySet == nullptr )
-        {
-            tokenSet.error("Function declaration requires a function body, but received none.");
-            return;
-        }
-
-        auto *nstBlock = new NBlock();
-        stride::ast::parser::parse(*fnBodySet, *nstBlock);
+        nstFunctionDecl->body = NBlock::capture(tokenSet);
     }
     else
     {

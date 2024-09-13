@@ -5,16 +5,16 @@
 
 #include "NodeProperties.h"
 
-void stride::ast::parseGenerics(TokenSet &tokenSet, std::vector<NIdentifier *> &genericsDst)
+void stride::ast::parseGenerics(TokenSet &tokenSet, std::vector<std::string *> &genericsDst)
 {
     if ( tokenSet.consume(TOKEN_LARROW))
     {
-        genericsDst.push_back(new NIdentifier(
+        genericsDst.push_back(new std::string(
                 tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected generic identifier after '<'.").value));
 
         while ( tokenSet.consume(TOKEN_COMMA))
         {
-            genericsDst.push_back(new NIdentifier(
+            genericsDst.push_back(new std::string(
                     tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected generic identifier after ','.").value));
         }
         tokenSet.consumeRequired(TOKEN_RARROW, "Expected '>' after generic declaration.");

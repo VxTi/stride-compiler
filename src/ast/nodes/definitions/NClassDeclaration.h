@@ -24,12 +24,15 @@ class NClassDeclaration : public stride::ast::Node
 private:
     std::string className;
     std::vector<NIdentifier *> *parents;
-    std::vector<NIdentifier *> *generics;
+    std::vector<std::string *> *generics;
     NBlock *body;
 
 public:
 
-    NClassDeclaration() : className(""), parents(new std::vector<NIdentifier *>()), generics(new std::vector<NIdentifier *>()), body(nullptr)
+    NClassDeclaration() :
+            parents(new std::vector<NIdentifier *>()),
+            generics(new std::vector<std::string *>()),
+            body(nullptr)
     {}
 
     ~NClassDeclaration();
@@ -41,15 +44,6 @@ public:
     void addParent(NIdentifier *parent)
     {
         parents->push_back(parent);
-    }
-
-    /**
-     * Add a generic to the class declaration.
-     * @param generic The generic to add.
-     */
-    void addClassGeneric(NIdentifier *generic)
-    {
-        generics->push_back(generic);
     }
 
     enum stride::ast::ENodeType getType() override

@@ -44,7 +44,7 @@ public:
      * Set the truthy block of the if statement.
      * @param truthyBlock The truthy block to set.
      */
-    void setTruthyBlock(NBlock *truthyBlock)
+    void setThen(NBlock *truthyBlock)
     {
         NConditionalStatement::truthyBlock = truthyBlock;
     }
@@ -53,10 +53,12 @@ public:
      * Set the otherwise block of the if statement.
      * @param otherwise The otherwise block to set.
      */
-    void setOtherwise(NBlock *otherwise)
+    void setElse(NBlock *otherwise)
     {
         NConditionalStatement::otherwise = otherwise;
     }
+
+    static void parse(TokenSet &tokenSet, Node &parent);/**/
 
     enum stride::ast::ENodeType getType() override
     { return stride::ast::CONDITIONAL_STATEMENT; }

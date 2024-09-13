@@ -68,6 +68,10 @@ typedef enum
     TOKEN_THREE_DOTS,
 
     /* Primitives */
+    TOKEN_PRIMITIVE_UINT8,
+    TOKEN_PRIMITIVE_UINT16,
+    TOKEN_PRIMITIVE_UINT32,
+    TOKEN_PRIMITIVE_UINT64,
     TOKEN_PRIMITIVE_INT8,
     TOKEN_PRIMITIVE_INT16,
     TOKEN_PRIMITIVE_INT32,
@@ -101,7 +105,6 @@ typedef enum
     TOKEN_KEYWORD_RETURN,
     TOKEN_KEYWORD_IF,
     TOKEN_KEYWORD_ELSE,
-    TOKEN_KEYWORD_ELIF,
     TOKEN_KEYWORD_CLASS,
     TOKEN_KEYWORD_THIS,
     TOKEN_KEYWORD_STRUCT,
@@ -146,8 +149,6 @@ typedef struct
     token_type_t type;
     char *value;
     int index;
-    int line;
-    int column;
 } token_t;
 
 /**

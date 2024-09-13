@@ -66,4 +66,8 @@ add_executable(stride_language src/main.cpp
         src/ast/nodes/NBlock.cpp
         src/ast/nodes/NReturnStatement.cpp
         src/ast/nodes/NSwitchStatement.cpp
+        src/ast/nodes/NConditionalStatement.cpp
+        src/ast/nodes/NBinaryOperator.cpp
+        src/ast/Reducible.h
+        src/ast/nodes/NLiteral.cpp
 )

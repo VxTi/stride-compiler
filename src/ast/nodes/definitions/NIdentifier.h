@@ -2,8 +2,6 @@
 #define STRIDE_LANGUAGE_NIDENTIFIER_H
 
 #include "../../ASTNodes.h"
-#include "../../../tokens/TokenSet.h"
-#include "../../../tokens/token.h"
 
 /**
      * Represents an identifier.
@@ -21,6 +19,7 @@ public:
 
     enum stride::ast::ENodeType getType() override
     { return stride::ast::IDENTIFIER; }
+
 };
 
 #endif

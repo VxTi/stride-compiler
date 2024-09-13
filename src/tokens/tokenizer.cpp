@@ -79,7 +79,7 @@ TokenSet *stride::tokenize(stride::StrideFile *source)
             {
                 if ((
                             !is_word_boundary(src[ i + match.rm_eo ]) ||
-                            (i + match.rm_so - 1 >= 0 && !is_word_boundary(src[ i + match.rm_so - 1 ]))
+                            ( i + match.rm_so - 1 >= 0 && !is_word_boundary(src[ i + match.rm_so - 1 ]))
                     ) && token_definitions[ j ].keyword )
                 {
                     continue;
@@ -101,7 +101,7 @@ TokenSet *stride::tokenize(stride::StrideFile *source)
         }
         if ( !matched )
         {
-            stride::error::error(*source, i, "Illegal character found in file.");
+            stride::error::error(*source, i, 1, "Illegal character found in file.");
         }
     }
 

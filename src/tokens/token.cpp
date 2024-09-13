@@ -40,16 +40,6 @@ token_def_t gen_token_kw(const char *expression, token_type_t token)
     return token_def;
 }
 
-std::map<token_type_t, unsigned int> primitive_byte_sizes = {
-        {TOKEN_PRIMITIVE_BOOL, 1},
-        {TOKEN_PRIMITIVE_INT8, 1},
-        {TOKEN_PRIMITIVE_INT16, 2},
-        {TOKEN_PRIMITIVE_INT32, 4},
-        {TOKEN_PRIMITIVE_INT64, 8},
-        {TOKEN_PRIMITIVE_FLOAT32, 4},
-        {TOKEN_PRIMITIVE_FLOAT64, 8},
-};
-
 /**
  * Token definitions for the tokens.
  */
@@ -65,7 +55,6 @@ std::vector<token_def_t> token_definitions = {
         gen_token_kw("return", TOKEN_KEYWORD_RETURN),
         gen_token_kw("if", TOKEN_KEYWORD_IF),
         gen_token_kw("else", TOKEN_KEYWORD_ELSE),
-        gen_token_kw("elif", TOKEN_KEYWORD_ELIF),
         gen_token_kw("class", TOKEN_KEYWORD_CLASS),
         gen_token_kw("const", TOKEN_KEYWORD_CONST),
         gen_token_kw("define", TOKEN_KEYWORD_DEFINE),

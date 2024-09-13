@@ -14,22 +14,23 @@ void NSwitchStatement::parse(TokenSet &tokenSet, stride::ast::Node &parent)
     nstSwitch->expression = NExpression::captureParenthesis(tokenSet);
 
     auto switchBodySet = NBlock::captureRaw(tokenSet);
-    do {
-        if (switchBodySet->consume(TOKEN_KEYWORD_CASE))
+    do
+    {
+        if ( switchBodySet->consume(TOKEN_KEYWORD_CASE))
         {
-            if (!stride::ast::validateLiteralValue(*switchBodySet))
+            if ( !stride::ast::validateLiteralValue(*switchBodySet))
             {
                 switchBodySet->error("Expected valid literal value after 'case' keyword.");
                 return;
             }
 
             auto nstCase = new NSwitchCase();
-            nstCase->conditionalValue = new NLiteral(switchBodySet->next().value);
+            nstCase->conditionalValue = new NLiteral(switchBodySet->next());
             switchBodySet->consumeRequired(TOKEN_DASH_RARROW, "Expected '->' after case value.");
             nstCase->body = NBlock::capture(*switchBodySet);
         }
 
-    } while (switchBodySet->hasNext());
+    } while ( switchBodySet->hasNext());
 
     parent.addChild(nstSwitch);
 }

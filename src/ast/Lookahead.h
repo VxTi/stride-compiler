@@ -11,13 +11,13 @@ namespace stride::ast
 {
 
     /**
-     * Captures a block of tokens that is enclosed by the provided start and end tokens.
-     * @param stream The stream to capture the block from.
-     * @param start The token that starts the block.
-     * @param end The token that ends the block.
+     * Captures a block of tokens that is enclosed by the provided startToken and endToken tokens.
+     * @param set The set to capture the block from.
+     * @param startToken The token that starts the block.
+     * @param endToken The token that ends the block.
      * @return A TokenSet containing the block of tokens.
      */
-    TokenSet *captureBlock(TokenSet &stream, token_type_t start, token_type_t end);
+    TokenSet *captureBlock(TokenSet &set, token_type_t startToken, token_type_t endToken);
 
     /**
      * Returns the distance to the provided token.

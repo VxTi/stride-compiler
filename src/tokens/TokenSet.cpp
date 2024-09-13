@@ -11,28 +11,34 @@ TokenSet::TokenSet(std::vector<token_t> *tokens, stride::StrideFile *source)
     this->tokens = tokens;
     this->index = 0;
     this->startOffset = 0;
-    if (this->tokens == nullptr)
+
+    if ( this->tokens == nullptr )
     {
         this->error("Token stream is null.");
         exit(1);
     }
+
     this->length = tokens->size();
 
     if ( this->length == 0 )
     {
         this->error("Token stream is empty.");
     }
+}
 
+bool TokenSet::end(int fromIndex) const
+{
+    return this->startOffset + fromIndex >= this->tokens->size();
+}
+
+bool TokenSet::end() const
+{
+    return this->end(this->index);
 }
 
 bool TokenSet::canConsume(token_type_t token, int fromIndex)
 {
-    if ( !hasNext())
-    {
-        return false;
-    }
-
-    return (*this->tokens)[ this->startOffset + fromIndex ].type == token;
+    return !end(fromIndex) && ( *this->tokens )[ this->startOffset + fromIndex ].type == token;
 }
 
 bool TokenSet::canConsume(token_type_t type)
@@ -42,12 +48,13 @@ bool TokenSet::canConsume(token_type_t type)
 
 bool TokenSet::consume(token_type_t token, int *fromIndex)
 {
-    if ( this->canConsume(token, *fromIndex))
+    if ( !this->canConsume(token, *fromIndex))
     {
-        ( *fromIndex )++;
-        return true;
+        return false;
     }
-    return false;
+
+    ( *fromIndex )++;
+    return true;
 }
 
 bool TokenSet::consume(token_type_t type)
@@ -66,19 +73,20 @@ token_t TokenSet::consumeRequired(token_type_t type, const char *message)
 
 token_t TokenSet::current()
 {
-    return (*this->tokens)[ this->startOffset + this->index ];
+    return ( *this->tokens )[ this->startOffset + this->index ];
 }
 
 bool TokenSet::peekEq(token_type_t type, int offset)
 {
     int absoluteIndex = this->startOffset + this->index + offset;
+
     // If the relative index or absolute index exceeds the boundaries, stop.
     if ( this->index + offset >= this->length || absoluteIndex >= this->tokens->size())
     {
         return false;
     }
 
-    return (*this->tokens)[ absoluteIndex ].type == type;
+    return ( *this->tokens )[ absoluteIndex ].type == type;
 }
 
 bool TokenSet::hasNext()
@@ -94,23 +102,28 @@ bool TokenSet::hasNext(int fromIndex)
 
 token_t TokenSet::next(int *fromIndex)
 {
-    return (*this->tokens)[ *fromIndex++ ];
+    if (end(*fromIndex))
+    {
+        this->error("No more tokens in the stream.");
+    }
+
+    token_t entry = ( *this->tokens )[ this->startOffset + *fromIndex ];
+    ( *fromIndex )++;
+    return entry;
 }
 
 token_t TokenSet::next()
 {
-    if ( !this->hasNext())
-    {
-        this->error("Unexpected end of file.");
-    }
     return this->next(&this->index);
 }
 
+// relative size, not absolute.
 unsigned long int TokenSet::size() const
 {
     return this->length;
 }
 
+// Relative index, not absolute.
 int TokenSet::getIndex() const
 {
     return this->index;
@@ -131,5 +144,10 @@ stride::StrideFile &TokenSet::getSource() const
 
 void TokenSet::error(const char *message)
 {
-    stride::error::error(*this->source, this->index, message);
+    stride::error::error(*this->source, this->current().index, strlen(this->current().value), message);
+}
+
+token_t TokenSet::peek(int offset)
+{
+    return ( *this->tokens )[ this->startOffset + this->index + offset ];
 }

@@ -1,25 +1,31 @@
 import "external library";
 
-define test() {};
+define test() {
+    fn_call();
+
+}
 
 define test() {
  // do nothing
-};
+}
 
-test();;
+class Test<T> {
+    define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
+        b::listen();;;;
 
-let k: type::something = test(null, 2, mod::test());
+    }
+}
+
+test();
+
+let g: unknown = fn::call(test , 0) + 2;
 
 let c: char = 'c',
     d: char = '\'';
 
-let g: char = c;
+let k: type::something = test(null, 2, mod::test());
 
-public class Test<T> {
-    define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
-        b::listen();
-    };
-}
+let g: char = c;
 
 module Test {
     class TestClass {
