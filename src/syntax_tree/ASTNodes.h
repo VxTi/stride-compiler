@@ -120,17 +120,17 @@ namespace stride::ast
     {
 
         /**
-         * Parses a token set and appends the generated nodes
+         * Parses a token set and appends the generated node_types
          * to a root node. This root node will then be returned.
          * @param tokenSet The token set to parse
          */
         Node *parse(TokenSet &tokenSet);
 
         /**
-         * Parses a token set and appends the generated nodes
+         * Parses a token set and appends the generated node_types
          * to the provided root node.
          * @param tokenSet The token set to parse
-         * @param root The root node to append the generated nodes to.
+         * @param root The root node to append the generated node_types to.
          */
         void parse(TokenSet &tokenSet, Node &root);
     }

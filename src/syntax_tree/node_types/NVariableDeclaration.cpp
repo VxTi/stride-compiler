@@ -7,7 +7,7 @@
 
 using namespace stride::ast;
 
-#include <utility>
+/*void parse(TokenSet &tokenSet, )*/
 
 NVariableDeclaration *
 NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration,
@@ -15,19 +15,31 @@ NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bo
 {
     auto nstVariableDecl = new NVariableDeclaration();
 
+    printf("Next token: %s\n", tokenSet.current().value);
+
     // If the variable is explicitly declared (let x: type = ... ),
     // we'll have to check for declaration symbols, e.g. let and const.
-    if ( implicitDeclaration && ( tokenSet.canConsume(TOKEN_KEYWORD_LET) || tokenSet.canConsume(TOKEN_KEYWORD_CONST)))
+    // Otherwise, 'implicit' declarations mean they can only contain 'const' before.
+    if ( implicitDeclaration)
     {
-        tokenSet.error("Variable declaration requires either 'let' or 'const' keyword.");
-        return nullptr;
-    }
-    else
-    {
-        nstVariableDecl->setConst(tokenSet.next().type == TOKEN_KEYWORD_CONST);
+        if ( !( tokenSet.canConsume(TOKEN_KEYWORD_LET) || tokenSet.canConsume(TOKEN_KEYWORD_CONST)))
+        {
+            tokenSet.error("Variable declaration requires either 'let' or 'const' keyword.");
+            return nullptr;
+        }
+        else
+        {
+            bool isConst = tokenSet.canConsume(TOKEN_KEYWORD_CONST);
+            nstVariableDecl->setConst(isConst);
+            if (isConst)
+            {
+                tokenSet.next();
+            }
+        }
     }
 
-    nstVariableDecl->setVariableName(tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected variable name").value);
+    nstVariableDecl->setVariableName(
+            tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected variable name in implicit declaration.").value);
 
     tokenSet.consumeRequired(TOKEN_COLON, "Expected colon after variable name, but received none.");
 
@@ -79,26 +91,11 @@ NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bo
             tokenSet.error("Variable declaration does not allow assignment.");
             return nullptr;
         }
-        int expressionStart = tokenSet.getIndex();
-        int expressionLength = 0;
 
-        token_t next;
-
-        while (( next = tokenSet.next()).type != TOKEN_SEMICOLON && next.type != TOKEN_COMMA )
-        {
-            expressionLength++;
-        }
-
-        if ( expressionLength == 0 )
-        {
-            tokenSet.error("Expected expression after assignment operator.");
-            return nullptr;
-        }
-
-        auto nstExprSubSet = tokenSet.subset(expressionStart, expressionLength);
-        auto nstExpr = NExpression::parse(*nstExprSubSet);
-        nstVariableDecl->setValue(nstExpr);
+        nstVariableDecl->setValue(NExpression::parse(tokenSet, false));
     }
+
+    tokenSet.consumeRequired(TOKEN_SEMICOLON, "Expected semicolon after variable declaration.");
 
     return nstVariableDecl;
 }
@@ -113,14 +110,16 @@ void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
     // If there's multiple variables declared after one another,
     // and the 'const' keyword is used for declaration,
     // all of them will be marked as const.
-    bool isConst = tokens.next().type == TOKEN_KEYWORD_CONST;
+    bool isConst = tokens.next().type == ( TOKEN_KEYWORD_CONST );
 
     do
     {
+        printf("[NVariableDeclaration] Parsing variable declaration\n");
         auto nstVariableDecl = new NVariableDeclaration();
         nstVariableDecl->setConst(isConst);
 
-        nstVariableDecl->setVariableName(tokens.consumeRequired(TOKEN_IDENTIFIER, "Expected variable name").value);
+        nstVariableDecl->setVariableName(
+                tokens.consumeRequired(TOKEN_IDENTIFIER, "Expected variable name after 'const' or 'let'.").value);
 
         tokens.consumeRequired(TOKEN_COLON, "Expected colon after variable name, but received none.");
 
@@ -141,9 +140,10 @@ void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
                 std::variant<std::string *, token_type_t>(tokens.next().type)
         );
 
-        printf("Variable name: %s\n", nstVariableDecl->varName->c_str());
-        printf("Variable type: %s\n", std::holds_alternative<std::string *>(nstVariableDecl->varType) ?
-                std::get<std::string *>(nstVariableDecl->varType)->c_str() : "Primitive");
+        printf("[NVariableDeclaration] Variable name: %s\n", nstVariableDecl->varName->c_str());
+        printf("[NVariableDeclaration] Variable type: %s\n",
+               std::holds_alternative<std::string *>(nstVariableDecl->varType) ?
+               std::get<std::string *>(nstVariableDecl->varType)->c_str() : "Primitive");
 
         // Check if the variable is an array.
         // If this is the case, we'll have to check if the assignment is of an array type,
@@ -159,6 +159,4 @@ void NVariableDeclaration::parse(TokenSet &tokens, stride::ast::Node &parent)
 
         parent.addChild(nstVariableDecl);
     } while ( tokens.consume(TOKEN_COMMA));
-
-    tokens.consumeRequired(TOKEN_SEMICOLON, "Expected semicolon after variable declaration.");
 }

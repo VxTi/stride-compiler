@@ -4,7 +4,7 @@
 
 #include "StrideFile.h"
 #include "tokens/tokenizer.h"
-#include "ast/ASTNodes.h"
+#include "syntax_tree/ASTNodes.h"
 #include <fstream>
 #include <iostream>
 

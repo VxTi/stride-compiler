@@ -11,7 +11,7 @@
  * Structure declaration.
  * Structures are defined using the following format: <br />
  * <code>
- * struct &lt;structure_name&gt; {
+ * struct &lt;name&gt; {
  *  &nbsp;&lt;field&gt; ...
  *  }
  */
@@ -19,13 +19,13 @@ class NStructureDeclaration : public stride::ast::Node
 {
 private:
 
-    std::string structure_name;
-    std::vector<NVariableDeclaration *> *fields;
+    std::string name;
+    std::vector<NVariableDeclaration *> fields = {};
+    std::vector<std::string *> generics = {};
 
 public:
 
-    explicit NStructureDeclaration() : structure_name(""), fields(new std::vector<NVariableDeclaration *>())
-    {}
+    NStructureDeclaration() = default;
 
     /**
      * Add a field to the structure declaration.
@@ -33,12 +33,12 @@ public:
      */
     void addField(NVariableDeclaration *field)
     {
-        fields->push_back(field);
+        fields.push_back(field);
     }
 
     void setName(const char *name)
     {
-        structure_name = name;
+        name = name;
     }
 
 

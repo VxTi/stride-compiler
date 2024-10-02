@@ -14,7 +14,6 @@ NBlock *NBlock::capture(TokenSet &set)
 {
     auto block = new NBlock();
     auto subset = NBlock::captureRaw(set);
-    printf("Captured block with length %lu\n", subset->size());
     if (subset->size() == 0)
     {
         delete block;

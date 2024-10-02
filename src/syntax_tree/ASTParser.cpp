@@ -2,22 +2,21 @@
 // Created by Luca Warmenhoven on 11/09/2024.
 //
 
-#include <cstdio>
 #include "ASTNodes.h"
-#include "nodes/definitions/NFunctionDeclaration.h"
-#include "nodes/definitions/NConditionalStatement.h"
-#include "nodes/definitions/NImportStatement.h"
-#include "nodes/definitions/NClassDeclaration.h"
-#include "nodes/definitions/NSwitchStatement.h"
-#include "nodes/definitions/NStructureDeclaration.h"
-#include "nodes/definitions/NTryCatchStatement.h"
-#include "nodes/definitions/NForLoop.h"
-#include "nodes/definitions/NWhileLoop.h"
-#include "nodes/definitions/NDoWhileLoop.h"
-#include "nodes/definitions/NEnumerableDeclaration.h"
-#include "nodes/definitions/NReturnStatement.h"
-#include "nodes/definitions/NThrowStatement.h"
-#include "nodes/definitions/NModuleDeclaration.h"
+#include "node_types/definitions/NFunctionDeclaration.h"
+#include "node_types/definitions/NConditionalStatement.h"
+#include "node_types/definitions/NImportStatement.h"
+#include "node_types/definitions/NClassDeclaration.h"
+#include "node_types/definitions/NSwitchStatement.h"
+#include "node_types/definitions/NStructureDeclaration.h"
+#include "node_types/definitions/NTryCatchStatement.h"
+#include "node_types/definitions/NForLoop.h"
+#include "node_types/definitions/NWhileLoop.h"
+#include "node_types/definitions/NDoWhileLoop.h"
+#include "node_types/definitions/NEnumerableDeclaration.h"
+#include "node_types/definitions/NReturnStatement.h"
+#include "node_types/definitions/NThrowStatement.h"
+#include "node_types/definitions/NModuleDeclaration.h"
 
 stride::ast::Node *stride::ast::parser::parse(TokenSet &tokenSet)
 {
@@ -28,7 +27,7 @@ stride::ast::Node *stride::ast::parser::parse(TokenSet &tokenSet)
 
 void stride::ast::parser::parse(TokenSet &tokenSet, stride::ast::Node &root)
 {
-    for (; tokenSet.hasNext(); )
+    for ( ; tokenSet.hasNext(); )
     {
         tokenSet.consume(static_cast<token_type_t>(0)); // skip whitespace and comments
 
@@ -47,6 +46,7 @@ void stride::ast::parser::parse(TokenSet &tokenSet, stride::ast::Node &root)
             case TOKEN_KEYWORD_IMPORT:
                 NImportStatement::parse(tokenSet, root);
                 break;
+            case TOKEN_KEYWORD_PUBLIC:
             case TOKEN_KEYWORD_CLASS:
                 NClassDeclaration::parse(tokenSet, root);
                 break;

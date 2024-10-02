@@ -29,6 +29,8 @@ bool isValidExpressionToken(TokenSet &set)
         case TOKEN_SLASH:
         case TOKEN_PLUS:
         case TOKEN_MINUS:
+        case TOKEN_QUESTION:
+        case TOKEN_COLON:
         case TOKEN_DOUBLE_STAR:
         case TOKEN_DOUBLE_RARROW:
         case TOKEN_DOUBLE_LARROW:
@@ -95,19 +97,14 @@ struct expression_segment_t
 };
 
 const std::map<token_type_t, struct expression_segment_t> tokenPrecedenceMap = {
-        /* Enclosing tokens  */
-        { TOKEN_LPAREN,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 100 }}, // (
-        { TOKEN_RPAREN,               { .associativity = ASSOCIATIVITY_NONE, .precedence = 100 }}, // )
-        { TOKEN_LSQUARE_BRACKET,      { .associativity = ASSOCIATIVITY_NONE, .precedence = 100 }}, // [
-        { TOKEN_RSQUARE_BRACKET,      { .associativity = ASSOCIATIVITY_NONE, .precedence = 100 }}, // ]
-
         /* High precedence operators */
-        { TOKEN_STAR,                 { .associativity = ASSOCIATIVITY_NONE, .precedence = 50 }}, // *
-        { TOKEN_SLASH,                { .associativity = ASSOCIATIVITY_NONE, .precedence = 50 }}, // /
-        { TOKEN_PLUS,                 { .associativity = ASSOCIATIVITY_RIGHT | ASSOCIATIVITY_OPTIONAL, .precedence = 45,  }}, // + (unary and binary)
-        { TOKEN_MINUS,                { .associativity = ASSOCIATIVITY_RIGHT | ASSOCIATIVITY_OPTIONAL, .precedence = 45,  }}, // - (unary and binary)
-        { TOKEN_PERCENT,              { .associativity = ASSOCIATIVITY_NONE, .precedence = 40 }}, // %
-        { TOKEN_DOUBLE_STAR,          { .associativity = ASSOCIATIVITY_NONE, .precedence = 40 }}, // **
+        { TOKEN_STAR,                 { .associativity = ASSOCIATIVITY_LEFT, .precedence = 50 }}, // *
+        { TOKEN_SLASH,                { .associativity = ASSOCIATIVITY_LEFT, .precedence = 50 }}, // /
+        { TOKEN_PLUS,                 { .associativity = ASSOCIATIVITY_LEFT | ASSOCIATIVITY_RIGHT | ASSOCIATIVITY_OPTIONAL, .precedence = 45,  }}, // + (unary and binary)
+        { TOKEN_MINUS,                { .associativity = ASSOCIATIVITY_LEFT | ASSOCIATIVITY_RIGHT | ASSOCIATIVITY_OPTIONAL, .precedence = 45,  }}, // - (unary and binary)
+        { TOKEN_PERCENT,              { .associativity = ASSOCIATIVITY_LEFT, .precedence = 40 }}, // %
+        { TOKEN_DOUBLE_STAR,          { .associativity = ASSOCIATIVITY_LEFT, .precedence = 40 }}, // **
+        
         /* Bitwise operators */
         { TOKEN_DOUBLE_RARROW,        { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // >>
         { TOKEN_DOUBLE_LARROW,        { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // <<
@@ -116,7 +113,7 @@ const std::map<token_type_t, struct expression_segment_t> tokenPrecedenceMap = {
         { TOKEN_CARET,                { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // ^
         { TOKEN_AMPERSAND,            { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // &
         { TOKEN_TILDE,                { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // ~
-        { TOKEN_PIPE,                 { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }},// |
+        { TOKEN_PIPE,                 { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // |
         { TOKEN_BANG,                 { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // !
         { TOKEN_PERCENT,              { .associativity = ASSOCIATIVITY_LEFT, .precedence = 30 }}, // %
 
@@ -133,8 +130,7 @@ const std::map<token_type_t, struct expression_segment_t> tokenPrecedenceMap = {
         { TOKEN_DOUBLE_LARROW_EQUALS, { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45 }},  // <<=
         { TOKEN_DOUBLE_RARROW_EQUALS, { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45 }},  // >>=
         { TOKEN_DOUBLE_STAR_EQUALS,   { .associativity = ASSOCIATIVITY_LEFT, .precedence = 50 }},  // **=
-        { TOKEN_CARET_EQUALS,         { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45 }}, //  ^=
-
+        { TOKEN_CARET_EQUALS,         { .associativity = ASSOCIATIVITY_LEFT, .precedence = 45 }},  //  ^=
 
         { TOKEN_DOUBLE_PLUS,   { .associativity = ASSOCIATIVITY_LEFT |
                                                   ASSOCIATIVITY_RIGHT, .precedence = 55 }}, // ++
@@ -158,7 +154,6 @@ const std::map<token_type_t, struct expression_segment_t> tokenPrecedenceMap = {
  */
 stride::ast::Node *parseIdentifier(TokenSet &tokenSet)
 {
-    printf("[NExpression] Parsing identifier.\n");
     // Parses an identifier; accepts nested::identifiers
     auto identifier = stride::ast::parseIdentifier(tokenSet);
 
@@ -172,13 +167,13 @@ stride::ast::Node *parseIdentifier(TokenSet &tokenSet)
 
         if ( argumentsSubset->size() > 0 )
         {
-            printf("[NExpression] Parsing function call argument, next token: %s.\n", tokenSet.current().value);
+            printf("[NExpression] Parsing function call argument, next token: %s.\n", argumentsSubset->current().value);
             do
             {
                 printf("[NExpression] Parsing function call argument.\n");
                 functionCall->addChild(NExpression::parse(*argumentsSubset, false));
 
-            } while ( tokenSet.canConsume(TOKEN_COMMA));
+            } while ( !argumentsSubset->end() && argumentsSubset->hasNext());
         }
         return functionCall;
     }
@@ -208,16 +203,18 @@ NExpression *NExpression::parse(TokenSet &tokenSet, bool explicitExpression)
     while ( !tokenSet.end())
     {
         printf("[NExpression] Parsing expression token: %s.\n", tokenSet.current().value);
-        if ( !isValidExpressionToken(tokenSet))
-        {
-            tokenSet.error("Invalid token in expression.");
-            return nullptr;
-        }
 
         if (( tokenSet.consume(TOKEN_SEMICOLON) ||
               ( tokenSet.consume(TOKEN_COMMA)) && !parens && !sqBrace && !brackets ))
         {
+            printf("[NExpression] Expression parsing complete.\n");
             break;
+        }
+
+        if ( !isValidExpressionToken(tokenSet))
+        {
+            tokenSet.error("Invalid token in expression.");
+            return nullptr;
         }
 
 
@@ -252,6 +249,9 @@ NExpression *NExpression::parse(TokenSet &tokenSet, bool explicitExpression)
             default:
                 break;
         }
+
+        if (!tokenSet.hasNext())
+            break;
 
         tokenSet.next();
     }

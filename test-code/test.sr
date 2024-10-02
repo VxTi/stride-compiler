@@ -2,30 +2,36 @@ import "external library";
 
 define test() {
     fn_call();
-
 }
 
 define test() {
  // do nothing
 }
 
-class Test<T> {
-    define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
-        b::listen();;;;
+module Module {
+    class Test<T> {
+        define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
+            b::listen();;;;
 
+        }
     }
 }
 
-test();
+public class First<K, L> {
+    const p: K;
+    const l: L;
+}
 
-let g: unknown = fn::call(test , 0) + 2;
+test();;;
 
-let c: char = 'c',
-    d: char = '\'';
+let test: unknown = 5 + symbol + fn::call(3, 5) + (3 + 5) ? 4 : 0;
 
-let k: type::something = test(null, 2, mod::test());
+let g: unknown = fn::call(test, 0) + 2;
 
-let g: char = c;
+                            // subset in function call
+let k: type::something = test(null, 2, mod::test());;
+
+let g: char = c;;
 
 module Test {
     class TestClass {
@@ -35,18 +41,13 @@ module Test {
 
 struct genericsTest<T, G, B> {
     val: T;
-    ref: Test::TestClass;
+    const ref: Test::TestClass;
 }
 
 struct Vector<T> {
     x: T;
     y: T;
     z: T;
-}
-
-class First<K, L> {
-    const p: K;
-    const l: L;
 }
 
 class Third has Second and Test {
@@ -118,3 +119,6 @@ module test::modulename {
 
      }
 }
+
+let c: char = 'c',
+    d: char = '\'';

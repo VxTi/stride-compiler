@@ -8,7 +8,7 @@
 #include <string>
 #include "../tokens/TokenSet.h"
 #include "ASTNodes.h"
-#include "nodes/definitions/NIdentifier.h"
+#include "node_types/definitions/NIdentifier.h"
 
 namespace stride::ast
 {

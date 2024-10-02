@@ -64,6 +64,20 @@ public:
     {
         return stride::ast::EXPRESSION;
     }
+
+private:
+
+/*
+    void parseFunctionCall(TokenSet &tokenSet);
+
+    void parseArgumentList(TokenSet &tokenSet);
+
+    void parseUnaryOperation(TokenSet &tokenSet);
+
+*/
+
+
+
 };
 
 #endif

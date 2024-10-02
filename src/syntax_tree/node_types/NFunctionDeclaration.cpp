@@ -69,7 +69,6 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
     nstFunctionDecl->setFunctionName(
             tokenSet.consumeRequired(TOKEN_IDENTIFIER, "Expected function name after function declaration.").value);
 
-    printf("Function name: %s\n", nstFunctionDecl->functionName->name.c_str());
 
     // Capture block for function parameter body, aka the part after the function name between the parenthesis
     auto *fnParameterSet = stride::ast::captureBlock(tokenSet, TOKEN_LPAREN, TOKEN_RPAREN);
@@ -84,7 +83,6 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
     // add the 'parameters' node
     if ( fnParameterSet->size() > 0 )
     {
-        printf("Function parameter count: %lu\n", fnParameterSet->size());
         bool hasVariadic = false;
         do
         {
@@ -131,6 +129,8 @@ void NFunctionDeclaration::parse(TokenSet &tokenSet, Node &parent)
             }
 
         } while ( fnParameterSet->hasNext() && fnParameterSet->consume(TOKEN_COMMA));
+
+        printf("[NFunctionDeclaration] Function name: %s, parameter count: %zu\n", nstFunctionDecl->functionName->name.c_str(), nstFunctionDecl->arguments.size());
 
         // The parameter parsing ends when no comma is found.
         // If there's still tokens remaining in the set, that means there's an illegal one out there.

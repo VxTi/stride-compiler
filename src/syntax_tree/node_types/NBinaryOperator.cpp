@@ -7,7 +7,7 @@
 
 bool NBinaryOperation::isReducible()
 {
-    // If both nodes of this binary operation are literals,
+    // If both node_types of this binary operation are literals,
     // then this operation is reducible into a single literal.
     if ( this->left->getType() == stride::ast::LITERAL &&
          this->right->getType() == stride::ast::LITERAL )

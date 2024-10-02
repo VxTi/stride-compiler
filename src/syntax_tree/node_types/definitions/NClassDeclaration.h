@@ -26,10 +26,13 @@ private:
     std::vector<NIdentifier *> *parents;
     std::vector<std::string *> *generics;
     NBlock *body;
+    bool isPublic;
 
 public:
 
     NClassDeclaration() :
+            className(""),
+            isPublic(false),
             parents(new std::vector<NIdentifier *>()),
             generics(new std::vector<std::string *>()),
             body(nullptr)

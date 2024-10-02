@@ -36,16 +36,18 @@ NClassDeclaration::~NClassDeclaration()
  */
 void NClassDeclaration::parse(TokenSet &tokens, Node &parent)
 {
-    // First inheritance class
     auto *nstClassDecl = new NClassDeclaration();
+    nstClassDecl->isPublic = tokens.consume(TOKEN_KEYWORD_PUBLIC);
+
     tokens.consumeRequired(TOKEN_KEYWORD_CLASS, "Class declaration requires 'class' keyword.");
     nstClassDecl->className = tokens.consumeRequired(TOKEN_IDENTIFIER,
                                                      "Class inheritance requires parent class name.").value;
 
-    printf("Class name: %s\n", nstClassDecl->className.c_str());
+    printf("[NClassDeclaration] Class name: %s, public: %s\n", nstClassDecl->className.c_str(), nstClassDecl->isPublic ? "true" : "false");
 
     stride::ast::parseGenerics(tokens, *nstClassDecl->generics);
 
+    // First inheritance class
     if ( tokens.consume(TOKEN_KEYWORD_HAS))
     {
         do

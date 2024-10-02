@@ -28,7 +28,8 @@ TokenSet::TokenSet(std::vector<token_t> *tokens, stride::StrideFile *source)
 
 bool TokenSet::end(int fromIndex) const
 {
-    return this->startOffset + fromIndex >= this->tokens->size();
+    return this->startOffset + fromIndex >= this->tokens->size()
+              || fromIndex >= this->length;
 }
 
 bool TokenSet::end() const
@@ -104,7 +105,7 @@ token_t TokenSet::next(int *fromIndex)
 {
     if (end(*fromIndex))
     {
-        this->error("No more tokens in the stream.");
+        this->error("No more tokens in stream.");
     }
 
     token_t entry = ( *this->tokens )[ this->startOffset + *fromIndex ];
