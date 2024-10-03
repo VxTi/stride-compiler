@@ -7,7 +7,15 @@
 
 using namespace stride::ast;
 
-/*void parse(TokenSet &tokenSet, )*/
+/**
+ * Parses a variable declaration.
+ * @param tokenSet The set of tokens to parse.
+ * @param parent The parent node to attach the variable declaration to.
+ */
+void parse(TokenSet &tokenSet, Node &parent)
+{
+    
+}
 
 NVariableDeclaration *
 NVariableDeclaration::parseSingular(TokenSet &tokenSet, bool allowAssignment, bool implicitDeclaration,

@@ -1,6 +1,5 @@
 # Backus-Naur form for Expressions.
 
-
 ```backus-naur-form 
 
 <expression> ::= <literal>

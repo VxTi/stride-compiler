@@ -40,7 +40,7 @@ bool stride::ast::validateVariableType(TokenSet &tokenSet)
         case TOKEN_PRIMITIVE_FLOAT32:
         case TOKEN_PRIMITIVE_FLOAT64:
 
-        case TOKEN_PRIMITIVE_UNKNOWN:
+        case TOKEN_PRIMITIVE_AUTO:
         case TOKEN_PRIMITIVE_VOID:
         case TOKEN_PRIMITIVE_BOOL:
         case TOKEN_PRIMITIVE_CHAR:

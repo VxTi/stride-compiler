@@ -81,7 +81,7 @@ std::vector<token_def_t> token_definitions = {
         gen_token_kw("string", TOKEN_PRIMITIVE_STRING),
         gen_token_kw("char", TOKEN_PRIMITIVE_CHAR),
         gen_token_kw("void", TOKEN_PRIMITIVE_VOID),
-        gen_token_kw("unknown", TOKEN_PRIMITIVE_UNKNOWN),
+        gen_token_kw("auto", TOKEN_PRIMITIVE_AUTO),
         gen_token("i8", TOKEN_PRIMITIVE_INT8),
         gen_token("i16", TOKEN_PRIMITIVE_INT16),
         gen_token("i32", TOKEN_PRIMITIVE_INT32),

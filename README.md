@@ -14,76 +14,15 @@ to be generated yet.
 A syntax example of the language can be found below:
 
 ```
-const externally_invisible: string = "I'm hidden";
-
-define async test(p1: i8, p2: i32, p3: string[]) {}
-
-/*
- * Functions have return type i32 and return 0 by default,
- * if no type or return current is provided.
- *
- * Classes, modules or letiables are isPublic through the 'isPublic' keyword.
- * This allows objects to be exposed to other modules.
- * Below is a representation of how one can write code in this language.
- */
-
-module module0::name {
-
-    // Reference external (C) library function
-    define public external shared_function();
-
-    define f3(const param: i8) {
-        return 0;
-    }
-
-    define fname(letname: i8) {
-        return 0;
-    }
-
-    define ts(letiadic: ...string) {}
-
-    // Enumerables
-    enum ename {
-        MEMBER_0 = 0,
-        MEMBER_1 = 1;
-    }
-}
-
-// Single function sharing
-define public external fname();
-
-// Structures
-struct Structure<A, B> {
-    coordX: A;
-    coordY: B;
-}
-
-// publicly isPublic class
-public class ClassName {
-    define main() {
-    
-       // Automatically gets transformed to 3 by syntax analysis
-       let len: i8 = [0, 1, 2].length;
-    
-       for ( let i: i32 = 0; i < 10; i++) {
-    
-       }
-    
-       return 0;
-    }
-}
-
-public class Secondary {
-    // Define something here
-}
-
-// Inheritance
-public class InheritedClass has Secondary and ClassName {
-    // Do something with the inheritance.
-}
-
+<span style="color:#a00">import</span> <span style="color:#0a0">"external library"</span>;<br><br><span style="color:#a00">define</span> a_function()&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;call_another::function();<br>}<br><br><span style="color:#a00">module</span> Module&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">class</span> Test<T>&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">define</span> <span style="color:#a00">async</span> <span style="color:#a00">public</span> fn(file:&nbsp;io::file,&nbsp;socket:&nbsp;io::socket,&nbsp;timeout_ms:&nbsp;i<span style="color:#00a">32</span>)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b::listen();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}<br><br><span style="color:#a00">public</span> <span style="color:#a00">class</span> First<K,&nbsp;L>&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">const</span> p:&nbsp;K;<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">const</span> l:&nbsp;L;<br>}<br><br><span style="color:#a00">let</span> test:&nbsp;auto&nbsp;=&nbsp;<span style="color:#00a">5</span> +&nbsp;symbol&nbsp;+&nbsp;fn::call(<span style="color:#00a">3</span>,&nbsp;<span style="color:#00a">5</span>)&nbsp;+&nbsp;((<span style="color:#00a">3</span> +&nbsp;<span style="color:#00a">5</span>)&nbsp;?&nbsp;<span style="color:#00a">4</span> :&nbsp;<span style="color:#00a">0</span>);<br><span style="color:#a00">let</span> g:&nbsp;auto&nbsp;=&nbsp;fn::call(test,&nbsp;<span style="color:#00a">0</span>)&nbsp;+&nbsp;<span style="color:#00a">2</span>;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">// subset in function call</span>
+<span style="color:#a00">let</span> k:&nbsp;type::something&nbsp;=&nbsp;test(<span style="color:#a00">null</span>,&nbsp;<span style="color:#00a">2</span>,&nbsp;mod::test());;<br><br><span style="color:#888">// Multiple variable declaration in one line</span>
+<span style="color:#a00">let</span> g:&nbsp;<span style="color:#a00">char</span> =&nbsp;c,<br>&nbsp;&nbsp;&nbsp;&nbsp;h:&nbsp;i<span style="color:#00a">32</span> =&nbsp;<span style="color:#00a">5</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;j:&nbsp;i<span style="color:#00a">32</span> =&nbsp;<span style="color:#00a">5</span>;<br><br><span style="color:#888">// If several variables are declared with 'const',</span>
+<span style="color:#888">// all of them must be initialized and will be constant.</span>
+<span style="color:#a00">const</span> const_g:&nbsp;i<span style="color:#00a">32</span> =&nbsp;<span style="color:#00a">5</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const_h:&nbsp;i<span style="color:#00a">32</span> =&nbsp;<span style="color:#00a">5</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const_j:&nbsp;i<span style="color:#00a">32</span> =&nbsp;<span style="color:#00a">5</span>;<br><br><span style="color:#a00">module</span> Test&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">class</span> TestClass&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">// Something</span>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>}<br><br><span style="color:#a00">struct</span> genericsTest<T,&nbsp;G,&nbsp;B>&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;val:&nbsp;T;<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">const</span> ref:&nbsp;Test::TestClass;<br>}<br><br><span style="color:#a00">struct</span> Vector<T>&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;x:&nbsp;T;<br>&nbsp;&nbsp;&nbsp;&nbsp;y:&nbsp;T;<br>&nbsp;&nbsp;&nbsp;&nbsp;z:&nbsp;T;<br>}<br><br><span style="color:#a00">class</span> Third&nbsp;<span style="color:#a00">has</span> Second&nbsp;<span style="color:#a00">and</span> Test&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">const</span> p:&nbsp;auto&nbsp;=&nbsp;super;<br>}<br><br><span style="color:#888">// Inherits p and l fields</span>
+<span style="color:#a00">class</span> Second<G,&nbsp;B>&nbsp;<span style="color:#a00">has</span> First<i<span style="color:#00a">8</span>,&nbsp;i<span style="color:#00a">32</span>>&nbsp;<span style="color:#a00">and</span> Test<P>&nbsp;{<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">const</span> p<span style="color:#00a">2</span>:&nbsp;auto;<br><br>}<br><br><span style="color:#a00">module</span> outer::inner&nbsp;{<br><br>&nbsp;&nbsp;&nbsp;&nbsp;/**&nbsp;Externally&nbsp;defined&nbsp;C&nbsp;function.&nbsp;*/<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">define</span> <span style="color:#a00">external</span> test();<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">define</span> for_test(upper:&nbsp;i<span style="color:#00a">8</span>)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">for</span> (<span style="color:#a00">let</span> i:&nbsp;i<span style="color:#00a">8</span> =&nbsp;<span style="color:#00a">0</span>;&nbsp;i&nbsp;<&nbsp;upper;&nbsp;i++)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(<span style="color:#0a0">"Hello, World!"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">throw</span> Error(<span style="color:#0a0">"oops"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">define</span> main(args:&nbsp;<span style="color:#a00">string</span>[])&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(<span style="color:#0a0">"Hello, World!"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">define</span> func(test:&nbsp;<span style="color:#a00">string</span>,&nbsp;test<span style="color:#00a">2</span>:&nbsp;...<span style="color:#a00">string</span>)&nbsp;{<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">let</span> k:&nbsp;i<span style="color:#00a">8</span> =&nbsp;<span style="color:#00a">0</span>;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">// Print all variadic arguments</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">for</span> (&nbsp;<span style="color:#a00">const</span> auto&nbsp;str&nbsp;in&nbsp;test<span style="color:#00a">2</span> )&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(str);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">do</span> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(test);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span style="color:#a00">while</span> (++x&nbsp;<&nbsp;<span style="color:#00a">10</span>);<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">try</span> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">throw</span> Error(<span style="color:#0a0">"oops"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span style="color:#a00">catch</span> (e:&nbsp;Error)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(<span style="color:#0a0">"Caught!"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">if</span> (kek)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">try</span> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">let</span> content:&nbsp;<span style="color:#a00">string</span> =&nbsp;io::read_file(<span style="color:#0a0">"/file/path"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">let</span> socket:&nbsp;socket&nbsp;=&nbsp;io::socket::create();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">catch</span> (err:&nbsp;Error)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system::println(<span style="color:#0a0">"Something went wrong"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">let</span> k:&nbsp;i<span style="color:#00a">8</span> =&nbsp;<span style="color:#00a">0</span>;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">let</span> con:&nbsp;socket::connection&nbsp;=&nbsp;socket::create(<span style="color:#0a0">"localhost"</span>,&nbsp;<span style="color:#00a">8080</span>);<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a00">do</span> {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket::<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span style="color:#a00">while</span> (!con::connected());<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>}
 ```
-
 The code shown above is a simple example of how the language syntax is going to
 be. The language is still in development, so there are no guarantees that the
 syntax will remain the same.

@@ -1,18 +1,13 @@
 import "external library";
 
-define test() {
-    fn_call();
-}
-
-define test() {
- // do nothing
+define a_function() {
+    call_another::function();
 }
 
 module Module {
     class Test<T> {
         define async public fn(file: io::file, socket: io::socket, timeout_ms: i32) {
-            b::listen();;;;
-
+            b::listen();
         }
     }
 }
@@ -22,16 +17,22 @@ public class First<K, L> {
     const l: L;
 }
 
-test();;;
-
-let test: unknown = 5 + symbol + fn::call(3, 5) + (3 + 5) ? 4 : 0;
-
-let g: unknown = fn::call(test, 0) + 2;
+let test: auto = 5 + symbol + fn::call(3, 5) + ((3 + 5) ? 4 : 0);
+let g: auto = fn::call(test, 0) + 2;
 
                             // subset in function call
 let k: type::something = test(null, 2, mod::test());;
 
-let g: char = c;;
+// Multiple variable declaration in one line
+let g: char = c,
+    h: i32 = 5,
+    j: i32 = 5;
+
+// If several variables are declared with 'const',
+// all of them must be initialized and will be constant.
+const const_g: i32 = 5,
+      const_h: i32 = 5,
+      const_j: i32 = 5;
 
 module Test {
     class TestClass {
@@ -51,25 +52,24 @@ struct Vector<T> {
 }
 
 class Third has Second and Test {
-    const p: unknown = super;
+    const p: auto = super;
 }
 
 // Inherits p and l fields
 class Second<G, B> has First<i8, i32> and Test<P> {
 
-    const p2: unknown;
+    const p2: auto;
 
 }
 
+module outer::inner {
 
-module test::modulename {
-
+    /** Externally defined C function. */
     define external test();
 
-    define for_test(i: none) {
-        for (let i: i8 = 0; i < 10; i++) {}
-        for (let i: i8 = 0; i < 10; i++) {
-
+    define for_test(upper: i8) {
+        for (let i: i8 = 0; i < upper; i++) {
+            system::println("Hello, World!");
         }
 
         throw Error("oops");
@@ -79,26 +79,23 @@ module test::modulename {
         system::println("Hello, World!");
     }
 
-    define external println(message: string, args: ...string);
-
     define func(test: string, test2: ...string) {
 
         let k: i8 = 0;
 
-        do {
-            // Nothing.
-        } while (k++ < 10);
+        // Print all variadic arguments
+        for ( const auto str in test2 ) {
+            system::println(str);
+        }
 
         do {
-            system::println("Hello, World!");
+            system::println(test);
         } while (++x < 10);
 
         try {
-            system::println("Hello, World!");
+            throw Error("oops");
         } catch (e: Error) {
-            system::println("Hello, World!");;
-
-            throw Error("fuck");
+            system::println("Caught!");
         }
 
         if (kek) {
@@ -113,12 +110,10 @@ module test::modulename {
 
         let k: i8 = 0;
 
-        do {
-            socket::listen();
-        } while (true);
+        let con: socket::connection = socket::create("localhost", 8080);
 
+        do {
+            socket::
+        } while (!con::connected());
      }
 }
-
-let c: char = 'c',
-    d: char = '\'';
