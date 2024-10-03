@@ -113,7 +113,7 @@ module outer::inner {
         let con: socket::connection = socket::create("localhost", 8080);
 
         do {
-            socket::
+            socket::listen();
         } while (!con::connected());
      }
 }
